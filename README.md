@@ -63,6 +63,7 @@ optimization](https://arxiv.org/pdf/1607.01231v3.pdf),"  arXiv preprint arXiv:16
 Algorithm configurations
 ---------
 
+[](
 |Algorithm name in example codes| module | options.sub_mode | other options |
 |---|---|---|
 |SGD|sgd|---|---|
@@ -80,7 +81,9 @@ Algorithm configurations
 |RMSProp|adagrad|'RMSProp'|---|
 |AdaDelta|adagrad|'AdaDelta'|---|
 |Adam|adam|'Adam'|---|
-|AdaMax|adam|'AdaMax'|---|
+|AdaMax|adam|'AdaMax'|---|)
+
+<img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/images/algorithm_table.png" width="800">
 
 - Note that other algorithms could be configurable by selecting other combinations of sub_mode and options. 
 
@@ -247,15 +250,15 @@ Example results of other problems
 
 - Linear regression problem  
 
-<img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/images/linear_reg_results.png" width="750">
+<img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/images/linear_reg_results.png" width="800">
 
 - Softmax classifier problem
 
-<img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/images/soft_class_results.png" width="750">
+<img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/images/soft_class_results.png" width="800">
 
 - Linear SVM problem
 
-<img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/images/linear_svm_results.png" width="750">
+<img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/images/linear_svm_results.png" width="800">
 <br /><br />
 
 License

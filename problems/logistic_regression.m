@@ -68,8 +68,8 @@ function [Problem] = logistic_regression(x_train, y_train, x_test, y_test, lambd
     function h = hess(w, indices)
         
         %org code
-        %temp_save = exp(-1*(y_train(indices)').*(x_train(:,indices)'*w));
-        %b = temp_save ./ (1+temp_save);
+        %temp = exp(-1*(y_train(indices)').*(x_train(:,indices)'*w));
+        %b = temp ./ (1+temp);
         %h = 1/length(indices)*x_train(:,indices)*(diag(b-b.^2)*(x_train(:,indices)'))+lambda*eye(d); 
         
         sigm_val = sigmoid(y_train(indices).*(w'*x_train(:,indices)));
