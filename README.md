@@ -83,7 +83,7 @@ Algorithm configurations
 |Adam|adam|'Adam'|---|
 |AdaMax|adam|'AdaMax'|---|)
 
-<img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/images/algorithm_table.png" width="800">
+<img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/images/algorithm_table.png" width="900">
 
 - Note that other algorithms could be configurable by selecting other combinations of sub_mode and options. 
 
@@ -112,13 +112,13 @@ Folders and files
 - problems
     - Condins definition files to be solved.
 
-- samples
+- examples
     - Some helpful test sample scipts to use this package.
 
 - plotting
     - Contains plotting tools to show convergence results and various plots.
                   
-- tools
+- tool
     - Some utility tools for this project.
                   
                               
@@ -250,15 +250,15 @@ Example results of other problems
 
 - Linear regression problem  
 
-<img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/images/linear_reg_results.png" width="800">
+<img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/images/linear_reg_results.png" width="900">
 
 - Softmax classifier problem
 
-<img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/images/soft_class_results.png" width="800">
+<img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/images/soft_class_results.png" width="900">
 
 - Linear SVM problem
 
-<img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/images/linear_svm_results.png" width="800">
+<img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/images/linear_svm_results.png" width="900">
 <br /><br />
 
 License
