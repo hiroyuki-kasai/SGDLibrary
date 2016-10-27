@@ -48,7 +48,7 @@ International Conference on Artificial Intelligence and Statistics (AISTATS), pp
     - Damp-oBFGS-Inf (Regularized damped oBFGS, Infinite memory) (denoted as "SDBFGS" in the paper below.)
         - X. Wang, S. Ma, D. Goldfarb and W. Liu, "[Stochastic quasi-Newton methods for nonconvex stochastic 
 optimization](https://arxiv.org/pdf/1607.01231v3.pdf),"  arXiv preprint arXiv:1607.01231, 2016.
-- **Adagrad variants**
+- **AdaGrad variants**
     - AdaGrad (Adaptive gradient algorithm)
         - J. Duchi, E. Hazan and Y. Singer, "[Adaptive subgradient methods for online learning and stochastic optimization](http://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf)," Journal of Machine Learning Research, 12, pp. 2121-2159, 2011.
     - AdaDelta
@@ -279,4 +279,4 @@ If you have any problems or questions, please contact the author: [Hiroyuki Kasa
 Release Notes
 --------------
 
-* Version 1.0.0 (Oct. 28, 2016): First version.
+* Version 1.0.0 (Oct. 27, 2016): First version.
