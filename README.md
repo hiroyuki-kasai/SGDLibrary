@@ -241,7 +241,7 @@ display_classification_result(problem, {'SGD', 'SVRG'}, {w_sgd, w_svrg}, ...
 
 * Output results 
 
-<img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/images/log_reg_results.png" width="750">
+<img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/images/log_reg_results.png" width="900">
 <br /><br />
 
 
