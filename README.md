@@ -106,16 +106,16 @@ Folders and files
 - demo.m
     - A demonstration scipt to check and understand this package easily. 
                       
-- solvers
+- solver
     - Contains various stochastic optimization algorithms.
 
-- problems
+- problem
     - Condins definition files to be solved.
 
-- examples
+- example
     - Some helpful test sample scipts to use this package.
 
-- plotting
+- plotter
     - Contains plotting tools to show convergence results and various plots.
                   
 - tool
