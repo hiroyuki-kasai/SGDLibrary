@@ -6,7 +6,7 @@ cd solver/;
 addpath(genpath(pwd));
 cd ..;
 
-cd problems/;
+cd problem/;
 addpath(genpath(pwd));
 cd ..;
 
@@ -14,11 +14,11 @@ cd tool/;
 addpath(genpath(pwd));
 cd ..;
 
-cd plotting/;
+cd plotter/;
 addpath(genpath(pwd));
 cd ..;
 
-cd examples/;
+cd example/;
 addpath(genpath(pwd));
 cd ..;
 
