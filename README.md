@@ -266,7 +266,7 @@ Example results of other problems
 Convergence behavior animation example (Linear regression problem)
 ----------------------------
 
-**"test_convergence_animation_demo.m"** provides you an illustration of convergence behaviors of algorithms.
+**"test_convergence_animation_demo.m"** provides you an animation of convergence behaviors of algorithms. Please click the image below to see its animation.
 
 [<img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/images/convergence_anime_screenshot.png" width="900">](https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/gifs/convergence_anime_s.gif)
 <br /><br />
