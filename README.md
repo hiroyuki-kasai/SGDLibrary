@@ -3,9 +3,9 @@
 
 Authors: [Hiroyuki Kasai](http://www.kasailab.com/)
 
-Last Page Update: Oct. 27, 2016
+Last Page Update: Oct. 28, 2016
 
-Latest Library Version: 1.0.0 (see Release Notes for more info)
+Latest Library Version: 1.0.1 (see Release notes for more info)
 
 Introduction
 ----------
@@ -296,4 +296,9 @@ If you have any problems or questions, please contact the author: [Hiroyuki Kasa
 Release Notes
 --------------
 
-* Version 1.0.0 (Oct. 27, 2016): First version.
+* Version 1.0.1 (Oct. 28, 2016)
+    - SS-SVRG (Subsampled Hessian algorithm followed by SVT) is added.
+    - Convergence behavior animation function is added.
+* Version 1.0.0 (Oct. 27, 2016)
+    - Initial version.
+
