@@ -268,7 +268,7 @@ Convergence behavior animation example (Linear regression problem)
 
 **"test_convergence_animation_demo.m"** provides you an illustration of convergence behaviors of algorithms.
 
-<img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/gifs/convergence_anime_s.gif" width="900">
+[<img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/images/convergence_anime_screenshot.png" width="900">](https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/gifs/convergence_anime_s.gif)
 <br /><br />
 
 - Note that this plotting function is executable when only the dimension of the parameters is 2.
