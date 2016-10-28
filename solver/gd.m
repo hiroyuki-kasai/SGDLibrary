@@ -61,6 +61,12 @@ function [w, infos] = gd(problem, options)
     else
         f_sol = options.f_sol;
     end    
+    
+    if ~isfield(options, 'store_sol')
+        store_sol = false;
+    else
+        store_sol = options.store_sol;
+    end    
 
     
     % initialise
@@ -79,6 +85,9 @@ function [w, infos] = gd(problem, options)
     grad = problem.grad(w, indices);
     gnorm = norm(grad);
     infos.gnorm = gnorm;
+    if store_sol
+        infos.w = w;       
+    end
     
     % set start time
     start_time = tic();    
@@ -109,7 +118,10 @@ function [w, infos] = gd(problem, options)
         infos.grad_calc_count = [infos.grad_calc_count epoch*n];      
         infos.optgap = [infos.optgap optgap];        
         infos.cost = [infos.cost f_val];
-        infos.gnorm = [infos.gnorm gnorm];        
+        infos.gnorm = [infos.gnorm gnorm]; 
+        if store_sol
+            infos.w = [infos.w w];         
+        end        
        
         % print info
         if verbose

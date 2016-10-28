@@ -245,6 +245,7 @@ display_classification_result(problem, {'SGD', 'SVRG'}, {w_sgd, w_svrg}, ...
 <br /><br />
 
 
+
 Example results of other problems
 ----------------------------
 
@@ -260,6 +261,17 @@ Example results of other problems
 
 <img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/images/linear_svm_results.png" width="900">
 <br /><br />
+
+
+Convergence behavior animation example (Linear regression problem)
+----------------------------
+
+**"test_convergence_animation_demo.m"** provides you an illustration of convergence behaviors of algorithms.
+
+<img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/gifs/convergence_anime_s.gif" width="900">
+<br /><br />
+
+- Note that this plotting function is executable when only the dimension of the parameters is 2.
 
 License
 -------

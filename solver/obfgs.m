@@ -149,6 +149,12 @@ function [w, infos] = obfgs(problem, options)
         verbose = options.verbose;
     end
     
+    if ~isfield(options, 'store_sol')
+        store_sol = false;
+    else
+        store_sol = options.store_sol;
+    end     
+    
     
     % initialize
     total_iter = 0;
@@ -172,6 +178,9 @@ function [w, infos] = obfgs(problem, options)
     optgap = f_val - f_sol;
     infos.optgap = optgap;
     infos.cost = f_val;
+    if store_sol
+        infos.w = w;       
+    end      
     
     % set start time
     start_time = tic();
@@ -279,6 +288,9 @@ function [w, infos] = obfgs(problem, options)
         infos.grad_calc_count = [infos.grad_calc_count grad_calc_count];
         infos.optgap = [infos.optgap optgap];
         infos.cost = [infos.cost f_val];
+        if store_sol
+            infos.w = [infos.w w];         
+        end           
 
         % display infos
         if verbose > 0

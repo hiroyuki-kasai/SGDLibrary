@@ -97,7 +97,7 @@ function [w, infos] = adagrad(problem, options)
     end
     
     if ~isfield(options, 'epsilon')
-        epsilon = 0.0000001;
+        epsilon = 1e-8;
     else
         epsilon = options.epsilon;
     end     
@@ -120,6 +120,12 @@ function [w, infos] = adagrad(problem, options)
         verbose = options.verbose;
     end
     
+    if ~isfield(options, 'store_sol')
+        store_sol = false;
+    else
+        store_sol = options.store_sol;
+    end     
+    
     
     % initialize
     total_iter = 0;
@@ -134,7 +140,10 @@ function [w, infos] = adagrad(problem, options)
     else % 'AdaDelta'
         r = zeros(d, 1);
         s = zeros(d, 1);        
-    end    
+    end   
+    if store_sol
+        infos.w = w;       
+    end     
 
     % store first infos
     clear infos;
@@ -145,6 +154,9 @@ function [w, infos] = adagrad(problem, options)
     optgap = f_val - f_sol;
     infos.optgap = optgap;
     infos.cost = f_val;
+    if store_sol
+        infos.w = w;       
+    end        
     
     % set start time
     start_time = tic();
@@ -224,6 +236,9 @@ function [w, infos] = adagrad(problem, options)
         infos.grad_calc_count = [infos.grad_calc_count grad_calc_count];
         infos.optgap = [infos.optgap optgap];
         infos.cost = [infos.cost f_val];
+        if store_sol
+            infos.w = [infos.w w];         
+        end          
 
         % display infos
         if verbose > 0
