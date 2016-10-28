@@ -29,10 +29,13 @@ List of the algorithms available in SGDLibrary
     - SQN (stochastic quasi-Newton)
         - R. H. Byrd, ,S. L. Hansen J. Nocedal, and Y. Singer, "[A stochastic quasi-Newton method 
 for large-scale optimization](http://epubs.siam.org/doi/abs/10.1137/140954362?journalCode=sjope8)," SIAM Journal on Optimization, vol. 26, Issue 2, pp. 1008-1031, 2016.
-    - SVRG SQN (denoted as "Stochastic L-BFGS" or "slbfgs" in the paper below.)
+    - SVRG-SQN (denoted as "Stochastic L-BFGS" or "slbfgs" in the paper below.)
         - P. Moritz, R. Nishihara and M. I. Jordan, "[A linearly-convergent stochastic L-BFGS Algorithm](http://www.jmlr.org/proceedings/papers/v51/moritz16.html)," International Conference on Artificial Intelligence and Statistics (AISTATS), pp.249-258, 2016.
-    - SVRG LBFGS (denoted as "SVRG+II: LBFGS" in the paper below.)
+    - SVRG-LBFGS (denoted as "SVRG+II: LBFGS" in the paper below.)
         - R. Kolte, M. Erdogdu and A. Ozgur, "[Accelerating SVRG via second-order information](http://www.opt-ml.org/papers/OPT2015_paper_41.pdf)," OPT2015, 2015.
+    - SS-SVRG (denoted as "SVRG+I: Subsampled Hessian followed by SVT" in the paper below.)
+        - R. Kolte, M. Erdogdu and A. Ozgur, "[Accelerating SVRG via second-order information](http://www.opt-ml.org/papers/OPT2015_paper_41.pdf)," OPT2015, 2015.
+
     - oBFGS-Inf (Online BFGS, Infinite memory)
         - N. N. Schraudolph, J. Yu and Simon Gunter, "[A stochastic quasi-Newton method for online convex optimization
 ](http://www.jmlr.org/proceedings/papers/v2/schraudolph07a/schraudolph07a.pdf)," 
@@ -73,6 +76,7 @@ Algorithm configurations
 |SQN|slbfgs|'SQN'|---|
 |SVRG-SQN|slbfgs|'SVRG-SQN'|---|
 |SVRG-LBFGS|slbfgs|'SVRG-LBFGS'|---|
+|SS-SVRG|subsamp_svrg|---|---|
 |oBFGS-Inf|obfgs|'Inf-mem'|---|
 |oLBFGS-Lim|obfgs|'Lim-mem'|---|
 |Reg-oBFGS-Inf|obfgs|'Inf-mem'|regularized=true|
@@ -81,7 +85,8 @@ Algorithm configurations
 |RMSProp|adagrad|'RMSProp'|---|
 |AdaDelta|adagrad|'AdaDelta'|---|
 |Adam|adam|'Adam'|---|
-|AdaMax|adam|'AdaMax'|---|)
+|AdaMax|adam|'AdaMax'|---|
+)
 
 <img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/images/algorithm_table.png" width="900">
 

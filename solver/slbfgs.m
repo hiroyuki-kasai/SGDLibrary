@@ -241,10 +241,9 @@ function [w, infos] = slbfgs(problem, options)
             u_new = u_new + w/L;
 
             % update LBFGS vectors Hessian at every L iteration for 'SQN' or 'SVRG-SQN'
-            %if(mod(total_iter,L)==0)                   % Paper complient
             if(mod(total_iter,L)==0 && total_iter)                 
                 
-                % subsampled Hessian
+                % calcluate Hessian-vector product using subsamples
                 sub_indices = datasample((1:n),batch_hess_size);
                 % calculate hessian
                 %H = problem.hess(w, sub_indices);

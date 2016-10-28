@@ -6,7 +6,7 @@ function  test_softmax_classifier()
 
     %% Set algorithms
     % Note that 'Reg-oBFGS-Inf', 'oBFGS-Inf' and 'Damp-oBFGS-Inf' do not work due to memory limitation.
-    % Note that 'SQN','SVRG-SQN' and 'SVRG-LBFGS' are not suppoted. 
+    % Note that 'SQN','SVRG-SQN','SVRG-LBFGS' and 'SS-SVRG' are not suppoted. 
     if 0
         all_algorithms = {'GD','SGD','SVRG','SAG','SAGA', ...
                          'oBFGS-Lim','Reg-oBFGS-Lim','Damp-oBFGS-Lim', ...

@@ -6,7 +6,7 @@ function  test_logistic_regression()
 
     %% Set algorithms
     if 0
-        all_algorithms = {'GD','SGD','SVRG','SAG','SAGA','SQN','SVRG-SQN','SVRG-LBFGS', ...
+        all_algorithms = {'GD','SGD','SVRG','SAG','SAGA','SQN','SVRG-SQN','SVRG-LBFGS','SS-SVRG', ...
                          'oBFGS-Inf','oBFGS-Lim','Reg-oBFGS-Inf','Reg-oBFGS-Lim','Damp-oBFGS-Inf','Damp-oBFGS-Lim', ...
                          'AdaGrad','RMSProp','AdaDelta','Adam','AdaMax'};
         algorithms = all_algorithms;                   
@@ -16,9 +16,9 @@ function  test_logistic_regression()
     
     
     %% prepare dataset
-    if 0
+    if 1
         % generate synthtic data        
-        d = 3;
+        d = 10;
         n = 100;
         data = logistic_regression_data_generator(n, d);
         x_train = data.x_train;
@@ -241,7 +241,21 @@ function  test_logistic_regression()
                 options.sub_mode = 'SVRG-LBFGS';
                 options.mem_size = 20;
 
-                [w_list{alg_idx}, info_list{alg_idx}] = slbfgs(problem, options);                     
+                [w_list{alg_idx}, info_list{alg_idx}] = slbfgs(problem, options);      
+                
+            case {'SS-SVRG'}                  
+ 
+                options.batch_size = batch_size;
+                options.batch_hess_size = batch_size * 20;        
+                options.step = 0.0005 * options.batch_size;
+                options.step_alg = 'fix';
+                r = d-1; 
+                if r < 1
+                    r = 1;
+                end
+                options.r = r;
+
+                [w_list{alg_idx}, info_list{alg_idx}] = subsamp_svrg(problem, options);                      
 
             case {'oBFGS-Inf'} 
 
