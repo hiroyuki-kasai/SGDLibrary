@@ -8,7 +8,7 @@ function [w, infos] = gd(problem, options)
 %       w           solution of w
 %       infos       information
 %
-% This file is part of SGDLibrary.
+% This file is part of GDLibrary and SGDLibrary.
 %
 % Created by H.Kasai on Feb. 15, 2016
 % Modified by H.Kasai on Oct. 25, 2016
@@ -18,6 +18,7 @@ function [w, infos] = gd(problem, options)
     d = problem.dim();
     n = problem.samples();  
 
+
     % extract options
     if ~isfield(options, 'step')
         step_init = 0.1;
@@ -26,11 +27,17 @@ function [w, infos] = gd(problem, options)
     end
     step = step_init;
     
+    if ~isfield(options, 'step_alg')
+        step_alg = 'backtracking';
+    else
+        step_alg  = options.step_alg;
+    end  
+   
     if ~isfield(options, 'tol_optgap')
         tol_optgap = 1.0e-12;
     else
         tol_optgap = options.tol_optgap;
-    end
+    end      
     
     if ~isfield(options, 'tol_gnorm')
         tol_gnorm = 1.0e-12;
@@ -67,11 +74,31 @@ function [w, infos] = gd(problem, options)
     else
         store_sol = options.store_sol;
     end    
+    
+    if ~isfield(options, 'sub_mode')
+        sub_mode = 'STANDARD';
+    else
+        sub_mode = options.sub_mode;
+    end  
+    
+    if ~isfield(options, 'S')
+        S = eye(d);
+    else
+        S = options.S;
+    end  
+    
+    ls_options.sub_mode = sub_mode;    
+    if strcmp(sub_mode, 'STANDARD')
+        %
+    elseif strcmp(sub_mode, 'SCALING')
+        ls_options.S = S;
+    else
+        %
+    end    
 
     
     % initialise
     epoch = 0;
-    indices = 1:problem.samples();    
     
     % store first infos
     clear infos;
@@ -82,7 +109,7 @@ function [w, infos] = gd(problem, options)
     infos.cost = f_val;     
     optgap = f_val - f_sol;
     infos.optgap = optgap;
-    grad = problem.grad(w, indices);
+    grad = problem.full_grad(w);
     gnorm = norm(grad);
     infos.gnorm = gnorm;
     if store_sol
@@ -95,12 +122,22 @@ function [w, infos] = gd(problem, options)
     % main loop
     while (optgap > tol_optgap) && (gnorm > tol_gnorm) && (epoch < max_epoch)        
 
-        % calculate gradient
-        grad = problem.grad(w, indices);
+        % line search
+        if strcmp(step_alg, 'backtracking')
+            rho = 1/2;
+            c = 1e-4;
+            step = backtracking_line_search(problem, -grad, w, rho, c);
+        elseif strcmp(step_alg, 'exact')
+            step = exact_line_search(problem, 'GD', -grad, [], [], w, ls_options);
+        else
+        end
         
         % update w
-        w = w - step * grad;
+        w = w - step * S * grad;
         
+        % calculate gradient
+        grad = problem.full_grad(w);
+
         % update epoch        
         epoch = epoch + 1;
         % calculate error

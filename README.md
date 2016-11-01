@@ -3,13 +3,13 @@
 
 Authors: [Hiroyuki Kasai](http://www.kasailab.com/)
 
-Last Page Update: Oct. 28, 2016
+Last page update: November 1, 2016
 
-Latest Library Version: 1.0.1 (see Release notes for more info)
+Latest library version: 1.0.2 (see Release notes for more info)
 
 Introduction
 ----------
-The SGDLibrary is a **pure-Matlab** library of a collection of stochastic optimization algorithms. This solves an unconstrained minimization problem of the form, min f(x) = sum_i f_i(x).
+The SGDLibrary is a **pure-Matlab** library of a collection of **stochastic optimization algorithms**. This solves an unconstrained minimization problem of the form, min f(x) = sum_i f_i(x).
 
 
 
@@ -62,6 +62,10 @@ optimization](https://arxiv.org/pdf/1607.01231v3.pdf),"  arXiv preprint arXiv:16
         - D. Kingma and J. Ba, "[Adam: A method for stochastic optimization](http://arxiv.org/pdf/1412.6980.pdf)," International Conference for Learning Representation (ICLR), 2015.
     - AdaMax
         - D. Kingma and J. Ba, "[Adam: A method for stochastic optimization](http://arxiv.org/pdf/1412.6980.pdf)," International Conference for Learning Representation (ICLR), 2015.
+- **Else**
+    - SVRG-BB (stochastic variance reduced gradient with Barzilai-Borwein)
+        - C. Tan, S. Ma, Y. Dai, Y. Qian, "[Barzilai-Borwein step size for stochastic gradient descent](https://arxiv.org/pdf/1605.04131v2.pdf)," NIPS, 2016.
+
 
 Algorithm configurations
 ---------
@@ -86,6 +90,7 @@ Algorithm configurations
 |AdaDelta|adagrad|'AdaDelta'|---|
 |Adam|adam|'Adam'|---|
 |AdaMax|adam|'AdaMax'|---|
+|SVRG-BB|svrg_bb|---|---|
 )
 
 <img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/images/algorithm_table.png" width="900">
@@ -225,10 +230,10 @@ y_pred_svrg(y_pred_svrg==1) = 1;
 %% plot all
 
 % display cost vs grads
-display_graph('cost', {'SGD', 'SVRG'}, {w_sgd, w_svrg}, {info_list_sgd, info_list_svrg});
+display_graph('grad_calc_count','cost', {'SGD', 'SVRG'}, {w_sgd, w_svrg}, {info_list_sgd, info_list_svrg});
 
 % display optimality gap vs grads
-display_graph('optimality_gap', {'SGD', 'SVRG'}, {w_sgd, w_svrg}, {info_list_sgd, info_list_svrg});
+display_graph('grad_calc_count','optimality_gap', {'SGD', 'SVRG'}, {w_sgd, w_svrg}, {info_list_sgd, info_list_svrg});
 
 % convert from {1,-1} to {1,2}
 y_train(y_train==-1) = 2;
@@ -296,6 +301,8 @@ If you have any problems or questions, please contact the author: [Hiroyuki Kasa
 Release Notes
 --------------
 
+* Version 1.0.2 (Nov. 01, 2016)
+    - SVRG-BB (SVRG with Barzilai-Borwein) is added.
 * Version 1.0.1 (Oct. 28, 2016)
     - SS-SVRG (Subsampled Hessian algorithm followed by SVT) is added.
     - Convergence behavior animation function is added.

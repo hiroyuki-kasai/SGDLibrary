@@ -35,7 +35,7 @@ function  demo()
     
     
     %% calculate solution 
-    w_star = problem.calc_solution(problem, 10000, 0.01);
+    w_star = problem.calc_solution(problem, 1000, 0.01);
      
 
     %% general options for optimization algorithms   
@@ -84,9 +84,9 @@ function  demo()
     
     %% plot all
     % display cost vs grads
-    display_graph('cost', {'SGD', 'SVRG'}, {w_sgd, w_svrg}, {info_list_sgd, info_list_svrg});
+    display_graph('grad_calc_count','cost', {'SGD', 'SVRG'}, {w_sgd, w_svrg}, {info_list_sgd, info_list_svrg});
     % display optimality gap vs grads
-    display_graph('optimality_gap', {'SGD', 'SVRG'}, {w_sgd, w_svrg}, {info_list_sgd, info_list_svrg});
+    display_graph('grad_calc_count','optimality_gap', {'SGD', 'SVRG'}, {w_sgd, w_svrg}, {info_list_sgd, info_list_svrg});
     % convert from {1,-1} to {1,2}
     y_train(y_train==-1) = 2;
     y_train(y_train==1) = 1;

@@ -72,6 +72,13 @@ function Problem = softmax_regression(x_train, y_train, x_test, y_test, lambda, 
         
     end
 
+    Problem.full_grad = @full_grad;
+    function g = full_grad(w)
+        
+        g = grad(w, 1:n_train);
+        
+    end
+
     Problem.hess = @hess; % To Do
     function h = hess(w, indices)
         
@@ -110,7 +117,8 @@ function Problem = softmax_regression(x_train, y_train, x_test, y_test, lambda, 
         options.max_epoch = maxiter;
         options.verbose = true;
         options.tol_optgap = 1.0e-24;        
-        options.tol_gnorm = 1.0e-16;        
+        options.tol_gnorm = 1.0e-16;
+        options.step_alg = 'backtracking';        
         [w_star,~] = gd(problem, options);
         
     end

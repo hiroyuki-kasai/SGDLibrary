@@ -340,10 +340,10 @@ function  test_logistic_regression()
     %% plot all
     close all;
     % display cost vs grads
-    display_graph('cost', algorithms, w_list, info_list);
+    display_graph('grad_calc_count','cost', algorithms, w_list, info_list);
     % display optimality gap vs grads
     if options.f_sol ~= -Inf
-        display_graph('optimality_gap', algorithms, w_list, info_list);
+        display_graph('grad_calc_count','optimality_gap', algorithms, w_list, info_list);
     end
     
     % display classification results

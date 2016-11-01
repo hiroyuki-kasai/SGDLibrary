@@ -64,6 +64,13 @@ function [Problem] = logistic_regression(x_train, y_train, x_test, y_test, lambd
         
     end
 
+    Problem.full_grad = @full_grad;
+    function g = full_grad(w)
+        
+        %g = -sum(ones(d,1) * y_train.*x_train * (ones(1,n_train)-sigmoid(y_train.*(w'*x_train)))',2)/n_train+ lambda * w;
+        g = grad(w, 1:n_train);
+    end
+
     Problem.hess = @hess; 
     function h = hess(w, indices)
         
@@ -114,6 +121,7 @@ function [Problem] = logistic_regression(x_train, y_train, x_test, y_test, lambd
         options.verbose = true;
         options.tol_optgap = 1.0e-24;
         options.tol_gnorm = 1.0e-16;
+        options.step_alg = 'backtracking';
         [w_star,~] = gd(problem, options);
         
     end

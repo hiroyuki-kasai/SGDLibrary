@@ -264,7 +264,7 @@ function [w, infos] = obfgs(problem, options)
                     y_array(:,1) = [];
                 end                
             else
-                % update  Hessian approximation
+                % update Hessian approximation
                 B = B + (r*r')/(s'*r) - (B*s*s'*B)/(s'*B*s) + delta*speye(d);
             end           
             
