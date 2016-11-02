@@ -29,13 +29,10 @@ function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, inf
         if ~isempty(info_list{alg_idx})
             alg_num = alg_num + 1;  
             
-            if strcmp(x_category, 'numofgrad')
+            if strcmp(x_category, 'grad_calc_count')
                 x_plot_data = info_list{alg_idx}.grad_calc_count;
             elseif strcmp(x_category, 'epoch')
                 x_plot_data = info_list{alg_idx}.epoch;    
-            elseif strcmp(x_category, 'grad_calc_count')
-                x_plot_data = info_list{alg_idx}.grad_calc_count; 
-            else
             end
             
             
