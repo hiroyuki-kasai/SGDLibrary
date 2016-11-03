@@ -1,4 +1,4 @@
-function [  ] = draw_convergence_animation(problem, algorithms_list, w_history, max_epoch, speed)
+function [  ] = draw_convergence_animation(problem, algorithms_list, w_history, max_epoch, varargin)
 % Draw convergence animation.
 %
 % Inputs:
@@ -10,7 +10,14 @@ function [  ] = draw_convergence_animation(problem, algorithms_list, w_history, 
 % This file is part of SGDLibrary.
 %
 % Created by H.Kasai on Oct. 28, 2016
+% Modified by H.Kasai on Mov. 02, 2016
 
+
+    if nargin < 5
+        speed = 0.5;
+    else
+        speed = varargin{1};
+    end
 
     % check the nunber of dimensions
     if problem.dim() > 2
@@ -78,7 +85,7 @@ function [  ] = draw_convergence_animation(problem, algorithms_list, w_history, 
     end
     len_max = max(len_array);   
     
-    pause(3)    
+    pause(5)    
 
     % show plot
     for iter=1:len_max

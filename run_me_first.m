@@ -18,7 +18,7 @@ cd plotter/;
 addpath(genpath(pwd));
 cd ..;
 
-cd example/;
+cd test/;
 addpath(genpath(pwd));
 cd ..;
 

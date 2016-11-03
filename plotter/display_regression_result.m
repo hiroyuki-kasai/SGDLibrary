@@ -1,9 +1,9 @@
-function [ ] = display_regression_result(problem, w_star, algorithms_list, w_list, y_pred_list, mse_list, x_train, y_train, x_test, y_test)
+function [ ] = display_regression_result(problem, w_opt, algorithms_list, w_list, y_pred_list, mse_list, x_train, y_train, x_test, y_test)
 % Display results of regression problem.
 %
 % Inputs:
 %       problem             function (cost/grad/hess)
-%       w_star              solution
+%       w_opt              solution
 %       algorithms_list     algorithms to be evaluated
 %       w_list              solution produced by each algorithm
 %       y_pred_list         predicted results produced by each algorithm
@@ -44,7 +44,7 @@ function [ ] = display_regression_result(problem, w_star, algorithms_list, w_lis
             plot(x_train(1,:), y_train, 'go');  hold on     
 
             % solution line
-            y_star_pred_line = w_star' * x_test; 
+            y_star_pred_line = w_opt' * x_test; 
             plot(x_test(1,:),  y_star_pred_line, 'bo'); hold on              
 
             % prediction line        
@@ -79,7 +79,7 @@ function [ ] = display_regression_result(problem, w_star, algorithms_list, w_lis
             plot3(x_train(1,:),x_train(2,:), y_train, 'go'); hold on
 
             % solution line
-            y_star_pred_line = w_star' * x_test; 
+            y_star_pred_line = w_opt' * x_test; 
             plot3(x_test(1,:), x_test(2,:), y_star_pred_line, 'bo'); hold on    
 
             % prediction line        

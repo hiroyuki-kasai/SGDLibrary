@@ -1,4 +1,4 @@
-function [Problem] = logistic_regression(x_train, y_train, x_test, y_test, lambda)
+function [Problem] = logistic_regression(x_train, y_train, x_test, y_test, varargin)
 % This file defines logistic regression (binary classifier) problem
 %
 % Inputs:
@@ -20,10 +20,17 @@ function [Problem] = logistic_regression(x_train, y_train, x_test, y_test, lambd
 % "w" is the model parameter of size d vector.
 %
 %
-% This file is part of SGDLibrary.
+% This file is part of GDLibrary and SGDLibrary.
 %
 % Created by H.Kasai on Feb. 17, 2016
 % Modified by H.Kasai on Oct. 25, 2016
+
+
+    if nargin < 5
+        lambda = 0.1;
+    else
+        lambda = varargin{1};
+    end
 
     d = size(x_train, 1);
     n_train = length(y_train);
@@ -71,6 +78,13 @@ function [Problem] = logistic_regression(x_train, y_train, x_test, y_test, lambd
         g = grad(w, 1:n_train);
     end
 
+    Problem.ind_grad = @ind_grad;
+    function g = ind_grad(w, indices)
+         
+        g = -ones(d,1) * y_train(indices).*x_train(:,indices) * diag(ones(1,length(indices))-sigmoid(y_train(indices).*(w'*x_train(:,indices))))+ lambda* repmat(w, [1 length(indices)]);
+         
+    end
+
     Problem.hess = @hess; 
     function h = hess(w, indices)
         
@@ -82,6 +96,13 @@ function [Problem] = logistic_regression(x_train, y_train, x_test, y_test, lambd
         sigm_val = sigmoid(y_train(indices).*(w'*x_train(:,indices)));
         c = sigm_val .* (ones(1,length(indices))-sigm_val); 
         h = 1/length(indices)* x_train(:,indices) * diag(y_train(indices).^2 .* c) * x_train(:,indices)'+lambda*eye(d);
+        
+    end
+
+    Problem.full_hess = @full_hess; 
+    function h = full_hess(w)
+        
+        h = hess(w, 1:n_train);
         
     end
 
@@ -114,15 +135,14 @@ function [Problem] = logistic_regression(x_train, y_train, x_test, y_test, lambd
     end
 
     Problem.calc_solution = @calc_solution;
-    function w_star = calc_solution(problem, maxiter, stepsize)
+    function w_opt = calc_solution(problem, maxiter)
         
-        options.step = stepsize;
-        options.max_epoch = maxiter;
+        options.max_iter = maxiter;
         options.verbose = true;
         options.tol_optgap = 1.0e-24;
         options.tol_gnorm = 1.0e-16;
         options.step_alg = 'backtracking';
-        [w_star,~] = gd(problem, options);
+        [w_opt,~] = gd(problem, options);
         
     end
 

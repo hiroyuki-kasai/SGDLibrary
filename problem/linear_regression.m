@@ -20,7 +20,7 @@ function Problem = linear_regression(x_train, y_train, x_test, y_test, lambda)
 % "w" is the model parameter of size d vector.
 %
 %
-% This file is part of SGDLibrary.
+% This file is part of GDLibrary and SGDLibrary.
 %
 % Created by H.Kasai on Feb. 17, 2016
 % Modified by H.Kasai on Oct. 25, 2016
@@ -56,10 +56,25 @@ function Problem = linear_regression(x_train, y_train, x_test, y_test, lambda)
         
     end
 
+    Problem.ind_grad = @ind_grad;
+    function g = ind_grad(w, indices)
+ 
+        residual = w'*x_train(:,indices)-y_train(indices);
+        g = x_train(:,indices) * diag(residual) + lambda* repmat(w, [1 length(indices)]);
+         
+    end
+
     Problem.hess = @hess; 
     function h = hess(w, indices)
         
         h = 0.5/length(indices) * x_train(:,indices) * (x_train(:,indices)') + lambda * eye(d);
+        
+    end
+
+    Problem.full_hess = @full_hess; 
+    function h = full_hess(w)
+        
+        h = hess(w, 1:n_train);
         
     end
 
@@ -83,15 +98,14 @@ function Problem = linear_regression(x_train, y_train, x_test, y_test, lambda)
     end
 
     Problem.calc_solution = @calc_solution;
-    function w_star = calc_solution(problem, maxiter, stepsize)
+    function w_opt = calc_solution(problem, maxiter)
         
-        options.step = stepsize;
-        options.max_epoch = maxiter;
+        options.max_iter = maxiter;
         options.verbose = true;
         options.tol_optgap = 1.0e-16;        
-        options.tol_gnorm = 1.0e-16;        
-        options.step_alg = 'backtracking';        
-        [w_star,~] = gd(problem, options);
+        options.tol_gnorm = 1.0e-16;  
+        options.step_alg = 'backtracking';
+        [w_opt,~] = gd(problem, options);
         
     end
 

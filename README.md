@@ -3,9 +3,9 @@
 
 Authors: [Hiroyuki Kasai](http://www.kasailab.com/)
 
-Last page update: November 1, 2016
+Last page update: November 04, 2016
 
-Latest library version: 1.0.2 (see Release notes for more info)
+Latest library version: 1.0.3 (see Release notes for more info)
 
 Introduction
 ----------
@@ -13,14 +13,14 @@ The SGDLibrary is a **pure-Matlab** library of a collection of **stochastic opti
 
 
 
-List of the algorithms available in SGDLibrary
----------
+## <a name="supp_solver"> List of the algorithms available in SGDLibrary </a>
+
 - **SGD** (stochastic gradient descent)
     - H. Robbins and S. Monro, "[A stochastic approximation method](https://www.jstor.org/stable/pdf/2236626.pdf)," The annals of mathematical statistics, vol. 22, no. 3, pp. 400-407, 1951.
     - L. Bottou, "[Online learning and stochastic approximations](http://leon.bottou.org/publications/pdf/online-1998.pdf)," Edited by David Saad, Cambridge University Press, Cambridge, UK, 1998.
 - **Variance reduction variants**
     - SVRG (stochastic variance reduced gradient)
-        - R. Johnson and T. Zhang, "[Accelerating sstochastic gradient descent using predictive variance reduction](http://papers.nips.cc/paper/4937-accelerating-stochastic-gradient-descent-using-predictive-variance-reduction.pdf)," NIPS, 2013.
+        - R. Johnson and T. Zhang, "[Accelerating stochastic gradient descent using predictive variance reduction](http://papers.nips.cc/paper/4937-accelerating-stochastic-gradient-descent-using-predictive-variance-reduction.pdf)," NIPS, 2013.
     - SAG (stochastic average gradient)
         - N. L. Roux, M. Schmidt, and F. R. Bach, "[A stochastic gradient method with an exponential convergence rate for finite training sets](https://papers.nips.cc/paper/4633-a-stochastic-gradient-method-with-an-exponential-convergence-_rate-for-finite-training-sets.pdf)," NIPS, 2012.
     - SAGA
@@ -67,31 +67,31 @@ optimization](https://arxiv.org/pdf/1607.01231v3.pdf),"  arXiv preprint arXiv:16
         - C. Tan, S. Ma, Y. Dai, Y. Qian, "[Barzilai-Borwein step size for stochastic gradient descent](https://arxiv.org/pdf/1605.04131v2.pdf)," NIPS, 2016.
 
 
-Algorithm configurations
----------
+## Algorithm configurations
 
-[](
+
+
 |Algorithm name in example codes| module | options.sub_mode | other options |
 |---|---|---|
-|SGD|sgd|---|---|
-|SVRG|svrg|---|---|
-|SAG|sag|'SAG'|---|
-|SAGA|sag|'SAGA'|---|
-|SQN|slbfgs|'SQN'|---|
-|SVRG-SQN|slbfgs|'SVRG-SQN'|---|
-|SVRG-LBFGS|slbfgs|'SVRG-LBFGS'|---|
-|SS-SVRG|subsamp_svrg|---|---|
-|oBFGS-Inf|obfgs|'Inf-mem'|---|
-|oLBFGS-Lim|obfgs|'Lim-mem'|---|
+|SGD|sgd|||
+|SVRG|svrg|||
+|SAG|sag|'SAG'||
+|SAGA|sag|'SAGA'||
+|SQN|slbfgs|'SQN'||
+|SVRG-SQN|slbfgs|'SVRG-SQN'||
+|SVRG-LBFGS|slbfgs|'SVRG-LBFGS'||
+|SS-SVRG|subsamp_svrg|||
+|oBFGS-Inf|obfgs|'Inf-mem'||
+|oLBFGS-Lim|obfgs|'Lim-mem'||
 |Reg-oBFGS-Inf|obfgs|'Inf-mem'|regularized=true|
 |Damp-oBFGS-Inf|obfgs|'Inf-mem'|regularized=true & damped=true|
-|AdaGrad|adagrad|'AdaGrad'|---|
-|RMSProp|adagrad|'RMSProp'|---|
-|AdaDelta|adagrad|'AdaDelta'|---|
-|Adam|adam|'Adam'|---|
-|AdaMax|adam|'AdaMax'|---|
-|SVRG-BB|svrg_bb|---|---|
-)
+|AdaGrad|adagrad|'AdaGrad'||
+|RMSProp|adagrad|'RMSProp'||
+|AdaDelta|adagrad|'AdaDelta'||
+|Adam|adam|'Adam'||
+|AdaMax|adam|'AdaMax'||
+|SVRG-BB|svrg_bb|||
+
 
 <img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/images/algorithm_table.png" width="900">
 
@@ -99,13 +99,15 @@ Algorithm configurations
 
 
 
-Supported problems
----------
+## <a name="supp_pro"> Supported problems </a>
+
 * Multidimensional linear regression
 * Linear SVM
 * Logistic regression
 * Softmax classification (multinomial logistic regression)
     - Note that softmax classification problem does not support Hessian-vector product type algorithms, i.e., SQN, SVRG-SQN and SVRG-LBFGS.
+
+
 
 Folders and files
 ---------
@@ -113,22 +115,22 @@ Folders and files
 - run_me_first.m
     - The scipt that you need to run first.
 
-- demo.m
-    - A demonstration scipt to check and understand this package easily. 
+- demo.m and demo_ext.m
+    - Demonstration scripts to check and understand this package easily. 
                       
-- solver
+- solver/
     - Contains various stochastic optimization algorithms.
 
-- problem
-    - Condins definition files to be solved.
+- problem/
+    - Problem definition files to be solved.
 
-- example
-    - Some helpful test sample scipts to use this package.
+- test/
+    - Some helpful test test scripts to use this package.
 
-- plotter
+- plotter/
     - Contains plotting tools to show convergence results and various plots.
                   
-- tool
+- tool/
     - Some utility tools for this project.
                   
                               
@@ -141,9 +143,11 @@ Run the setup script "**run_me_first.m**" for path configurations.
 run_me_first; 
 ```
 
-Usage example (logistic regression problem)
+Simplest usage example: 4 steps!
 ----------------------------
-Now, you just execute "**demo.m**" for demonstration of this package.
+
+Just execute `demo` for the simplest demonstration of this package. This is the case of logistic regression problem.
+
 ```Matlab
 %% Execute the demonstration script
 demo; 
@@ -151,103 +155,132 @@ demo;
 
 The "**demo.m**" file contains below.
 ```Matlab
-%% generate synthtic data        
+%% generate synthetic data        
 % set number of dimensions
 d = 3;
 % set number of samples    
-n = 100;
+n = 300;
 % generate data
 data = logistic_regression_data_generator(n, d);
-% set train data
-x_train = data.x_train;
-y_train = data.y_train;  
-% set test data
-x_test = data.x_test;
-y_test = data.y_test;            
-% set lambda 
-lambda = 0.1;
+
 
 %% define problem definitions
-problem = logistic_regression(x_train, y_train, x_test, y_test, lambda); 
+problem = logistic_regression(data.x_train, data.y_train, data.x_test, data.y_test); 
 
 
-%% calculate solution 
-w_star = problem.calc_solution(problem, 10000, 0.01);
+%% perform algorithms SGD and SVRG 
+options.w_init = data.w_init;
+options.step_init = 0.01;       
+[w_sgd, info_sgd] = sgd(problem, options);  
+[w_svrg, info_svrg] = svrg(problem, options);
 
 
-%% general options for optimization algorithms   
-% generate initial point
-options.w_init = randn(d,1);
-% set iteration optimality gap tolerance
-options.tol_optgap = -Inf;
-% set max epoch
-options.max_epoch = 100;
-% set verbose mode
-options.verbose = true;
-% set regularization parameter    
-options.lambda = lambda;
-% set solution
-options.f_sol = problem.cost(w_star);
-% set batch sizse    
-options.batch_size = 10;
-% set stepsize algorithm and stepsize
-options.step_alg = 'fix';
-options.step = 0.005;     
+%% display cost/optimality gap vs number of gradient evaluations
+display_graph('grad_calc_count','cost', {'SGD', 'SVRG'}, {w_sgd, w_svrg}, {info_sgd, info_svrg});
 
+```
 
+<br />
+Let take a closer look at the codes above bit by bit. The procedure has only **4 steps**!
 
-%% perform algorithms SGD
-[w_sgd, info_list_sgd] = sgd(problem, options);  
+1. **Generate data**
 
+First, we generate datasets including train set and test set using a data generator function `logistic_regression_data_generator()`. 
+The output include train set and test set and an initial value of the solution `w`.
+```Matlab    
+d = 3;
+n = 300;
+data = logistic_regression_data_generator(n, d);
+```
+
+1. **Define problem**
+
+The problem to be solved should be defined properly from the [supported problems](#supp_pro). `logistic_regression()` provides the comprehensive 
+functions for a logistic regression problem. This returns the cost value by `cost(w)`, the gradient by `grad(w)` and the hessian by `hess(w)` when given `w`. 
+These are essential for any gradient descent algorithms.
+```Matlab
+problem = logistic_regression(data.x_train, data.y_train, data.x_test, data.y_test); 
+```
+
+1. **Perform solver**
+
+Now, you can perform optimization solvers, i.e., SGD and SVRG, calling [solver functions](#supp_solver), i.e., `sgd()` function and `svrg()` function after setting some optimization options. 
+```Matlab
+options.w_init = data.w_init;
+options.step_init = 0.01;  
+[w_sgd, info_sgd] = sgd(problem, options);  
+[w_svrg, info_svrg] = svrg(problem, options);
+```
+They return the final solutions of `w` and the statistics information that include the histories of epoch numbers, cost values, norms of gradient, the number of gradient evaluations and so on.
+
+1. **Show result**
+
+Finally, `display_graph()` provides output results of decreasing behavior of the cost values in terms of the number of gradient evaluations. 
+Note that each algorithm needs different number of evaluations of samples in each epoch. Therefore, it is common to use this number to evaluate stochastic optimization algorithms instead of the number of iterations.
+```Matlab
+display_graph('grad_calc_count','cost', {'SGD', 'SVRG'}, {w_sgd, w_svrg}, {info_sgd, info_svrg});
+```
+
+That's it!
+
+More plots
+----------------------------
+
+"**demo_ext.m**" gives you more plots.
+
+- **Demonstration of "optimality gap"**
+
+For the calculation of "optimality gap", you need optimal solution `w_opt` beforehand by calling `calc_solution()` function of the problem definition function. 
+```Matlab
+%% calculate optimal solution for optimality gap
+w_opt = problem.calc_solution(problem, 1000);
+options.f_opt = problem.cost(w_opt);
+```
+
+This case uses the full gradient descent solve `gd()` to obtain an optimal solution under max iteration 1000 with very precise tolerant stopping condition.
+
+Then, you obtain the result of optimality gap by `display_graph()`. 
+```Matlab
+display_graph('grad_calc_count','optimality_gap', {'SGD', 'SVRG'}, {w_sgd, w_svrg}, {info_sgd, info_svrg});    
+```
+
+- **Demonstration of "classification accuracy"**
+
+Additionally, in this case of logistic regression, the results of classification accuracy are calculated using the corresponding prediction function `prediction()` and `accuracy` of the problem definition function `logistic_regression()`. 
+Furthermore, the classification accuracies are illustrated by `display_classification_result()` function that is written in "**demo.m**" like below;
+```Matlab
+%% calculate classification accuracy
+% for SGD
 % predict
 y_pred_sgd = problem.prediction(w_sgd);
 % calculate accuracy
 accuracy_sgd = problem.accuracy(y_pred_sgd); 
 fprintf('Classificaiton accuracy: %s: %.4f\n', 'SGD', accuracy_sgd);
-
 % convert from {1,-1} to {1,2}
 y_pred_sgd(y_pred_sgd==-1) = 2;
-y_pred_sgd(y_pred_sgd==1) = 1;
+y_pred_sgd(y_pred_sgd==1) = 1; 
 
-
-
-%% perform algorithms SVRG
-[w_svrg, info_list_svrg] = svrg(problem, options);  
-
-% predict
+% for SVRG
+% predict    
 y_pred_svrg = problem.prediction(w_svrg);
-
 % calculate accuracy
 accuracy_svrg = problem.accuracy(y_pred_svrg); 
 fprintf('Classificaiton accuracy: %s: %.4f\n', 'SVRG', accuracy_svrg);
-
 % convert from {1,-1} to {1,2}
 y_pred_svrg(y_pred_svrg==-1) = 2;
 y_pred_svrg(y_pred_svrg==1) = 1;
 
 
-
-%% plot all
-
-% display cost vs grads
-display_graph('grad_calc_count','cost', {'SGD', 'SVRG'}, {w_sgd, w_svrg}, {info_list_sgd, info_list_svrg});
-
-% display optimality gap vs grads
-display_graph('grad_calc_count','optimality_gap', {'SGD', 'SVRG'}, {w_sgd, w_svrg}, {info_list_sgd, info_list_svrg});
-
+%% display classification results 
 % convert from {1,-1} to {1,2}
-y_train(y_train==-1) = 2;
-y_train(y_train==1) = 1;
-y_test(y_test==-1) = 2;
-y_test(y_test==1) = 1;  
+data.y_train(data.y_train==-1) = 2;
+data.y_train(data.y_train==1) = 1;
+data.y_test(data.y_test==-1) = 2;
+data.y_test(data.y_test==1) = 1;  
+% display results
+display_classification_result(problem, {'SGD', 'SVRG'}, {w_sgd, w_svrg}, {y_pred_sgd, y_pred_svrg}, {accuracy_sgd, accuracy_svrg}, data.x_train, data.y_train, data.x_test, data.y_test);    
+ ```   
 
-% display classification results    
-display_classification_result(problem, {'SGD', 'SVRG'}, {w_sgd, w_svrg}, ...
-                                {y_pred_sgd, y_pred_svrg}, {accuracy_sgd, accuracy_svrg}, ...
-                                x_train, y_train, x_test, y_test);    
-
-
-```
 
 * Output results 
 
@@ -255,6 +288,22 @@ display_classification_result(problem, {'SGD', 'SVRG'}, {w_sgd, w_svrg}, ...
 <br /><br />
 
 
+- **Demonstration of "convergence animation"**
+
+You need specify additional options before executing solvers.
+
+```Matlab
+%% set options for convergence animation
+options.max_epoch = 100;    
+options.store_w = true;
+ ```  
+
+Then, `draw_convergence_animation()` draws a convergence animation. Note that `draw_convergence_animation()` is executable when only the dimension of the parameters is 2.
+
+```Matlab
+%% display convergence animation
+draw_convergence_animation(problem, {'SGD', 'SVRG'}, {info_sgd.w, info_svrg.w}, options.max_epoch);   
+ ``` 
 
 Example results of other problems
 ----------------------------
@@ -281,7 +330,7 @@ Convergence behavior animation example (Linear regression problem)
 [<img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/images/convergence_anime_screenshot.png" width="900">](https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/gifs/convergence_anime_new.gif)
 <br /><br />
 
-- Note that this plotting function is executable when only the dimension of the parameters is 2.
+
 
 License
 -------
@@ -290,7 +339,7 @@ The SGDLibrary is free and open source for academic/research purposes (non-comme
 
 Notes
 -------
-- As always, parameters such as the stepsize should be configured properly in eash algorithm and each problem. 
+- As always, parameters such as the step size should be configured properly in each algorithm and each problem. 
 - Softmax classification problem does not support "Hessian-vector product" type algorithms, i.e., SQN, SVRG-SQN and SVRG-LBFGS.
 
 
@@ -301,6 +350,8 @@ If you have any problems or questions, please contact the author: [Hiroyuki Kasa
 Release Notes
 --------------
 
+* Version 1.0.3 (Nov. 04, 2016)
+    - Modify many items. 
 * Version 1.0.2 (Nov. 01, 2016)
     - SVRG-BB (SVRG with Barzilai-Borwein) is added.
 * Version 1.0.1 (Oct. 28, 2016)

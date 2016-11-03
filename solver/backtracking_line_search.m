@@ -17,9 +17,6 @@ function [ alpha ] = backtracking_line_search(problem, p, x, rho, c)
 %
 %       Algorithm 3.1 in Section 3.1.
 %
-%       sub_mode    'PRELIM'    Algorithm 5.1
-%       sub_mode    'STANDARD'  Algorithm 5.2
-%       sub_mode    'PRECON'    Algorithm 5.3
 %
 % This file is part of GDLibrary.
 %
@@ -33,6 +30,7 @@ function [ alpha ] = backtracking_line_search(problem, p, x, rho, c)
     x = x + alpha * p;
     fk = problem.cost(x);
     
+    % repeat until the Armijo condition meets
     while fk > f0 + c * alpha * (g0'*p)
       alpha = rho * alpha;
       x = x0 + alpha * p;

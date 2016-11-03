@@ -32,10 +32,10 @@ function [w, infos] = adagrad(problem, options)
     n = problem.samples();
     
     % extract options
-    if ~isfield(options, 'step')
+    if ~isfield(options, 'step_init')
         step_init = 0.1;
     else
-        step_init = options.step;
+        step_init = options.step_init;
     end
     step = step_init;
     
@@ -64,14 +64,14 @@ function [w, infos] = adagrad(problem, options)
     end        
 
     if ~isfield(options, 'batch_size')
-        batch_size = 1;
+        batch_size = 10;
     else
         batch_size = options.batch_size;
     end
     num_of_bachces = floor(n / batch_size);        
     
     if ~isfield(options, 'max_epoch')
-        max_epoch = inf;
+        max_epoch = 100;
     else
         max_epoch = options.max_epoch;
     end 
@@ -102,10 +102,10 @@ function [w, infos] = adagrad(problem, options)
         epsilon = options.epsilon;
     end     
     
-    if ~isfield(options, 'f_sol')
-        f_sol = -Inf;
+    if ~isfield(options, 'f_opt')
+        f_opt = -Inf;
     else
-        f_sol = options.f_sol;
+        f_opt = options.f_opt;
     end     
     
     if ~isfield(options, 'permute_on')
@@ -120,10 +120,10 @@ function [w, infos] = adagrad(problem, options)
         verbose = options.verbose;
     end
     
-    if ~isfield(options, 'store_sol')
-        store_sol = false;
+    if ~isfield(options, 'store_w')
+        store_w = false;
     else
-        store_sol = options.store_sol;
+        store_w = options.store_w;
     end     
     
     
@@ -141,7 +141,7 @@ function [w, infos] = adagrad(problem, options)
         r = zeros(d, 1);
         s = zeros(d, 1);        
     end   
-    if store_sol
+    if store_w
         infos.w = w;       
     end     
 
@@ -151,10 +151,10 @@ function [w, infos] = adagrad(problem, options)
     infos.time = 0;    
     infos.grad_calc_count = grad_calc_count;
     f_val = problem.cost(w);
-    optgap = f_val - f_sol;
+    optgap = f_val - f_opt;
     infos.optgap = optgap;
     infos.cost = f_val;
-    if store_sol
+    if store_w
         infos.w = w;       
     end        
     
@@ -228,7 +228,7 @@ function [w, infos] = adagrad(problem, options)
         epoch = epoch + 1;
         % calculate optgap
         f_val = problem.cost(w);
-        optgap = f_val - f_sol;        
+        optgap = f_val - f_opt;        
 
         % store infos
         infos.iter = [infos.iter epoch];
@@ -236,7 +236,7 @@ function [w, infos] = adagrad(problem, options)
         infos.grad_calc_count = [infos.grad_calc_count grad_calc_count];
         infos.optgap = [infos.optgap optgap];
         infos.cost = [infos.cost f_val];
-        if store_sol
+        if store_w
             infos.w = [infos.w w];         
         end          
 

@@ -1,107 +1,111 @@
-function  test_softmax_classifier()
-        
+function  test_convergence_animation_demo()
+
     clc;
     clear;
     close all;
 
+
     %% Set algorithms
-    % Note that 'Reg-oBFGS-Inf', 'oBFGS-Inf' and 'Damp-oBFGS-Inf' do not work due to memory limitation.
-    % Note that 'SQN','SVRG-SQN','SVRG-LBFGS' and 'SS-SVRG' are not suppoted. 
     if 0
-        all_algorithms = {'GD','SGD','SVRG','SAG','SAGA', ...
-                         'oBFGS-Lim','Reg-oBFGS-Lim','Damp-oBFGS-Lim', ...
-                         'AdaGrad','RMSProp','AdaDelta','Adam','AdaMax'};
-        algorithms = all_algorithms;                   
+        algorithms = solver_list('ALL');  
     else
-        algorithms = {'SGD','SVRG','Adam'};        
-    end
+        algorithms = {'SGD','SVRG','SQN','SVRG-LBFGS','Damp-oBFGS-Lim','AdaGrad'};
+    end      
     
-    if ismember('Reg-oBFGS-Inf', algorithms) || ismember('oBFGS-Inf', algorithms) || ismember('Damp-oBFGS-Inf', algorithms)
-        fprintf('Reg-oBFGS-Inf, oBFGS-Inf and Damp-oBFGS-Inf do not work properly due to memory limitation. \nPlease reconfigure proper algorithms, and execute this script again.\nThank you.\n');
-        return;
-    end    
-    
-    if ismember('SQN', algorithms) || ismember('SVRG-SQN', algorithms) || ismember('SVRG-LBFGS', algorithms)
-        fprintf('SQN, SVRG-SQN and SVRG-LBFGS are not supported in this problem. \nPlease reconfigure proper algorithms, and execute this script again.\nThank you.\n');
-        return;
-    end
-    
-    
+
+     
     %% prepare dataset
     if 1
-        n_per_class = 100;    % # of samples        
-        d = 3;      % # of dimensions     
-        l = 5;      % # of classes 
-        std = 0.15; % standard deviation
+        n = 100;
+        d = 1;
+        std = 0.55;
+        
+        % generate data
+        data = linear_regression_data_generator(n, d, std);
+        % set train data        
+        x_train = data.x_train;
+        y_train = data.y_train;  
+        % set test data        
+        x_test = data.x_test;
+        y_test = data.y_test;     
+        % set solution
+        w_opt = pinv(x_train * x_train') * x_train * y_train'
+        % for intersect  
+        d = d + 1;
+        % set lambda         
+        lambda = 0.01;   
 
-        data = multiclass_data_generator(n_per_class, d, l, std);  
-        n = length(data.y_train);
+        % define problem definitions
+        problem = linear_regression(x_train, y_train, x_test, y_test, lambda);            
+        
+    elseif 0
+        n = 300;        
+        d = 2;
+
+        % generate data
+        data = logistic_regression_data_generator(n, d);
+        % set train data
+        x_train = data.x_train;
+        y_train = data.y_train;  
+        % set test data
+        x_test = data.x_test;
+        y_test = data.y_test; 
+        % set solution        
+        w_opt = data.w_opt;    
+        % set lambda 
+        lambda = 0.1;
+    
+        % define problem definitions
+        problem = logistic_regression(x_train, y_train, x_test, y_test, lambda);   
+        
+    else
+        l = 2;
+        n = 100;    % # of samples per class           
+        d = 1;      % # of dimensions
+        std = 0.15; % standard deviation        
+        
+        % generate data        
+        data = multiclass_data_generator(n, d, l, std);
         d = d + 1; % adding '1' row for intersect
         
         % train data        
-        x_train = [data.x_train; ones(1,n)];
-        % transform class label into label logical matrix
-        y_train = zeros(l,n);
-        for j=1:n
-            y_train(data.y_train(j),j) = 1;
-        end        
-
+        x_train = [data.x_train; ones(1,l*n)];
+        % assign y (label) {1,-1}
+        y_train(data.y_train<=1.5) = -1;
+        y_train(data.y_train>1.5) = 1;
         % test data
-        x_test = [data.x_test; ones(1,n)];
-        % transform class label into label logical matrix
-        y_test = zeros(l,n);
-        for j=1:n
-            y_test(data.y_test(j),j) = 1;
-        end     
+        x_test = [data.x_test; ones(1,l*n)];
+        % assign y (label) {1,-1}        
+        y_test(data.y_test<=1.5) = -1;
+        y_test(data.y_test>1.5) = 1;
+        % set solution              
+        w_opt = zeros(d,1);          
+        % set lambda         
+        lambda = 0.1;
+ 
+        % define problem definitions
+        problem = linear_svm(x_train, y_train, x_test, y_test, lambda);    
         
-        lambda = 0.0001;
-        w_star = zeros(d*l,1);            
-        
-    else
-        % load real-world data
-        data = importdata('../data/mnist/6000_data_0.001.mat');
-        x_train = data.x_trn;
-        y_train = data.y_trn; 
-        x_test = data.x_tst;
-        y_test= data.y_tst;         
-        d = size(x_train,1);
-        n = length(y_train);
-        lambda = data.lambda;
-        
-        w_star = data.w_star;
-        l = data.L;
     end
     
-    % set plot_flag
-    if d > 4
-        plot_flag = false;  % too high dimension  
-    else
-        plot_flag = true;
-    end       
 
-    
-    %% define problem definitions
-    problem = softmax_regression(x_train, y_train, x_test, y_test, lambda, l);
-
-   
     %% initialize
-    w_init = randn(d*l,1);
+    w_init = randn(d,1);
     batch_size = 10;
     w_list = cell(length(algorithms),1);
     info_list = cell(length(algorithms),1);
-    algname_list = cell(length(algorithms),1);    
-    
+
     
     %% calculate solution
-    if norm(w_star)
+    if norm(w_opt)
     else
         % calculate solution
-        w_star = problem.calc_solution(problem, 1000, 2);
+        w_opt = problem.calc_solution(problem, 1000);
     end
-    f_sol = problem.cost(w_star); 
-    fprintf('f_sol: %.24e\n', f_sol);   
+    f_opt = problem.cost(w_opt); 
+    fprintf('f_opt: %.24e\n', f_opt);       
     
-
+    
     %% perform algorithms
     for alg_idx=1:length(algorithms)
         fprintf('\n\n### [%02d] %s ###\n\n', alg_idx, algorithms{alg_idx});
@@ -114,19 +118,23 @@ function  test_softmax_classifier()
         options.verbose = true;
         options.lambda = lambda;
         options.permute_on = 1; 
-        options.f_sol = f_sol;
+        options.f_opt = problem.cost(w_opt);
+        options.store_w = true;
         
+
         switch algorithms{alg_idx}
             case {'GD'}
                 
-                options.step = 2;
-                options.max_epoch = 30 * options.max_epoch;
+                options.step = 0.1;
+                options.max_epoch = 10 * options.max_epoch;
                 [w_list{alg_idx}, info_list{alg_idx}] = gd(problem, options);
+
+                w_opt = w_list{alg_idx};
 
             case {'SGD'} 
 
                 options.batch_size = batch_size;
-                options.step = 0.01 * options.batch_size;
+                options.step = 0.001 * options.batch_size;
                 %options.step_alg = 'decay';
                 options.step_alg = 'fix';
 
@@ -136,7 +144,7 @@ function  test_softmax_classifier()
             case {'SVRG'}
                 
                 options.batch_size = batch_size;
-                options.step = 0.5 * options.batch_size;
+                options.step = 0.01 * options.batch_size;
                 options.step_alg = 'fix';
 
                 [w_list{alg_idx}, info_list{alg_idx}] = svrg(problem, options);      
@@ -145,26 +153,27 @@ function  test_softmax_classifier()
                 
                 options.batch_size = batch_size;
                 %options.step = 0.00005 * options.batch_size;
-                options.step = 0.0001 * options.batch_size;
+                options.step = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
+                options.sub_mode = 'SAG';                   
 
-                [w_list{alg_idx}, info_list{alg_idx}] = sag(problem, options);   
+                [w_list{alg_idx}, info_list{alg_idx}] = sag(problem, options);
                 
             case {'SAGA'}
                 
                 options.batch_size = batch_size;
                 %options.step = 0.00005 * options.batch_size;
-                options.step = 0.0001 * options.batch_size;
+                options.step = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'SAGA';                       
 
-                [w_list{alg_idx}, info_list{alg_idx}] = sag(problem, options);                  
+                [w_list{alg_idx}, info_list{alg_idx}] = sag(problem, options);                   
                 
             % AdaGrad variants                
             case {'AdaGrad'}
                 
                 options.batch_size = batch_size;
-                options.step = 0.01 * options.batch_size;
+                options.step = 0.05 * options.batch_size;
                 options.step_alg = 'fix';
                 options.epsilon = 0.00001;
                 options.sub_mode = 'AdaGrad';        
@@ -185,7 +194,7 @@ function  test_softmax_classifier()
             case {'AdaDelta'}                  
     
                 options.batch_size = batch_size;
-                options.step = 0.01 * options.batch_size;
+                options.step = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.epsilon = 0.00001;
 
@@ -224,30 +233,55 @@ function  test_softmax_classifier()
 
                 options.batch_size = batch_size;
                 options.batch_hess_size = batch_size * 20;        
-                options.step = 0.00001 * options.batch_size;
+                options.step = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'SQN';        
-                options.l = 20;
-                options.r = 20;
+                options.L = 20;
+                options.mem_size = 20;
 
                 [w_list{alg_idx}, info_list{alg_idx}] = slbfgs(problem, options);
 
-            case {'SLBFGS-SVRG'}                  
+            case {'SVRG-SQN'}                  
  
                 options.batch_size = batch_size;
                 options.batch_hess_size = batch_size * 20;        
-                options.step = 0.0001 * options.batch_size;
+                options.step = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
-                options.sub_mode = 'SVRG';
-                options.l = 20;
-                options.r = 20;
+                options.sub_mode = 'SVRG-SQN';
+                options.L = 20;
+                options.mem_size = 20;
 
                 [w_list{alg_idx}, info_list{alg_idx}] = slbfgs(problem, options);
+                
+            case {'SVRG-LBFGS'}                  
+ 
+                options.batch_size = batch_size;
+                options.batch_hess_size = batch_size * 20;        
+                options.step = 0.001 * options.batch_size;
+                options.step_alg = 'fix';
+                options.sub_mode = 'SVRG-LBFGS';
+                options.mem_size = 20;
+
+                [w_list{alg_idx}, info_list{alg_idx}] = slbfgs(problem, options);   
+                
+            case {'SS-SVRG'}                  
+ 
+                options.batch_size = batch_size;
+                options.batch_hess_size = batch_size * 20;        
+                options.step = 0.0005 * options.batch_size;
+                options.step_alg = 'fix';
+                r = d-1; 
+                if r < 1
+                    r = 1;
+                end
+                options.r = r;
+
+                [w_list{alg_idx}, info_list{alg_idx}] = subsamp_svrg(problem, options);                      
 
             case {'oBFGS-Inf'} 
 
                 options.batch_size = batch_size;
-                options.step = 0.0001 * options.batch_size;
+                options.step = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Inf-mem';
                 options.regularized = false;
@@ -260,7 +294,7 @@ function  test_softmax_classifier()
                 options.step = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Lim-mem';
-                options.r = 20;
+                options.mem_size = 20;
                 options.regularized = false;        
 
                 [w_list{alg_idx}, info_list{alg_idx}] = obfgs(problem, options);
@@ -268,7 +302,7 @@ function  test_softmax_classifier()
             case {'Reg-oBFGS-Inf'}
 
                 options.batch_size = batch_size;
-                options.step = 0.0001 * options.batch_size;
+                options.step = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Inf-mem';
                 options.regularized = true;  
@@ -279,38 +313,39 @@ function  test_softmax_classifier()
             case {'Reg-oBFGS-Lim'}
 
                 options.batch_size = batch_size;
-                options.step = 0.00000001 * options.batch_size;
+                options.step = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Lim-mem';
-                options.r = 20;
+                options.mem_size = 20;
                 options.regularized = true;  
                 options.delta = 0.1;     
 
                 [w_list{alg_idx}, info_list{alg_idx}] = obfgs(problem, options);
                 
-            case {'Damp-oBFGS-Inf'}
+            case {'Damp-oBFGS-Inf'} % SDBFGS
 
                 options.batch_size = batch_size;
-                options.step = 0.0001 * options.batch_size;
+                options.step = 0.005 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Inf-mem';
                 options.regularized = true;  
                 options.delta = 0.1;
-                options.damping = true;
+                options.damped = true;
 
-                [w_list{alg_idx}, info_list{alg_idx}] = obfgs(problem, options);         
+                [w_list{alg_idx}, info_list{alg_idx}] = obfgs(problem, options);  
+                
                 
             case {'Damp-oBFGS-Lim'}
 
                 options.batch_size = batch_size;
-                options.step = 0.001 * options.batch_size;
+                options.step = 0.005 * options.batch_size;
                 options.step_alg = 'fix';
-                options.sub_mode = 'Inf-Lim';
+                options.sub_mode = 'Lim-mem';
                 options.regularized = true;  
                 options.delta = 0.1;
-                options.damping = true;
+                options.damped = true;
 
-                [w_list{alg_idx}, info_list{alg_idx}] = obfgs(problem, options);                     
+                [w_list{alg_idx}, info_list{alg_idx}] = obfgs(problem, options);                    
 
             otherwise
                 warn_str = [algorithms{alg_idx}, ' is not supported.'];
@@ -319,40 +354,26 @@ function  test_softmax_classifier()
                 info_list{alg_idx} = '';                
         end
         
-        algname_list{alg_idx} = algorithms{alg_idx};
     end
-    
-    fprintf('\n\n');
-
     
     
     %% plot all
     close all;
     % display cost vs grads
-    display_graph('grad_calc_count','cost', algorithms, w_list, info_list);
+    %display_graph('grad_calc_count','cost', algorithms, w_list, info_list);
     % display optimality gap vs grads
-    if options.f_sol ~= -Inf
-        display_graph('grad_calc_count','optimality_gap', algorithms, w_list, info_list);
+    if options.f_opt ~= -Inf
+        %display_graph('grad_calc_count','optimality_gap', algorithms, w_list, info_list);
     end
     
-    % display classification results
-    y_pred_list = cell(length(algorithms),1);
-    accuracy_list = cell(length(algorithms),1);    
+    % draw convergence animation
+    w_history = cell(1,1);
     for alg_idx=1:length(algorithms)    
-        % predict class
-        y_pred_list{alg_idx} = problem.prediction(w_list{alg_idx});
-        % calculate accuracy
-        accuracy_list{alg_idx} = problem.accuracy(y_pred_list{alg_idx}); 
-        fprintf('Classificaiton accuracy: %s: %.4f\n', algorithms{alg_idx}, accuracy_list{alg_idx});        
-    end      
-
-    % convert logial matrix to class label vector
-    [~, y_train] = max(y_train, [], 1);
-    [~, y_test] = max(y_test, [], 1);    
-    if plot_flag
-        display_classification_result(problem, algorithms, w_list, y_pred_list, accuracy_list, x_train, y_train, x_test, y_test);  
+        w_history{alg_idx} = info_list{alg_idx}.w;
     end
-    
+    speed = 0.5;
+    draw_convergence_animation(problem, algorithms, w_history, options.max_epoch, speed);    
+
 end
 
 

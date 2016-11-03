@@ -23,7 +23,7 @@ function Problem = softmax_regression(x_train, y_train, x_test, y_test, lambda, 
 % "w" is the 'vectorized' model parameter of size d x num_class matrix.
 %
 %
-% This file is part of SGDLibrary.
+% This file is part of GDLibrary and SGDLibrary.
 %
 % Created by H.Kasai on Feb. 17, 2016
 % Modified by H.Kasai on Oct. 25, 2016
@@ -111,13 +111,12 @@ function Problem = softmax_regression(x_train, y_train, x_test, y_test, lambda, 
     end
 
     Problem.calc_solution = @calc_solution;
-    function w_star = calc_solution(problem, maxiter, stepsize)
+    function w_star = calc_solution(problem, maxiter)
         
-        options.step = stepsize;
-        options.max_epoch = maxiter;
+        options.max_iter = maxiter;
         options.verbose = true;
         options.tol_optgap = 1.0e-24;        
-        options.tol_gnorm = 1.0e-16;
+        options.tol_gnorm = 1.0e-16;    
         options.step_alg = 'backtracking';        
         [w_star,~] = gd(problem, options);
         

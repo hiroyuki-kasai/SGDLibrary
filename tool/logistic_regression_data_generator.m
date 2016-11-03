@@ -10,20 +10,20 @@ function [data] = logistic_regression_data_generator(n, d)
 %       data.y_train    train data of y.
 %       data.x_test     test data of x.
 %       data.y_test     test data of y.
-%       data.w_star     solusion.
+%       data.w_opt      solusion.
 %
 % This file is part of SGDLibrary.
 %
 % Created H.Kasai on Oct. 25, 2016
 
     % true
-    w_star = randn(d, 1);  
-    %w_star = 0.5 * ones(d, 1);
-    data.w_star = w_star;    
+    w_opt = randn(d, 1);  
+    %w_opt = 0.5 * ones(d, 1);
+    data.w_opt = w_opt;    
 
     % train data
     x1 = 20 * randn(d, n);
-    y1 = rand(1, n) < sigmoid(w_star' * x1);
+    y1 = rand(1, n) < sigmoid(w_opt' * x1);
     y1 = 2*y1 - 1;
     assert(sum(y1 == 1) + sum(y1 == -1) == n);
 
@@ -32,12 +32,13 @@ function [data] = logistic_regression_data_generator(n, d)
     
     % test data    
     x2 = 20 * randn(d, n);
-    y2 = rand(1, n) < sigmoid(w_star' * x2);
+    y2 = rand(1, n) < sigmoid(w_opt' * x2);
     y2 = 2*y2 - 1;
     assert(sum(y2 == 1) + sum(y2 == -1) == n);
     
     data.x_test = x2;
     data.y_test = y2;
-    
+
+    data.w_init = randn(d,1);
 end
 

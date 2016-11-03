@@ -11,7 +11,7 @@ function [w, infos] = gd(problem, options)
 % This file is part of GDLibrary and SGDLibrary.
 %
 % Created by H.Kasai on Feb. 15, 2016
-% Modified by H.Kasai on Oct. 25, 2016
+% Modified by H.Kasai on Nov. 01, 2016
 
 
     % set dimensions and samples
@@ -20,10 +20,10 @@ function [w, infos] = gd(problem, options)
 
 
     % extract options
-    if ~isfield(options, 'step')
+    if ~isfield(options, 'step_init')
         step_init = 0.1;
     else
-        step_init = options.step;
+        step_init = options.step_init;
     end
     step = step_init;
     
@@ -45,10 +45,10 @@ function [w, infos] = gd(problem, options)
         tol_gnorm = options.tol_gnorm;
     end    
     
-    if ~isfield(options, 'max_epoch')
-        max_epoch = 1000;
+    if ~isfield(options, 'max_iter')
+        max_iter = 1000;
     else
-        max_epoch = options.max_epoch;
+        max_iter = options.max_iter;
     end 
     
     if ~isfield(options, 'verbose')
@@ -63,16 +63,16 @@ function [w, infos] = gd(problem, options)
         w = options.w_init;
     end 
     
-    if ~isfield(options, 'f_sol')
-        f_sol = -Inf;
+    if ~isfield(options, 'f_opt')
+        f_opt = -Inf;
     else
-        f_sol = options.f_sol;
+        f_opt = options.f_opt;
     end    
     
-    if ~isfield(options, 'store_sol')
-        store_sol = false;
+    if ~isfield(options, 'store_w')
+        store_w = false;
     else
-        store_sol = options.store_sol;
+        store_w = options.store_w;
     end    
     
     if ~isfield(options, 'sub_mode')
@@ -81,38 +81,24 @@ function [w, infos] = gd(problem, options)
         sub_mode = options.sub_mode;
     end  
     
-    if ~isfield(options, 'S')
-        S = eye(d);
-    else
-        S = options.S;
-    end  
-    
-    ls_options.sub_mode = sub_mode;    
-    if strcmp(sub_mode, 'STANDARD')
-        %
-    elseif strcmp(sub_mode, 'SCALING')
-        ls_options.S = S;
-    else
-        %
-    end    
 
-    
     % initialise
-    epoch = 0;
+    iter = 0;
+    S = eye(d);
     
     % store first infos
     clear infos;
-    infos.epoch = epoch;
+    infos.iter = iter;
     infos.time = 0;    
     infos.grad_calc_count = 0;    
     f_val = problem.cost(w);
     infos.cost = f_val;     
-    optgap = f_val - f_sol;
+    optgap = f_val - f_opt;
     infos.optgap = optgap;
     grad = problem.full_grad(w);
     gnorm = norm(grad);
     infos.gnorm = gnorm;
-    if store_sol
+    if store_w
         infos.w = w;       
     end
     
@@ -120,7 +106,7 @@ function [w, infos] = gd(problem, options)
     start_time = tic();    
 
     % main loop
-    while (optgap > tol_optgap) && (gnorm > tol_gnorm) && (epoch < max_epoch)        
+    while (optgap > tol_optgap) && (gnorm > tol_gnorm) && (iter < max_iter)        
 
         % line search
         if strcmp(step_alg, 'backtracking')
@@ -128,8 +114,20 @@ function [w, infos] = gd(problem, options)
             c = 1e-4;
             step = backtracking_line_search(problem, -grad, w, rho, c);
         elseif strcmp(step_alg, 'exact')
+            ls_options.sub_mode = sub_mode;
+            ls_options.S = S;
             step = exact_line_search(problem, 'GD', -grad, [], [], w, ls_options);
+        elseif strcmp(step_alg, 'strong_wolfe')
+            c1 = 1e-4;
+            c2 = 0.9;
+            step = strong_wolfe_line_search(problem, -grad, w, c1, c2);
         else
+        end
+        
+        if strcmp(sub_mode, 'SCALING')
+            % diagonal scaling            
+            h = problem.hess(w);
+            S = diag(1./diag(h));
         end
         
         % update w
@@ -138,11 +136,11 @@ function [w, infos] = gd(problem, options)
         % calculate gradient
         grad = problem.full_grad(w);
 
-        % update epoch        
-        epoch = epoch + 1;
+        % update iter        
+        iter = iter + 1;
         % calculate error
         f_val = problem.cost(w);
-        optgap = f_val - f_sol;  
+        optgap = f_val - f_opt;  
         % calculate norm of gradient
         gnorm = norm(grad);
         
@@ -150,19 +148,19 @@ function [w, infos] = gd(problem, options)
         elapsed_time = toc(start_time);        
 
         % store infoa
-        infos.epoch = [infos.epoch epoch];
+        infos.iter = [infos.iter iter];
         infos.time = [infos.time elapsed_time];        
-        infos.grad_calc_count = [infos.grad_calc_count epoch*n];      
+        infos.grad_calc_count = [infos.grad_calc_count iter*n];      
         infos.optgap = [infos.optgap optgap];        
         infos.cost = [infos.cost f_val];
         infos.gnorm = [infos.gnorm gnorm]; 
-        if store_sol
+        if store_w
             infos.w = [infos.w w];         
         end        
        
         % print info
         if verbose
-            fprintf('GD: Epoch = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', epoch, f_val, gnorm, optgap);
+            fprintf('GD: Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
         end        
     end
     
@@ -170,8 +168,8 @@ function [w, infos] = gd(problem, options)
         fprintf('Gradient norm tolerance reached: tol_gnorm = %g\n', tol_gnorm);
     elseif optgap < tol_optgap
         fprintf('Optimality gap tolerance reached: tol_optgap = %g\n', tol_optgap);        
-    elseif epoch == max_epoch
-        fprintf('Max epoch reached: max_epochr = %g\n', max_epoch);
+    elseif iter == max_iter
+        fprintf('Max iter reached: max_iter = %g\n', max_iter);
     end    
     
 end

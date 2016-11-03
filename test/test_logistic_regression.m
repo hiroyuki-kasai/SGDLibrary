@@ -1,92 +1,72 @@
-function  test_linear_regression()
+function  test_logistic_regression()
 
     clc;
     clear;
     close all;
 
+    
     %% Set algorithms
     if 0
-        all_algorithms = {'GD','SGD','SVRG','SAG','SAGA','SQN','SVRG-SQN','SVRG-LBFGS','SS-SVRG', ...
-                         'oBFGS-Inf','oBFGS-Lim','Reg-oBFGS-Inf','Reg-oBFGS-Lim','Damp-oBFGS-Inf','Damp-oBFGS-Lim', ...
-                         'AdaGrad','RMSProp','AdaDelta','Adam','AdaMax'};
-        algorithms = all_algorithms;                   
+        algorithms = solver_list('ALL');  
     else
-        %algorithms = {'GD', 'SGD','SVRG','SAG','Reg-oBFGS-Lim','AdaGrad','Adam','SVRG-SQN'};     
-        %algorithms = {'GD','SVRG','SAG','SAGA'};
-        algorithms = {'SGD','SVRG','SQN'};
-    end
-
-     
+        algorithms = {'SGD','SVRG','SVRG-LBFGS'};     
+    end       
+    
+    
     %% prepare dataset
     if 1
-        % generate synthtic data
-        % sample data generating for training: y = w1*x1 + w2*x2 + ... * wd*1
+        % generate synthtic data        
+        d = 10;
         n = 100;
-        d = 2;
-        std = 0.25;
-        data = linear_regression_data_generator(n, d, std);
-        
+        data = logistic_regression_data_generator(n, d);
         x_train = data.x_train;
         y_train = data.y_train;    
         x_test = data.x_test;
-        y_test = data.y_test;           
+        y_test = data.y_test;          
+        d = size(x_train,1);
+        w_opt = data.w_opt;        
+        lambda = 0.1;        
         
-    elseif 0
-        % load real-world data        
-        data = load('../data/linear_regression/ex1data2.txt');
-        x_in = data(:,1:2);
-        y_in = data(:,3);
-        n = length(y_in);
-        n_train = floor(n/2);
-        d = 2;
-        
-        % scale features and set them to zero mean
-        x_in = featureNormalize(x_in);
-        % add intercept term to x_in
-        x_in = [x_in ones(n, 1)];      
-        
-        x_train = x_in(1:n_train,:)';
-        y_train = y_in(1:n_train)';     
-        x_test = x_in(n_train+1:end,:)';
-        y_test = y_in(n_train+1:end)';           
+    elseif 1
+        % load pre-created synthetic data        
+        data = importdata('../data/logistic_regression/data_100d_10000.mat'); 
+        x_train = data.x_train;
+        y_train = data.y_train;    
+        x_test = data.x_test;
+        y_test = data.y_test;          
+        d = size(x_train,1);
+        n = length(y_train);
+        w_opt = data.w_opt;
+        lambda = data.lambda;
         
     else
         % load real-world data
-        data = importdata('../data/linear_regression/Example.mat');
+        data = importdata('../data/mushroom/mushroom.mat');
         x_in = data.X';
-        y_in = data.Y';    
+        y_in = data.y';    
         d = size(x_in,1);
-        n = length(y_in);  
+        n = length(y_in);
         n_train = floor(n/2);        
-
-        % scale features and set them to zero mean
-        x_in = featureNormalize(x_in);   
-        % add intercept term to x_in
-        x_in = [x_in; ones(1,n)]; 
-        
+        % split data into train and test data
         x_train = x_in(:,1:n_train);
         y_train = y_in(1:n_train);     
         x_test = x_in(:,n_train+1:end);
-        y_test = y_in(n_train+1:end);           
-        
+        y_test = y_in(n_train+1:end);          
+        w_opt = zeros(d,1);        
+        lambda = 0.1;
+
     end
-    
-    % solution
-    w_star = pinv(x_train * x_train') * x_train * y_train';
-    % for intersect
-    d = d + 1;          
-    lambda = 0.01;   
     
     % set plot_flag
     if d > 4
         plot_flag = false;  % too high dimension  
     else
         plot_flag = true;
-    end      
+    end    
 
     
     %% define problem definitions
-    problem = linear_regression(x_train, y_train, x_test, y_test, lambda);
+    problem = logistic_regression(x_train, y_train, x_test, y_test, lambda);
 
     
     %% initialize
@@ -97,15 +77,15 @@ function  test_linear_regression()
     
     
     %% calculate solution
-    if norm(w_star)
+    if norm(w_opt)
     else
         % calculate solution
-        w_star = problem.calc_solution(problem, 1000, 0.05);
+        w_opt = problem.calc_solution(problem, 1000);
     end
-    f_sol = problem.cost(w_star); 
-    fprintf('f_sol: %.24e\n', f_sol);       
-    
-    
+    f_opt = problem.cost(w_opt); 
+    fprintf('f_opt: %.24e\n', f_opt);    
+     
+
     %% perform algorithms
     for alg_idx=1:length(algorithms)
         fprintf('\n\n### [%02d] %s ###\n\n', alg_idx, algorithms{alg_idx});
@@ -113,27 +93,25 @@ function  test_linear_regression()
         clear options;
         % general options for optimization algorithms   
         options.w_init = w_init;
-        options.tol = 10^-24;
-        options.max_epoch = 500;
+        options.tol_optgap = 10^-36;
+        options.max_epoch = 100;
         options.verbose = true;
         options.lambda = lambda;
         options.permute_on = 1; 
-        options.f_sol = problem.cost(w_star);        
+        options.f_opt = f_opt;
         
-
+        
         switch algorithms{alg_idx}
             case {'GD'}
                 
-                options.step = 0.1;
-                options.max_epoch = 10 * options.max_epoch;
+                options.step = 0.05;
+                options.max_epoch = options.max_epoch;
                 [w_list{alg_idx}, info_list{alg_idx}] = gd(problem, options);
-
-                w_star = w_list{alg_idx};
 
             case {'SGD'} 
 
                 options.batch_size = batch_size;
-                options.step = 0.01 * options.batch_size;
+                options.step = 0.0001 * options.batch_size;
                 %options.step_alg = 'decay';
                 options.step_alg = 'fix';
 
@@ -143,7 +121,7 @@ function  test_linear_regression()
             case {'SVRG'}
                 
                 options.batch_size = batch_size;
-                options.step = 0.01 * options.batch_size;
+                options.step = 0.0001 * options.batch_size;
                 options.step_alg = 'fix';
 
                 [w_list{alg_idx}, info_list{alg_idx}] = svrg(problem, options);      
@@ -154,9 +132,9 @@ function  test_linear_regression()
                 %options.step = 0.00005 * options.batch_size;
                 options.step = 0.0001 * options.batch_size;
                 options.step_alg = 'fix';
-                options.sub_mode = 'SAG';                   
+                options.sub_mode = 'SAG';               
 
-                [w_list{alg_idx}, info_list{alg_idx}] = sag(problem, options);
+                [w_list{alg_idx}, info_list{alg_idx}] = sag(problem, options);      
                 
             case {'SAGA'}
                 
@@ -166,13 +144,13 @@ function  test_linear_regression()
                 options.step_alg = 'fix';
                 options.sub_mode = 'SAGA';                       
 
-                [w_list{alg_idx}, info_list{alg_idx}] = sag(problem, options);                   
+                [w_list{alg_idx}, info_list{alg_idx}] = sag(problem, options);                    
                 
             % AdaGrad variants                
             case {'AdaGrad'}
                 
                 options.batch_size = batch_size;
-                options.step = 0.02 * options.batch_size;
+                options.step = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.epsilon = 0.00001;
                 options.sub_mode = 'AdaGrad';        
@@ -232,23 +210,23 @@ function  test_linear_regression()
 
                 options.batch_size = batch_size;
                 options.batch_hess_size = batch_size * 20;        
-                options.step = 0.001 * options.batch_size;
+                options.step = 0.0001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'SQN';        
                 options.L = 20;
-                options.mem_size = 20;
+                options.r = 20;
 
                 [w_list{alg_idx}, info_list{alg_idx}] = slbfgs(problem, options);
 
-            case {'SVRG-SQN'}                  
+            case {'SVRG-SQN'}       
  
                 options.batch_size = batch_size;
                 options.batch_hess_size = batch_size * 20;        
-                options.step = 0.01 * options.batch_size;
+                options.step = 0.0001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'SVRG-SQN';
                 options.L = 20;
-                options.mem_size = 20;
+                options.r = 20;
 
                 [w_list{alg_idx}, info_list{alg_idx}] = slbfgs(problem, options);
                 
@@ -256,12 +234,12 @@ function  test_linear_regression()
  
                 options.batch_size = batch_size;
                 options.batch_hess_size = batch_size * 20;        
-                options.step = 0.01 * options.batch_size;
+                options.step = 0.0001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'SVRG-LBFGS';
                 options.mem_size = 20;
 
-                [w_list{alg_idx}, info_list{alg_idx}] = slbfgs(problem, options);  
+                [w_list{alg_idx}, info_list{alg_idx}] = slbfgs(problem, options);      
                 
             case {'SS-SVRG'}                  
  
@@ -275,7 +253,7 @@ function  test_linear_regression()
                 end
                 options.r = r;
 
-                [w_list{alg_idx}, info_list{alg_idx}] = subsamp_svrg(problem, options);                    
+                [w_list{alg_idx}, info_list{alg_idx}] = subsamp_svrg(problem, options);                      
 
             case {'oBFGS-Inf'} 
 
@@ -293,7 +271,7 @@ function  test_linear_regression()
                 options.step = 0.00001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Lim-mem';
-                options.mem_size = 20;
+                options.r = 20;
                 options.regularized = false;        
 
                 [w_list{alg_idx}, info_list{alg_idx}] = obfgs(problem, options);
@@ -315,36 +293,35 @@ function  test_linear_regression()
                 options.step = 0.0001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Lim-mem';
-                options.mem_size = 20;
+                options.r = 20;
                 options.regularized = true;  
                 options.delta = 0.1;     
 
                 [w_list{alg_idx}, info_list{alg_idx}] = obfgs(problem, options);
                 
-            case {'Damp-oBFGS-Inf'} % SDBFGS
+            case {'Damp-oBFGS-Inf'}
 
                 options.batch_size = batch_size;
                 options.step = 0.0001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Inf-mem';
-                options.regularized = true;  
+                options.regularized = false;  
                 options.delta = 0.1;
                 options.damped = true;
 
-                [w_list{alg_idx}, info_list{alg_idx}] = obfgs(problem, options);  
-                
+                [w_list{alg_idx}, info_list{alg_idx}] = obfgs(problem, options);    
                 
             case {'Damp-oBFGS-Lim'}
 
                 options.batch_size = batch_size;
-                options.step = 0.01 * options.batch_size;
+                options.step = 0.0001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Lim-mem';
-                options.regularized = true;  
+                options.regularized = false;  
                 options.delta = 0.1;
                 options.damped = true;
 
-                [w_list{alg_idx}, info_list{alg_idx}] = obfgs(problem, options);                    
+                [w_list{alg_idx}, info_list{alg_idx}] = obfgs(problem, options);                     
 
             otherwise
                 warn_str = [algorithms{alg_idx}, ' is not supported.'];
@@ -355,29 +332,44 @@ function  test_linear_regression()
         
     end
     
+    fprintf('\n\n');
+    
     
     %% plot all
     close all;
     % display cost vs grads
     display_graph('grad_calc_count','cost', algorithms, w_list, info_list);
     % display optimality gap vs grads
-    if options.f_sol ~= -Inf
+    if options.f_opt ~= -Inf
         display_graph('grad_calc_count','optimality_gap', algorithms, w_list, info_list);
     end
     
-    % display regression results
+    % display classification results
     y_pred_list = cell(length(algorithms),1);
-    mse_list = cell(length(algorithms),1);    
-    for alg_idx=1:length(algorithms)    
-        % predict class
-        y_pred_list{alg_idx} = problem.prediction(w_list{alg_idx});
+    accuracy_list = cell(length(algorithms),1);    
+    for alg_idx=1:length(algorithms)  
+        p = problem.prediction(w_list{alg_idx});
         % calculate accuracy
-        mse_list{alg_idx} = problem.mse(y_pred_list{alg_idx}); 
-    end 
-    if plot_flag
-        display_regression_result(problem, w_star, algorithms, w_list, y_pred_list, mse_list, x_train, y_train, x_test, y_test);      
-    end
+        accuracy_list{alg_idx} = problem.accuracy(p); 
+        
+        fprintf('Classificaiton accuracy: %s: %.4f\n', algorithms{alg_idx}, problem.accuracy(p));
 
+        % convert from {1,-1} to {1,2}
+        p(p==-1) = 2;
+        p(p==1) = 1;
+        % predict class
+        y_pred_list{alg_idx} = p;
+    end 
+
+    % convert from {1,-1} to {1,2}
+    y_train(y_train==-1) = 2;
+    y_train(y_train==1) = 1;
+    y_test(y_test==-1) = 2;
+    y_test(y_test==1) = 1;  
+    if plot_flag        
+        display_classification_result(problem, algorithms, w_list, y_pred_list, accuracy_list, x_train, y_train, x_test, y_test);    
+    end
+    
 end
 
 

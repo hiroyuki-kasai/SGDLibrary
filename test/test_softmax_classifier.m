@@ -1,62 +1,74 @@
-function  test_logistic_regression()
-
+function  test_softmax_classifier()
+        
     clc;
     clear;
     close all;
 
+    
     %% Set algorithms
+    % Note that 'Reg-oBFGS-Inf', 'oBFGS-Inf' and 'Damp-oBFGS-Inf' do not work due to memory limitation.
+    % Note that 'SQN','SVRG-SQN','SVRG-LBFGS' and 'SS-SVRG' are not suppoted. 
     if 0
-        all_algorithms = {'GD','SGD','SVRG','SAG','SAGA','SQN','SVRG-SQN','SVRG-LBFGS','SS-SVRG', ...
-                         'oBFGS-Inf','oBFGS-Lim','Reg-oBFGS-Inf','Reg-oBFGS-Lim','Damp-oBFGS-Inf','Damp-oBFGS-Lim', ...
-                         'AdaGrad','RMSProp','AdaDelta','Adam','AdaMax'};
-        algorithms = all_algorithms;                   
+        algorithms = solver_list('ALL');  
     else
-        algorithms = {'SGD','SVRG','SVRG-LBFGS'};        
+        algorithms = {'SGD','SVRG','Adam'};     
+    end      
+    
+    
+    if ismember('Reg-oBFGS-Inf', algorithms) || ismember('oBFGS-Inf', algorithms) || ismember('Damp-oBFGS-Inf', algorithms)
+        fprintf('Reg-oBFGS-Inf, oBFGS-Inf and Damp-oBFGS-Inf do not work properly due to memory limitation. \nPlease reconfigure proper algorithms, and execute this script again.\nThank you.\n');
+        return;
+    end    
+    
+    if ismember('SQN', algorithms) || ismember('SVRG-SQN', algorithms) || ismember('SVRG-LBFGS', algorithms)
+        fprintf('SQN, SVRG-SQN and SVRG-LBFGS are not supported in this problem. \nPlease reconfigure proper algorithms, and execute this script again.\nThank you.\n');
+        return;
     end
     
     
     %% prepare dataset
     if 1
-        % generate synthtic data        
-        d = 10;
-        n = 100;
-        data = logistic_regression_data_generator(n, d);
-        x_train = data.x_train;
-        y_train = data.y_train;    
-        x_test = data.x_test;
-        y_test = data.y_test;          
-        d = size(x_train,1);
-        w_star = data.w_star;        
-        lambda = 0.1;        
+        n_per_class = 100;    % # of samples        
+        d = 3;      % # of dimensions     
+        l = 5;      % # of classes 
+        std = 0.15; % standard deviation
+
+        data = multiclass_data_generator(n_per_class, d, l, std);  
+        n = length(data.y_train);
+        d = d + 1; % adding '1' row for intersect
         
-    elseif 1
-        % load pre-created synthetic data        
-        data = importdata('../data/logistic_regression/data_100d_10000.mat'); 
-        x_train = data.x_train;
-        y_train = data.y_train;    
-        x_test = data.x_test;
-        y_test = data.y_test;          
-        d = size(x_train,1);
-        n = length(y_train);
-        w_star = data.w_star;
-        lambda = data.lambda;
+        % train data        
+        x_train = [data.x_train; ones(1,n)];
+        % transform class label into label logical matrix
+        y_train = zeros(l,n);
+        for j=1:n
+            y_train(data.y_train(j),j) = 1;
+        end        
+
+        % test data
+        x_test = [data.x_test; ones(1,n)];
+        % transform class label into label logical matrix
+        y_test = zeros(l,n);
+        for j=1:n
+            y_test(data.y_test(j),j) = 1;
+        end     
+        
+        lambda = 0.0001;
+        w_opt = zeros(d*l,1);            
         
     else
         % load real-world data
-        data = importdata('../data/mushroom/mushroom.mat');
-        x_in = data.X';
-        y_in = data.y';    
-        d = size(x_in,1);
-        n = length(y_in);
-        n_train = floor(n/2);        
-        % split data into train and test data
-        x_train = x_in(:,1:n_train);
-        y_train = y_in(1:n_train);     
-        x_test = x_in(:,n_train+1:end);
-        y_test = y_in(n_train+1:end);          
-        w_star = zeros(d,1);        
-        lambda = 0.1;
-
+        data = importdata('../data/mnist/6000_data_0.001.mat');
+        x_train = data.x_trn;
+        y_train = data.y_trn; 
+        x_test = data.x_tst;
+        y_test= data.y_tst;         
+        d = size(x_train,1);
+        n = length(y_train);
+        lambda = data.lambda;
+        
+        w_opt = data.w_opt;
+        l = data.L;
     end
     
     % set plot_flag
@@ -64,29 +76,30 @@ function  test_logistic_regression()
         plot_flag = false;  % too high dimension  
     else
         plot_flag = true;
-    end    
+    end       
 
     
     %% define problem definitions
-    problem = logistic_regression(x_train, y_train, x_test, y_test, lambda);
+    problem = softmax_regression(x_train, y_train, x_test, y_test, lambda, l);
 
-    
+   
     %% initialize
-    w_init = randn(d,1);
+    w_init = randn(d*l,1);
     batch_size = 10;
     w_list = cell(length(algorithms),1);
     info_list = cell(length(algorithms),1);
+    algname_list = cell(length(algorithms),1);    
     
     
     %% calculate solution
-    if norm(w_star)
+    if norm(w_opt)
     else
         % calculate solution
-        w_star = problem.calc_solution(problem, 1000, 0.05);
+        w_opt = problem.calc_solution(problem, 1000);
     end
-    f_sol = problem.cost(w_star); 
-    fprintf('f_sol: %.24e\n', f_sol);    
-     
+    f_opt = problem.cost(w_opt); 
+    fprintf('f_opt: %.24e\n', f_opt);   
+    
 
     %% perform algorithms
     for alg_idx=1:length(algorithms)
@@ -95,25 +108,24 @@ function  test_logistic_regression()
         clear options;
         % general options for optimization algorithms   
         options.w_init = w_init;
-        options.tol_optgap = 10^-36;
+        options.tol = 10^-24;
         options.max_epoch = 100;
         options.verbose = true;
         options.lambda = lambda;
         options.permute_on = 1; 
-        options.f_sol = f_sol;
-        
+        options.f_opt = f_opt;
         
         switch algorithms{alg_idx}
             case {'GD'}
                 
-                options.step = 0.05;
-                options.max_epoch = options.max_epoch;
+                options.step = 2;
+                options.max_epoch = 30 * options.max_epoch;
                 [w_list{alg_idx}, info_list{alg_idx}] = gd(problem, options);
 
             case {'SGD'} 
 
                 options.batch_size = batch_size;
-                options.step = 0.0001 * options.batch_size;
+                options.step = 0.01 * options.batch_size;
                 %options.step_alg = 'decay';
                 options.step_alg = 'fix';
 
@@ -123,7 +135,7 @@ function  test_logistic_regression()
             case {'SVRG'}
                 
                 options.batch_size = batch_size;
-                options.step = 0.0001 * options.batch_size;
+                options.step = 0.5 * options.batch_size;
                 options.step_alg = 'fix';
 
                 [w_list{alg_idx}, info_list{alg_idx}] = svrg(problem, options);      
@@ -134,25 +146,24 @@ function  test_logistic_regression()
                 %options.step = 0.00005 * options.batch_size;
                 options.step = 0.0001 * options.batch_size;
                 options.step_alg = 'fix';
-                options.sub_mode = 'SAG';               
 
-                [w_list{alg_idx}, info_list{alg_idx}] = sag(problem, options);      
+                [w_list{alg_idx}, info_list{alg_idx}] = sag(problem, options);   
                 
             case {'SAGA'}
                 
                 options.batch_size = batch_size;
                 %options.step = 0.00005 * options.batch_size;
-                options.step = 0.000001 * options.batch_size;
+                options.step = 0.0001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'SAGA';                       
 
-                [w_list{alg_idx}, info_list{alg_idx}] = sag(problem, options);                    
+                [w_list{alg_idx}, info_list{alg_idx}] = sag(problem, options);                  
                 
             % AdaGrad variants                
             case {'AdaGrad'}
                 
                 options.batch_size = batch_size;
-                options.step = 0.001 * options.batch_size;
+                options.step = 0.01 * options.batch_size;
                 options.step_alg = 'fix';
                 options.epsilon = 0.00001;
                 options.sub_mode = 'AdaGrad';        
@@ -162,7 +173,7 @@ function  test_logistic_regression()
             case {'RMSProp'}    
     
                 options.batch_size = batch_size;
-                options.step = 0.00001 * options.batch_size;
+                options.step = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.epsilon = 0.00001;
                 options.sub_mode = 'RMSProp';
@@ -185,7 +196,7 @@ function  test_logistic_regression()
             case {'Adam'}                 
 
                 options.batch_size = batch_size;
-                options.step = 0.00001 * options.batch_size;
+                options.step = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Adam';
                 options.beta1 = 0.8;
@@ -197,7 +208,7 @@ function  test_logistic_regression()
             case {'AdaMax'}                 
 
                 options.batch_size = batch_size;
-                options.step = 0.00001 * options.batch_size;
+                options.step = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'AdaMax';
                 options.beta1 = 0.8;
@@ -212,50 +223,25 @@ function  test_logistic_regression()
 
                 options.batch_size = batch_size;
                 options.batch_hess_size = batch_size * 20;        
-                options.step = 0.0001 * options.batch_size;
+                options.step = 0.00001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'SQN';        
-                options.L = 20;
+                options.l = 20;
                 options.r = 20;
 
                 [w_list{alg_idx}, info_list{alg_idx}] = slbfgs(problem, options);
 
-            case {'SVRG-SQN'}       
+            case {'SLBFGS-SVRG'}                  
  
                 options.batch_size = batch_size;
                 options.batch_hess_size = batch_size * 20;        
                 options.step = 0.0001 * options.batch_size;
                 options.step_alg = 'fix';
-                options.sub_mode = 'SVRG-SQN';
-                options.L = 20;
+                options.sub_mode = 'SVRG';
+                options.l = 20;
                 options.r = 20;
 
                 [w_list{alg_idx}, info_list{alg_idx}] = slbfgs(problem, options);
-                
-            case {'SVRG-LBFGS'}                  
- 
-                options.batch_size = batch_size;
-                options.batch_hess_size = batch_size * 20;        
-                options.step = 0.0001 * options.batch_size;
-                options.step_alg = 'fix';
-                options.sub_mode = 'SVRG-LBFGS';
-                options.mem_size = 20;
-
-                [w_list{alg_idx}, info_list{alg_idx}] = slbfgs(problem, options);      
-                
-            case {'SS-SVRG'}                  
- 
-                options.batch_size = batch_size;
-                options.batch_hess_size = batch_size * 20;        
-                options.step = 0.0005 * options.batch_size;
-                options.step_alg = 'fix';
-                r = d-1; 
-                if r < 1
-                    r = 1;
-                end
-                options.r = r;
-
-                [w_list{alg_idx}, info_list{alg_idx}] = subsamp_svrg(problem, options);                      
 
             case {'oBFGS-Inf'} 
 
@@ -270,7 +256,7 @@ function  test_logistic_regression()
             case {'oBFGS-Lim'}
 
                 options.batch_size = batch_size;
-                options.step = 0.00001 * options.batch_size;
+                options.step = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Lim-mem';
                 options.r = 20;
@@ -292,7 +278,7 @@ function  test_logistic_regression()
             case {'Reg-oBFGS-Lim'}
 
                 options.batch_size = batch_size;
-                options.step = 0.0001 * options.batch_size;
+                options.step = 0.00000001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Lim-mem';
                 options.r = 20;
@@ -307,21 +293,21 @@ function  test_logistic_regression()
                 options.step = 0.0001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Inf-mem';
-                options.regularized = false;  
+                options.regularized = true;  
                 options.delta = 0.1;
-                options.damped = true;
+                options.damping = true;
 
-                [w_list{alg_idx}, info_list{alg_idx}] = obfgs(problem, options);    
+                [w_list{alg_idx}, info_list{alg_idx}] = obfgs(problem, options);         
                 
             case {'Damp-oBFGS-Lim'}
 
                 options.batch_size = batch_size;
-                options.step = 0.0001 * options.batch_size;
+                options.step = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
-                options.sub_mode = 'Lim-mem';
-                options.regularized = false;  
+                options.sub_mode = 'Inf-Lim';
+                options.regularized = true;  
                 options.delta = 0.1;
-                options.damped = true;
+                options.damping = true;
 
                 [w_list{alg_idx}, info_list{alg_idx}] = obfgs(problem, options);                     
 
@@ -332,9 +318,11 @@ function  test_logistic_regression()
                 info_list{alg_idx} = '';                
         end
         
+        algname_list{alg_idx} = algorithms{alg_idx};
     end
     
     fprintf('\n\n');
+
     
     
     %% plot all
@@ -342,34 +330,26 @@ function  test_logistic_regression()
     % display cost vs grads
     display_graph('grad_calc_count','cost', algorithms, w_list, info_list);
     % display optimality gap vs grads
-    if options.f_sol ~= -Inf
+    if options.f_opt ~= -Inf
         display_graph('grad_calc_count','optimality_gap', algorithms, w_list, info_list);
     end
     
     % display classification results
     y_pred_list = cell(length(algorithms),1);
     accuracy_list = cell(length(algorithms),1);    
-    for alg_idx=1:length(algorithms)  
-        p = problem.prediction(w_list{alg_idx});
-        % calculate accuracy
-        accuracy_list{alg_idx} = problem.accuracy(p); 
-        
-        fprintf('Classificaiton accuracy: %s: %.4f\n', algorithms{alg_idx}, problem.accuracy(p));
-
-        % convert from {1,-1} to {1,2}
-        p(p==-1) = 2;
-        p(p==1) = 1;
+    for alg_idx=1:length(algorithms)    
         % predict class
-        y_pred_list{alg_idx} = p;
-    end 
+        y_pred_list{alg_idx} = problem.prediction(w_list{alg_idx});
+        % calculate accuracy
+        accuracy_list{alg_idx} = problem.accuracy(y_pred_list{alg_idx}); 
+        fprintf('Classificaiton accuracy: %s: %.4f\n', algorithms{alg_idx}, accuracy_list{alg_idx});        
+    end      
 
-    % convert from {1,-1} to {1,2}
-    y_train(y_train==-1) = 2;
-    y_train(y_train==1) = 1;
-    y_test(y_test==-1) = 2;
-    y_test(y_test==1) = 1;  
-    if plot_flag        
-        display_classification_result(problem, algorithms, w_list, y_pred_list, accuracy_list, x_train, y_train, x_test, y_test);    
+    % convert logial matrix to class label vector
+    [~, y_train] = max(y_train, [], 1);
+    [~, y_test] = max(y_test, [], 1);    
+    if plot_flag
+        display_classification_result(problem, algorithms, w_list, y_pred_list, accuracy_list, x_train, y_train, x_test, y_test);  
     end
     
 end

@@ -11,23 +11,23 @@ function [data] = linear_regression_data_generator(n, d, std)
 %       data.y_train    train data of y of size 1 x n.
 %       data.x_test     test data of x of size d x n.
 %       data.y_test     test data of y of size 1 x n.
-%       data.w_star     solusion.
+%       data.w_opt      solusion.
 %
 % This file is part of SGDLibrary.
 %
 % Created H.Kasai on Oct. 25, 2016
 
     % true
-    %w_star = randn(d, 1);  
-    w_star = 0.5 * ones(d+1, 1);
-    data.w_star = w_star;    
+    %w_opt = randn(d, 1);  
+    w_opt = 0.5 * ones(d+1, 1);
+    data.w_opt = w_opt;    
 
     % train data
     x_tmp = randn(1,2*n);
     x = repmat(x_tmp, [d 1]);     
     % add intercept term to x
     x = [x; ones(1, 2*n)];            
-    y = w_star' * x;
+    y = w_opt' * x;
     % add noise
     noise = rand(1, 2*n);
     y = y + norm(y) * std * noise;
