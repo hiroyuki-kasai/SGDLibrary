@@ -70,7 +70,7 @@ optimization](https://arxiv.org/pdf/1607.01231v3.pdf),"  arXiv preprint arXiv:16
 ## Algorithm configurations
 
 
-
+[](
 |Algorithm name in example codes| module | options.sub_mode | other options |
 |---|---|---|
 |SGD|sgd|||
@@ -91,7 +91,7 @@ optimization](https://arxiv.org/pdf/1607.01231v3.pdf),"  arXiv preprint arXiv:16
 |Adam|adam|'Adam'||
 |AdaMax|adam|'AdaMax'||
 |SVRG-BB|svrg_bb|||
-
+)
 
 <img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/images/algorithm_table.png" width="900">
 
@@ -181,7 +181,7 @@ display_graph('grad_calc_count','cost', {'SGD', 'SVRG'}, {w_sgd, w_svrg}, {info_
 ```
 
 <br />
-Let take a closer look at the codes above bit by bit. The procedure has only **4 steps**!
+Let take a closer look at the code above bit by bit. The procedure has only **4 steps**!
 
 1. **Generate data**
 
