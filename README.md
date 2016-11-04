@@ -104,6 +104,12 @@ optimization](https://arxiv.org/pdf/1607.01231v3.pdf),"  arXiv preprint arXiv:16
 | SGD      | sgd |  | |
 | SVRG      | svrg |  | |
 
+
+Markdown | Less | Pretty
+--- | --- | ---
+*Still* | `renders` | **nicely**
+1 | 2 | 3
+
 <img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/images/algorithm_table.png" width="900">
 
 - Note that other algorithms could be configurable by selecting other combinations of sub_mode and options. 
