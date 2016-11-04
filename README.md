@@ -195,7 +195,7 @@ display_graph('grad_calc_count','cost', {'SGD', 'SVRG'}, {w_sgd, w_svrg}, {info_
 <br />
 Let take a closer look at the code above bit by bit. The procedure has only **4 steps**!
 
-1. **Generate data**
+**Step 1: Generate data**
 
 First, we generate datasets including train set and test set using a data generator function `logistic_regression_data_generator()`. 
 The output include train set and test set and an initial value of the solution `w`.
@@ -205,7 +205,7 @@ n = 300;
 data = logistic_regression_data_generator(n, d);
 ```
 
-1. **Define problem**
+**Step 2: Define problem**
 
 The problem to be solved should be defined properly from the [supported problems](#supp_pro). `logistic_regression()` provides the comprehensive 
 functions for a logistic regression problem. This returns the cost value by `cost(w)`, the gradient by `grad(w)` and the hessian by `hess(w)` when given `w`. 
@@ -214,7 +214,7 @@ These are essential for any gradient descent algorithms.
 problem = logistic_regression(data.x_train, data.y_train, data.x_test, data.y_test); 
 ```
 
-1. **Perform solver**
+**Step 3: Perform solver**
 
 Now, you can perform optimization solvers, i.e., SGD and SVRG, calling [solver functions](#supp_solver), i.e., `sgd()` function and `svrg()` function after setting some optimization options. 
 ```Matlab
@@ -225,7 +225,7 @@ options.step_init = 0.01;
 ```
 They return the final solutions of `w` and the statistics information that include the histories of epoch numbers, cost values, norms of gradient, the number of gradient evaluations and so on.
 
-1. **Show result**
+**Step 4: Show result**
 
 Finally, `display_graph()` provides output results of decreasing behavior of the cost values in terms of the number of gradient evaluations. 
 Note that each algorithm needs different number of evaluations of samples in each epoch. Therefore, it is common to use this number to evaluate stochastic optimization algorithms instead of the number of iterations.
