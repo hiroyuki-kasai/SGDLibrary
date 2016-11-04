@@ -7,6 +7,8 @@ Last page update: November 04, 2016
 
 Latest library version: 1.0.4 (see Release notes for more info)
 
+<br />
+
 Introduction
 ----------
 The SGDLibrary is a **pure-Matlab** library of a collection of **stochastic optimization algorithms**. This solves an unconstrained minimization problem of the form, min f(x) = sum_i f_i(x).
@@ -15,6 +17,8 @@ Note that the [SGDLibrary](https://github.com/hiroyuki-kasai/GDLibrary) internal
 
 
 ## <a name="supp_solver"> List of the algorithms available in SGDLibrary </a>
+
+<br />
 
 - **SGD** (stochastic gradient descent)
     - H. Robbins and S. Monro, "[A stochastic approximation method](https://www.jstor.org/stable/pdf/2236626.pdf)," The annals of mathematical statistics, vol. 22, no. 3, pp. 400-407, 1951.
@@ -67,6 +71,7 @@ optimization](https://arxiv.org/pdf/1607.01231v3.pdf),"  arXiv preprint arXiv:16
     - SVRG-BB (stochastic variance reduced gradient with Barzilai-Borwein)
         - C. Tan, S. Ma, Y. Dai, Y. Qian, "[Barzilai-Borwein step size for stochastic gradient descent](https://arxiv.org/pdf/1605.04131v2.pdf)," NIPS, 2016.
 
+<br />
 
 ## Algorithm configurations
 
@@ -98,7 +103,7 @@ optimization](https://arxiv.org/pdf/1607.01231v3.pdf),"  arXiv preprint arXiv:16
 
 - Note that other algorithms could be configurable by selecting other combinations of sub_mode and options. 
 
-
+<br />
 
 ## <a name="supp_pro"> Supported problems </a>
 
@@ -114,6 +119,7 @@ Additionally, the following problems are provided for gradient descent algorithm
 * Quadratic problem
 * General problem
 
+<br />
 
 Folders and files
 ---------
@@ -145,7 +151,7 @@ Folders and files
 - gd_test/
     - Some helpful test scripts using gradient descent algorithms to use this package.
                   
-                              
+<br />                              
 
 First to do
 ----------------------------
@@ -154,6 +160,8 @@ Run the setup script "**run_me_first.m**" for path configurations.
 %% First run the setup script
 run_me_first; 
 ```
+
+<br />
 
 Simplest usage example: 4 steps!
 ----------------------------
@@ -235,6 +243,8 @@ display_graph('grad_calc_count','cost', {'SGD', 'SVRG'}, {w_sgd, w_svrg}, {info_
 
 That's it!
 
+<br />
+
 More plots
 ----------------------------
 
@@ -294,7 +304,7 @@ display_classification_result(problem, {'SGD', 'SVRG'}, {w_sgd, w_svrg}, {y_pred
  ```   
 
 
-* Output results 
+Output results:
 
 <img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/images/log_reg_results.png" width="900">
 <br /><br />
@@ -317,6 +327,8 @@ Then, `draw_convergence_animation()` draws a convergence animation. Note that `d
 draw_convergence_animation(problem, {'SGD', 'SVRG'}, {info_sgd.w, info_svrg.w}, options.max_epoch);   
  ``` 
 
+<br />
+
 Example results of other problems
 ----------------------------
 
@@ -334,6 +346,8 @@ Example results of other problems
 <br /><br />
 
 
+<br />
+
 Convergence behavior animation example (Linear regression problem)
 ----------------------------
 
@@ -343,11 +357,13 @@ Convergence behavior animation example (Linear regression problem)
 <br /><br />
 
 
+<br />
 
 License
 -------
 The SGDLibrary is free and open source for academic/research purposes (non-commercial).
 
+<br />
 
 Notes
 -------
@@ -355,10 +371,13 @@ Notes
 - Softmax classification problem does not support "Hessian-vector product" type algorithms, i.e., SQN, SVRG-SQN and SVRG-LBFGS.
 - The [SGDLibrary](https://github.com/hiroyuki-kasai/GDLibrary) internally contains the GDLibrary.
 
+<br />
 
 Problems or questions
 ---------------------
 If you have any problems or questions, please contact the author: [Hiroyuki Kasai](http://www.kasailab.com/) (email: kasai **at** is **dot** uec **dot** ac **dot** jp)
+
+<br />
 
 Release Notes
 --------------
