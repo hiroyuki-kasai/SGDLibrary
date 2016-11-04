@@ -394,3 +394,10 @@ Release Notes
 * Version 1.0.0 (Oct. 27, 2016)
     - Initial version.
 
+
+| Tables        | Are           | Cool  |
+| ------------- |:-------------:| -----:|
+| col 3 is      | right-aligned | $1600 |
+| col 2 is      | centered      |   $12 |
+| zebra stripes | are neat      |    $1 |
+
