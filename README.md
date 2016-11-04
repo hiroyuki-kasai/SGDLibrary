@@ -13,7 +13,7 @@ Introduction
 ----------
 The SGDLibrary is a **pure-Matlab** library of a collection of **stochastic optimization algorithms**. This solves an unconstrained minimization problem of the form, min f(x) = sum_i f_i(x).
 
-Note that the [SGDLibrary](https://github.com/hiroyuki-kasai/GDLibrary) internally contains the GDLibrary.
+Note that this SGDLibrary internally contains the [GDLibrary](https://github.com/hiroyuki-kasai/GDLibrary).
 
 
 ## <a name="supp_solver"> List of the algorithms available in SGDLibrary </a>
@@ -369,7 +369,7 @@ Notes
 -------
 - As always, parameters such as the step size should be configured properly in each algorithm and each problem. 
 - Softmax classification problem does not support "Hessian-vector product" type algorithms, i.e., SQN, SVRG-SQN and SVRG-LBFGS.
-- The [SGDLibrary](https://github.com/hiroyuki-kasai/GDLibrary) internally contains the GDLibrary.
+- This SGDLibrary internally contains the [GDLibrary](https://github.com/hiroyuki-kasai/GDLibrary).
 
 <br />
 
