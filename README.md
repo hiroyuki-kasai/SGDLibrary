@@ -76,7 +76,7 @@ optimization](https://arxiv.org/pdf/1607.01231v3.pdf),"  arXiv preprint arXiv:16
 ## Algorithm configurations
 
 
-[](
+
 |Algorithm name in example codes| module | options.sub_mode | other options |
 |---|---|---|---|
 |SGD|sgd|||
@@ -97,7 +97,7 @@ optimization](https://arxiv.org/pdf/1607.01231v3.pdf),"  arXiv preprint arXiv:16
 |Adam|adam|'Adam'||
 |AdaMax|adam|'AdaMax'||
 |SVRG-BB|svrg_bb|||
-)
+
 
 | Algorithm name in example codes        | module           | options.sub_mode  | other options |
 | ------------- |:-------------:| -----:|-----|
