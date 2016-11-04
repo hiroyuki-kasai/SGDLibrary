@@ -15,10 +15,10 @@ The SGDLibrary is a **pure-Matlab** library of a collection of **stochastic opti
 
 Note that this SGDLibrary internally contains the [GDLibrary](https://github.com/hiroyuki-kasai/GDLibrary).
 
+<br />
 
 ## <a name="supp_solver"> List of the algorithms available in SGDLibrary </a>
 
-<br />
 
 - **SGD** (stochastic gradient descent)
     - H. Robbins and S. Monro, "[A stochastic approximation method](https://www.jstor.org/stable/pdf/2236626.pdf)," The annals of mathematical statistics, vol. 22, no. 3, pp. 400-407, 1951.
