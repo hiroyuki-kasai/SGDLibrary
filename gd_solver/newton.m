@@ -1,5 +1,5 @@
-function [w, infos] = gd(problem, options)
-% Full gradient descent algorithm.
+function [w, infos] = newton(problem, options)
+% Netwon method algorithm.
 %
 % Inputs:
 %       problem     function (cost/grad/hess)
@@ -8,10 +8,23 @@ function [w, infos] = gd(problem, options)
 %       w           solution of w
 %       infos       information
 %
-% This file is part of GDLibrary and SGDLibrary.
+% Reference:
+%       Jorge Nocedal and Stephen Wright,
+%       "Numerical optimization,"
+%       Springer Science & Business Media, 2006.
+%
+%       sub_mode    'DAMPED'
+%                   Amir Beck,
+%                   "Introduction to Nonlinear Optimization Theory,
+%                   Algorithms, and Applications with MATLAB,"
+%                   MOS-SIAM Seris on Optimization, 
+%
+%                   Algorithm X.X in Section X.
+%
+% This file is part of GDLibrary.
 %
 % Created by H.Kasai on Feb. 15, 2016
-% Modified by H.Kasai on Nov. 01, 2016
+% Modified by H.Kasai on Oct. 25, 2016
 
 
     % set dimensions and samples
@@ -46,7 +59,7 @@ function [w, infos] = gd(problem, options)
     end    
     
     if ~isfield(options, 'max_iter')
-        max_iter = 1000;
+        max_iter = 100;
     else
         max_iter = options.max_iter;
     end 
@@ -79,12 +92,11 @@ function [w, infos] = gd(problem, options)
         sub_mode = 'STANDARD';
     else
         sub_mode = options.sub_mode;
-    end  
+    end
     
-
+    
     % initialise
     iter = 0;
-    S = eye(d);
     
     % store first infos
     clear infos;
@@ -95,9 +107,14 @@ function [w, infos] = gd(problem, options)
     infos.cost = f_val;     
     optgap = f_val - f_opt;
     infos.optgap = optgap;
+    % calculate gradient
     grad = problem.full_grad(w);
     gnorm = norm(grad);
     infos.gnorm = gnorm;
+    % calculate hessian
+    hess = problem.full_hess(w);
+    % calcualte direction    
+    d = hess \ grad;
     if store_w
         infos.w = w;       
     end
@@ -107,35 +124,42 @@ function [w, infos] = gd(problem, options)
 
     % main loop
     while (optgap > tol_optgap) && (gnorm > tol_gnorm) && (iter < max_iter)        
+        
+        if strcmp(sub_mode, 'STANDARD')
+            % update w
+            w = w - d;            
+        elseif strcmp(sub_mode, 'DAMPED') || strcmp(sub_mode, 'CHOLESKY') 
+            
+            if strcmp(step_alg, 'backtracking')
+                rho = 1/2;
+                c = 1e-4;
+                step = backtracking_line_search(problem, -d, w, rho, c);
+            else
+                %
+            end
 
-        % line search
-        if strcmp(step_alg, 'backtracking')
-            rho = 1/2;
-            c = 1e-4;
-            step = backtracking_line_search(problem, -grad, w, rho, c);
-        elseif strcmp(step_alg, 'exact')
-            ls_options.sub_mode = sub_mode;
-            ls_options.S = S;
-            step = exact_line_search(problem, 'GD', -grad, [], [], w, ls_options);
-        elseif strcmp(step_alg, 'strong_wolfe')
-            c1 = 1e-4;
-            c2 = 0.9;
-            step = strong_wolfe_line_search(problem, -grad, w, c1, c2);
-        else
+            % update w
+            w = w - step * d;            
         end
-        
-        if strcmp(sub_mode, 'SCALING')
-            % diagonal scaling            
-            h = problem.hess(w);
-            S = diag(1./diag(h));
-        end
-        
-        % update w
-        w = w - step * S * grad;
-        
+
         % calculate gradient
         grad = problem.full_grad(w);
-
+        % calculate hessian        
+        hess = problem.full_hess(w);
+        
+        % calcualte direction        
+        if strcmp(sub_mode, 'CHOLESKY') 
+            [L, p] = chol(hess, 'lower');
+            if p==0
+                d = L' \ ( L \ grad);
+            else
+                d = grad;
+            end
+        else
+            d = hess \ grad;        
+        end
+        
+        
         % update iter        
         iter = iter + 1;
         % calculate error
@@ -160,7 +184,7 @@ function [w, infos] = gd(problem, options)
        
         % print info
         if verbose
-            fprintf('GD: Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
+            fprintf('Newton: Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
         end        
     end
     

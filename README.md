@@ -5,12 +5,13 @@ Authors: [Hiroyuki Kasai](http://www.kasailab.com/)
 
 Last page update: November 04, 2016
 
-Latest library version: 1.0.3 (see Release notes for more info)
+Latest library version: 1.0.4 (see Release notes for more info)
 
 Introduction
 ----------
 The SGDLibrary is a **pure-Matlab** library of a collection of **stochastic optimization algorithms**. This solves an unconstrained minimization problem of the form, min f(x) = sum_i f_i(x).
 
+Note that the [SGDLibrary](https://github.com/hiroyuki-kasai/GDLibrary) internally contains the GDLibrary.
 
 
 ## <a name="supp_solver"> List of the algorithms available in SGDLibrary </a>
@@ -107,6 +108,11 @@ optimization](https://arxiv.org/pdf/1607.01231v3.pdf),"  arXiv preprint arXiv:16
 * Softmax classification (multinomial logistic regression)
     - Note that softmax classification problem does not support Hessian-vector product type algorithms, i.e., SQN, SVRG-SQN and SVRG-LBFGS.
 
+Additionally, the following problems are provided for gradient descent algorithms. 
+
+* [Rosenbrock problem](https://en.wikipedia.org/wiki/Rosenbrock_function)
+* Quadratic problem
+* General problem
 
 
 Folders and files
@@ -117,21 +123,27 @@ Folders and files
 
 - demo.m and demo_ext.m
     - Demonstration scripts to check and understand this package easily. 
-                      
-- solver/
-    - Contains various stochastic optimization algorithms.
 
 - problem/
     - Problem definition files to be solved.
-
-- test/
-    - Some helpful test test scripts to use this package.
-
+                      
 - plotter/
     - Contains plotting tools to show convergence results and various plots.
                   
 - tool/
     - Some utility tools for this project.
+
+- sgd_solver/
+    - Contains various stochastic optimization algorithms.
+
+- sgd_test/
+    - Some helpful test scripts using stochastic gradient algorithms to use this package.
+
+- gd_solver/
+    - Contains various gradient descent optimization algorithms.
+
+- gd_test/
+    - Some helpful test scripts using gradient descent algorithms to use this package.
                   
                               
 
@@ -341,6 +353,7 @@ Notes
 -------
 - As always, parameters such as the step size should be configured properly in each algorithm and each problem. 
 - Softmax classification problem does not support "Hessian-vector product" type algorithms, i.e., SQN, SVRG-SQN and SVRG-LBFGS.
+- The [SGDLibrary](https://github.com/hiroyuki-kasai/GDLibrary) internally contains the GDLibrary.
 
 
 Problems or questions
@@ -350,6 +363,8 @@ If you have any problems or questions, please contact the author: [Hiroyuki Kasa
 Release Notes
 --------------
 
+* Version 1.0.4 (Nov. 04, 2016)
+    - Integrate GDLibrary with SGDLibrary.
 * Version 1.0.3 (Nov. 04, 2016)
     - Modify many items. 
 * Version 1.0.2 (Nov. 01, 2016)
