@@ -99,6 +99,11 @@ optimization](https://arxiv.org/pdf/1607.01231v3.pdf),"  arXiv preprint arXiv:16
 |SVRG-BB|svrg_bb|||
 )
 
+| Algorithm name in example codes        | module           | options.sub_mode  | other options |
+| ------------- |:-------------:| -----:|
+| SGD      | sgd |  | |
+| SVRG      | svrg |  | |
+
 <img src="https://dl.dropboxusercontent.com/u/869853/github/SGDLibrary/images/algorithm_table.png" width="900">
 
 - Note that other algorithms could be configurable by selecting other combinations of sub_mode and options. 
@@ -395,9 +400,5 @@ Release Notes
     - Initial version.
 
 
-| Tables        | Are           | Cool  |
-| ------------- |:-------------:| -----:|
-| col 3 is      | right-aligned | $1600 |
-| col 2 is      | centered      |   $12 |
-| zebra stripes | are neat      |    $1 |
+
 
