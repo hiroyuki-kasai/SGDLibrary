@@ -100,7 +100,7 @@ optimization](https://arxiv.org/pdf/1607.01231v3.pdf),"  arXiv preprint arXiv:16
 )
 
 | Algorithm name in example codes        | module           | options.sub_mode  | other options |
-| ------------- |:-------------:| -----:|
+| ------------- |:-------------:| -----:|-----|
 | SGD      | sgd |  | |
 | SVRG      | svrg |  | |
 
