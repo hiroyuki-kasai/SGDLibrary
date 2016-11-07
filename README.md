@@ -79,24 +79,24 @@ optimization](https://arxiv.org/pdf/1607.01231v3.pdf),"  arXiv preprint arXiv:16
 
 |Algorithm name in example codes| module | options.sub_mode | other options |
 |---|---|---|---|
-|SGD|sgd|||
-|SVRG|svrg|||
-|SAG|sag|'SAG'||
-|SAGA|sag|'SAGA'||
-|SQN|slbfgs|'SQN'||
-|SVRG-SQN|slbfgs|'SVRG-SQN'||
-|SVRG-LBFGS|slbfgs|'SVRG-LBFGS'||
-|SS-SVRG|subsamp_svrg|||
-|oBFGS-Inf|obfgs|'Inf-mem'||
-|oLBFGS-Lim|obfgs|'Lim-mem'||
-|Reg-oBFGS-Inf|obfgs|'Inf-mem'|regularized=true|
-|Damp-oBFGS-Inf|obfgs|'Inf-mem'|regularized=true & damped=true|
-|AdaGrad|adagrad|'AdaGrad'||
-|RMSProp|adagrad|'RMSProp'||
-|AdaDelta|adagrad|'AdaDelta'||
-|Adam|adam|'Adam'||
-|AdaMax|adam|'AdaMax'||
-|SVRG-BB|svrg_bb|||
+|SGD|`sgd`|||
+|SVRG|`svrg`|||
+|SAG|`sag`|'SAG'||
+|SAGA|`sag`|'SAGA'||
+|SQN|`slbfg`s|'SQN'||
+|SVRG-SQN|`slbfgs`|'SVRG-SQN'||
+|SVRG-LBFGS|`slbfgs`|'SVRG-LBFGS'||
+|SS-SVRG|`subsamp_svrg`|||
+|oBFGS-Inf|`obfgs`|'Inf-mem'||
+|oLBFGS-Lim|`obfgs`|'Lim-mem'||
+|Reg-oBFGS-Inf|`obfgs`|'Inf-mem'|regularized=true|
+|Damp-oBFGS-Inf|`obfgs`|'Inf-mem'|regularized=true & damped=true|
+|AdaGrad|`adagrad`|'AdaGrad'||
+|RMSProp|`adagrad`|'RMSProp'||
+|AdaDelta|`adagrad`|'AdaDelta'||
+|Adam|`adam`|'Adam'||
+|AdaMax|`adam`|'AdaMax'||
+|SVRG-BB|`svrg_bb`|||
 
 
 - Note that other algorithms could be configurable by selecting other combinations of sub_mode and options. 
@@ -153,7 +153,7 @@ Folders and files
 
 First to do
 ----------------------------
-Run the setup script "**run_me_first.m**" for path configurations. 
+Run `run_me_first` for path configurations. 
 ```Matlab
 %% First run the setup script
 run_me_first; 

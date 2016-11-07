@@ -22,7 +22,7 @@ function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, inf
     linewidth = 2;    
 
     % initialize
-    legend_str = cell(1,1);    
+    legend_str = cell(1);    
     alg_num = 0;
 
     % plot
@@ -39,6 +39,8 @@ function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, inf
                 x_plot_data = info_list{alg_idx}.epoch;                    
             elseif strcmp(x_category, 'grad_calc_count')
                 x_plot_data = info_list{alg_idx}.grad_calc_count; 
+            elseif strcmp(x_category, 'time')
+                x_plot_data = info_list{alg_idx}.time;                 
             else
             end
             
@@ -49,6 +51,8 @@ function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, inf
                 y_plot_data = info_list{alg_idx}.optgap;
             elseif strcmp(y_category, 'gnorm')
                 y_plot_data = info_list{alg_idx}.gnorm;                
+            elseif strcmp(y_category, 'K')
+                y_plot_data = info_list{alg_idx}.K;                     
             end
             
             semilogy(x_plot_data, y_plot_data, linetype{alg_num}, 'MarkerSize', markersize, 'Linewidth', linewidth); hold on;
@@ -61,12 +65,14 @@ function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, inf
     hold off;
 
     % X label
-    if strcmp(x_category, 'numgrad');    
+    if strcmp(x_category, 'numofgrad');    
         xlabel('Number of gradient evaluations', 'FontSize', fontsize);
     elseif strcmp(x_category, 'iter');
         xlabel('Iteration', 'FontSize', fontsize);  
     elseif strcmp(x_category, 'epoch');
-        xlabel('Epoch', 'FontSize', fontsize);           
+        xlabel('Epoch', 'FontSize', fontsize);    
+    elseif strcmp(x_category, 'time');
+        xlabel('Time', 'FontSize', fontsize);             
     end    
     
     % Y label    
@@ -75,7 +81,9 @@ function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, inf
     elseif strcmp(y_category, 'optimality_gap');
         ylabel('Optimality gap', 'FontSize', fontsize);
     elseif strcmp(y_category, 'gnorm');
-        ylabel('Norm of gradient', 'FontSize', fontsize);        
+        ylabel('Norm of gradient', 'FontSize', fontsize);   
+    elseif strcmp(y_category, 'K');
+        ylabel('Batch size', 'FontSize', fontsize);          
     end
     legend(legend_str);
     set(gca, 'FontSize', fontsize);      

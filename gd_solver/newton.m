@@ -17,9 +17,17 @@ function [w, infos] = newton(problem, options)
 %                   Amir Beck,
 %                   "Introduction to Nonlinear Optimization Theory,
 %                   Algorithms, and Applications with MATLAB,"
-%                   MOS-SIAM Seris on Optimization, 
+%                   MOS-SIAM Seris on Optimization, 2014.
 %
-%                   Algorithm X.X in Section X.
+%                   Algorithm in Section 5.2.
+%
+%       sub_mode    'CHOLESKY'
+%                   Amir Beck,
+%                   "Introduction to Nonlinear Optimization Theory,
+%                   Algorithms, and Applications with MATLAB,"
+%                   MOS-SIAM Seris on Optimization, 2014.
+%
+%                   Algorithm in Section 5.3.
 %
 % This file is part of GDLibrary.
 %
