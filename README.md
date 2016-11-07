@@ -81,21 +81,21 @@ optimization](https://arxiv.org/pdf/1607.01231v3.pdf),"  arXiv preprint arXiv:16
 |---|---|---|---|
 |SGD|`sgd`|||
 |SVRG|`svrg`|||
-|SAG|`sag`|'SAG'||
-|SAGA|`sag`|'SAGA'||
-|SQN|`slbfg`s|'SQN'||
-|SVRG-SQN|`slbfgs`|'SVRG-SQN'||
-|SVRG-LBFGS|`slbfgs`|'SVRG-LBFGS'||
+|SAG|`sag`|`'SAG'`||
+|SAGA|`sag`|`'SAGA'`||
+|SQN|`slbfg`s|`'SQN'`||
+|SVRG-SQN|`slbfgs`|`'SVRG-SQN'`||
+|SVRG-LBFGS|`slbfgs`|`'SVRG-LBFGS'`||
 |SS-SVRG|`subsamp_svrg`|||
-|oBFGS-Inf|`obfgs`|'Inf-mem'||
-|oLBFGS-Lim|`obfgs`|'Lim-mem'||
-|Reg-oBFGS-Inf|`obfgs`|'Inf-mem'|`regularized=true`|
-|Damp-oBFGS-Inf|`obfgs`|'Inf-mem'|`regularized=true` & `damped=true`|
-|AdaGrad|`adagrad`|'AdaGrad'||
-|RMSProp|`adagrad`|'RMSProp'||
-|AdaDelta|`adagrad`|'AdaDelta'||
-|Adam|`adam`|'Adam'||
-|AdaMax|`adam`|'AdaMax'||
+|oBFGS-Inf|`obfgs`|`'Inf-mem'`||
+|oLBFGS-Lim|`obfgs`|`'Lim-mem'`||
+|Reg-oBFGS-Inf|`obfgs`|`'Inf-mem'`|`regularized=true`|
+|Damp-oBFGS-Inf|`obfgs`|`'Inf-mem'`|`regularized=true` & `damped=true`|
+|AdaGrad|`adagrad`|`'AdaGrad'`||
+|RMSProp|`adagrad`|`'RMSProp'`||
+|AdaDelta|`adagrad`|`'AdaDelta'`||
+|Adam|`adam`|`'Adam'`||
+|AdaMax|`adam`|`'AdaMax'`||
 |SVRG-BB|`svrg_bb`|||
 
 
