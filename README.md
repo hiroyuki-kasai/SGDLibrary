@@ -77,7 +77,7 @@ optimization](https://arxiv.org/pdf/1607.01231v3.pdf),"  arXiv preprint arXiv:16
 
 
 
-|Algorithm name in example codes| module | options.sub_mode | other options |
+|Algorithm name in example codes| function | `options.sub_mode` | other `options` |
 |---|---|---|---|
 |SGD|`sgd`|||
 |SVRG|`svrg`|||
@@ -89,8 +89,8 @@ optimization](https://arxiv.org/pdf/1607.01231v3.pdf),"  arXiv preprint arXiv:16
 |SS-SVRG|`subsamp_svrg`|||
 |oBFGS-Inf|`obfgs`|'Inf-mem'||
 |oLBFGS-Lim|`obfgs`|'Lim-mem'||
-|Reg-oBFGS-Inf|`obfgs`|'Inf-mem'|regularized=true|
-|Damp-oBFGS-Inf|`obfgs`|'Inf-mem'|regularized=true & damped=true|
+|Reg-oBFGS-Inf|`obfgs`|'Inf-mem'|`regularized=true`|
+|Damp-oBFGS-Inf|`obfgs`|'Inf-mem'|`regularized=true` & `damped=true`|
 |AdaGrad|`adagrad`|'AdaGrad'||
 |RMSProp|`adagrad`|'RMSProp'||
 |AdaDelta|`adagrad`|'AdaDelta'||
