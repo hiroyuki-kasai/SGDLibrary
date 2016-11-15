@@ -7,9 +7,9 @@ function  test_softmax_classifier()
     
     %% Set algorithms
     if 0
-        algorithms = solver_list('ALL');  
+        algorithms = gd_solver_list('ALL');  
     else     
-        algorithms = solver_list('LS');
+        algorithms = gd_solver_list('LS');
     end
     
     

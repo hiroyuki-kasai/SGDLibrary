@@ -81,9 +81,14 @@ function [  ] = draw_convergence_sequence(problem, opt_sol, algorithms_list, w_h
     
     %% plot
     figure;
-    %suptitle('Convergence sequence');    
+    %suptitle('Convergence sequence'); 
+    if alg_num < 3
+        plot_col = alg_num;
+    else
+        plot_col = 3;
+    end
     for alg_idx=1:alg_num
-        subplot(row_num,3,alg_idx); 
+        subplot(row_num,plot_col,alg_idx); 
         
         w = w_history{alg_idx};
         

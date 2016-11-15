@@ -9,7 +9,7 @@ function  test_softmax_classifier()
     % Note that 'Reg-oBFGS-Inf', 'oBFGS-Inf' and 'Damp-oBFGS-Inf' do not work due to memory limitation.
     % Note that 'SQN','SVRG-SQN','SVRG-LBFGS' and 'SS-SVRG' are not suppoted. 
     if 0
-        algorithms = solver_list('ALL');  
+        algorithms = sgd_solver_list('ALL');  
     else
         algorithms = {'SGD','SVRG','Adam'};     
     end      
@@ -118,14 +118,14 @@ function  test_softmax_classifier()
         switch algorithms{alg_idx}
             case {'GD'}
                 
-                options.step = 2;
+                options.step_init = 2;
                 options.max_epoch = 30 * options.max_epoch;
                 [w_list{alg_idx}, info_list{alg_idx}] = gd(problem, options);
 
             case {'SGD'} 
 
                 options.batch_size = batch_size;
-                options.step = 0.01 * options.batch_size;
+                options.step_init = 0.01 * options.batch_size;
                 %options.step_alg = 'decay';
                 options.step_alg = 'fix';
 
@@ -135,7 +135,7 @@ function  test_softmax_classifier()
             case {'SVRG'}
                 
                 options.batch_size = batch_size;
-                options.step = 0.5 * options.batch_size;
+                options.step_init = 0.5 * options.batch_size;
                 options.step_alg = 'fix';
 
                 [w_list{alg_idx}, info_list{alg_idx}] = svrg(problem, options);      
@@ -143,8 +143,8 @@ function  test_softmax_classifier()
             case {'SAG'}
                 
                 options.batch_size = batch_size;
-                %options.step = 0.00005 * options.batch_size;
-                options.step = 0.0001 * options.batch_size;
+                %options.step_init = 0.00005 * options.batch_size;
+                options.step_init = 0.0001 * options.batch_size;
                 options.step_alg = 'fix';
 
                 [w_list{alg_idx}, info_list{alg_idx}] = sag(problem, options);   
@@ -152,8 +152,8 @@ function  test_softmax_classifier()
             case {'SAGA'}
                 
                 options.batch_size = batch_size;
-                %options.step = 0.00005 * options.batch_size;
-                options.step = 0.0001 * options.batch_size;
+                %options.step_init = 0.00005 * options.batch_size;
+                options.step_init = 0.0001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'SAGA';                       
 
@@ -163,7 +163,7 @@ function  test_softmax_classifier()
             case {'AdaGrad'}
                 
                 options.batch_size = batch_size;
-                options.step = 0.01 * options.batch_size;
+                options.step_init = 0.01 * options.batch_size;
                 options.step_alg = 'fix';
                 options.epsilon = 0.00001;
                 options.sub_mode = 'AdaGrad';        
@@ -173,7 +173,7 @@ function  test_softmax_classifier()
             case {'RMSProp'}    
     
                 options.batch_size = batch_size;
-                options.step = 0.001 * options.batch_size;
+                options.step_init = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.epsilon = 0.00001;
                 options.sub_mode = 'RMSProp';
@@ -184,7 +184,7 @@ function  test_softmax_classifier()
             case {'AdaDelta'}                  
     
                 options.batch_size = batch_size;
-                options.step = 0.01 * options.batch_size;
+                options.step_init = 0.01 * options.batch_size;
                 options.step_alg = 'fix';
                 options.epsilon = 0.00001;
 
@@ -196,7 +196,7 @@ function  test_softmax_classifier()
             case {'Adam'}                 
 
                 options.batch_size = batch_size;
-                options.step = 0.001 * options.batch_size;
+                options.step_init = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Adam';
                 options.beta1 = 0.8;
@@ -208,7 +208,7 @@ function  test_softmax_classifier()
             case {'AdaMax'}                 
 
                 options.batch_size = batch_size;
-                options.step = 0.001 * options.batch_size;
+                options.step_init = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'AdaMax';
                 options.beta1 = 0.8;
@@ -223,7 +223,7 @@ function  test_softmax_classifier()
 
                 options.batch_size = batch_size;
                 options.batch_hess_size = batch_size * 20;        
-                options.step = 0.00001 * options.batch_size;
+                options.step_init = 0.00001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'SQN';        
                 options.l = 20;
@@ -235,7 +235,7 @@ function  test_softmax_classifier()
  
                 options.batch_size = batch_size;
                 options.batch_hess_size = batch_size * 20;        
-                options.step = 0.0001 * options.batch_size;
+                options.step_init = 0.0001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'SVRG';
                 options.l = 20;
@@ -246,7 +246,7 @@ function  test_softmax_classifier()
             case {'oBFGS-Inf'} 
 
                 options.batch_size = batch_size;
-                options.step = 0.0001 * options.batch_size;
+                options.step_init = 0.0001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Inf-mem';
                 options.regularized = false;
@@ -256,7 +256,7 @@ function  test_softmax_classifier()
             case {'oBFGS-Lim'}
 
                 options.batch_size = batch_size;
-                options.step = 0.001 * options.batch_size;
+                options.step_init = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Lim-mem';
                 options.r = 20;
@@ -267,7 +267,7 @@ function  test_softmax_classifier()
             case {'Reg-oBFGS-Inf'}
 
                 options.batch_size = batch_size;
-                options.step = 0.0001 * options.batch_size;
+                options.step_init = 0.0001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Inf-mem';
                 options.regularized = true;  
@@ -278,7 +278,7 @@ function  test_softmax_classifier()
             case {'Reg-oBFGS-Lim'}
 
                 options.batch_size = batch_size;
-                options.step = 0.00000001 * options.batch_size;
+                options.step_init = 0.00000001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Lim-mem';
                 options.r = 20;
@@ -290,7 +290,7 @@ function  test_softmax_classifier()
             case {'Damp-oBFGS-Inf'}
 
                 options.batch_size = batch_size;
-                options.step = 0.0001 * options.batch_size;
+                options.step_init = 0.0001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Inf-mem';
                 options.regularized = true;  
@@ -302,7 +302,7 @@ function  test_softmax_classifier()
             case {'Damp-oBFGS-Lim'}
 
                 options.batch_size = batch_size;
-                options.step = 0.001 * options.batch_size;
+                options.step_init = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Inf-Lim';
                 options.regularized = true;  

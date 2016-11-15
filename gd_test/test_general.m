@@ -7,9 +7,9 @@ function  test_general()
     
     %% Set algorithms
     if 0
-        algorithms = solver_list('ALL');  
+        algorithms = gd_solver_list('ALL');  
     else
-        algorithms = solver_list('BFGS'); 
+        algorithms = gd_solver_list('BFGS'); 
     end
 
      

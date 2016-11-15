@@ -7,7 +7,7 @@ function  test_convergence_animation_demo()
 
     %% Set algorithms
     if 0
-        algorithms = solver_list('ALL');  
+        algorithms = sgd_solver_list('ALL');  
     else
         algorithms = {'SGD','SVRG','SQN','SVRG-LBFGS','Damp-oBFGS-Lim','AdaGrad'};
     end      
@@ -125,7 +125,7 @@ function  test_convergence_animation_demo()
         switch algorithms{alg_idx}
             case {'GD'}
                 
-                options.step = 0.1;
+                options.step_init = 0.1;
                 options.max_epoch = 10 * options.max_epoch;
                 [w_list{alg_idx}, info_list{alg_idx}] = gd(problem, options);
 
@@ -134,7 +134,7 @@ function  test_convergence_animation_demo()
             case {'SGD'} 
 
                 options.batch_size = batch_size;
-                options.step = 0.001 * options.batch_size;
+                options.step_init = 0.001 * options.batch_size;
                 %options.step_alg = 'decay';
                 options.step_alg = 'fix';
 
@@ -144,7 +144,7 @@ function  test_convergence_animation_demo()
             case {'SVRG'}
                 
                 options.batch_size = batch_size;
-                options.step = 0.01 * options.batch_size;
+                options.step_init = 0.01 * options.batch_size;
                 options.step_alg = 'fix';
 
                 [w_list{alg_idx}, info_list{alg_idx}] = svrg(problem, options);      
@@ -152,8 +152,8 @@ function  test_convergence_animation_demo()
             case {'SAG'}
                 
                 options.batch_size = batch_size;
-                %options.step = 0.00005 * options.batch_size;
-                options.step = 0.001 * options.batch_size;
+                %options.step_init = 0.00005 * options.batch_size;
+                options.step_init = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'SAG';                   
 
@@ -162,8 +162,8 @@ function  test_convergence_animation_demo()
             case {'SAGA'}
                 
                 options.batch_size = batch_size;
-                %options.step = 0.00005 * options.batch_size;
-                options.step = 0.001 * options.batch_size;
+                %options.step_init = 0.00005 * options.batch_size;
+                options.step_init = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'SAGA';                       
 
@@ -173,7 +173,7 @@ function  test_convergence_animation_demo()
             case {'AdaGrad'}
                 
                 options.batch_size = batch_size;
-                options.step = 0.05 * options.batch_size;
+                options.step_init = 0.05 * options.batch_size;
                 options.step_alg = 'fix';
                 options.epsilon = 0.00001;
                 options.sub_mode = 'AdaGrad';        
@@ -183,7 +183,7 @@ function  test_convergence_animation_demo()
             case {'RMSProp'}    
     
                 options.batch_size = batch_size;
-                options.step = 0.001 * options.batch_size;
+                options.step_init = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.epsilon = 0.00001;
                 options.sub_mode = 'RMSProp';
@@ -194,7 +194,7 @@ function  test_convergence_animation_demo()
             case {'AdaDelta'}                  
     
                 options.batch_size = batch_size;
-                options.step = 0.001 * options.batch_size;
+                options.step_init = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.epsilon = 0.00001;
 
@@ -206,7 +206,7 @@ function  test_convergence_animation_demo()
             case {'Adam'}                 
 
                 options.batch_size = batch_size;
-                options.step = 0.001 * options.batch_size;
+                options.step_init = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Adam';
                 options.beta1 = 0.8;
@@ -218,7 +218,7 @@ function  test_convergence_animation_demo()
             case {'AdaMax'}                 
 
                 options.batch_size = batch_size;
-                options.step = 0.001 * options.batch_size;
+                options.step_init = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'AdaMax';
                 options.beta1 = 0.8;
@@ -233,7 +233,7 @@ function  test_convergence_animation_demo()
 
                 options.batch_size = batch_size;
                 options.batch_hess_size = batch_size * 20;        
-                options.step = 0.001 * options.batch_size;
+                options.step_init = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'SQN';        
                 options.L = 20;
@@ -245,7 +245,7 @@ function  test_convergence_animation_demo()
  
                 options.batch_size = batch_size;
                 options.batch_hess_size = batch_size * 20;        
-                options.step = 0.001 * options.batch_size;
+                options.step_init = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'SVRG-SQN';
                 options.L = 20;
@@ -257,7 +257,7 @@ function  test_convergence_animation_demo()
  
                 options.batch_size = batch_size;
                 options.batch_hess_size = batch_size * 20;        
-                options.step = 0.001 * options.batch_size;
+                options.step_init = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'SVRG-LBFGS';
                 options.mem_size = 20;
@@ -268,7 +268,7 @@ function  test_convergence_animation_demo()
  
                 options.batch_size = batch_size;
                 options.batch_hess_size = batch_size * 20;        
-                options.step = 0.0005 * options.batch_size;
+                options.step_init = 0.0005 * options.batch_size;
                 options.step_alg = 'fix';
                 r = d-1; 
                 if r < 1
@@ -281,7 +281,7 @@ function  test_convergence_animation_demo()
             case {'oBFGS-Inf'} 
 
                 options.batch_size = batch_size;
-                options.step = 0.001 * options.batch_size;
+                options.step_init = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Inf-mem';
                 options.regularized = false;
@@ -291,7 +291,7 @@ function  test_convergence_animation_demo()
             case {'oBFGS-Lim'}
 
                 options.batch_size = batch_size;
-                options.step = 0.001 * options.batch_size;
+                options.step_init = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Lim-mem';
                 options.mem_size = 20;
@@ -302,7 +302,7 @@ function  test_convergence_animation_demo()
             case {'Reg-oBFGS-Inf'}
 
                 options.batch_size = batch_size;
-                options.step = 0.001 * options.batch_size;
+                options.step_init = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Inf-mem';
                 options.regularized = true;  
@@ -313,7 +313,7 @@ function  test_convergence_animation_demo()
             case {'Reg-oBFGS-Lim'}
 
                 options.batch_size = batch_size;
-                options.step = 0.001 * options.batch_size;
+                options.step_init = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Lim-mem';
                 options.mem_size = 20;
@@ -325,7 +325,7 @@ function  test_convergence_animation_demo()
             case {'Damp-oBFGS-Inf'} % SDBFGS
 
                 options.batch_size = batch_size;
-                options.step = 0.005 * options.batch_size;
+                options.step_init = 0.005 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Inf-mem';
                 options.regularized = true;  
@@ -338,7 +338,7 @@ function  test_convergence_animation_demo()
             case {'Damp-oBFGS-Lim'}
 
                 options.batch_size = batch_size;
-                options.step = 0.005 * options.batch_size;
+                options.step_init = 0.005 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Lim-mem';
                 options.regularized = true;  

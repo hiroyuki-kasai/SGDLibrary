@@ -7,9 +7,9 @@ function  test_rosenbrock()
     
     %% Set algorithms
     if 0
-        algorithms = solver_list('ALL');  
+        algorithms = gd_solver_list('ALL');  
     else
-        algorithms = solver_list('NCG');         
+        algorithms = gd_solver_list('NCG');         
     end
     
     

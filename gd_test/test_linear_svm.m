@@ -7,11 +7,11 @@ function  test_linear_svm()
     
     %% Set algorithms
     if 0
-        algorithms = solver_list('ALL');  
+        algorithms = gd_solver_list('ALL');  
     else     
-        %algorithms = solver_list('LS');
-        %algorithms = solver_list('NCG');        
-        algorithms = solver_list('BFGS'); 
+        %algorithms = gd_solver_list('LS');
+        %algorithms = gd_solver_list('NCG');        
+        algorithms = gd_solver_list('BFGS'); 
     end
 
     

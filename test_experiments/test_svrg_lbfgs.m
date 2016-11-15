@@ -1,4 +1,4 @@
-function  test_logistic_regression()
+function  test_svrg_lbfgs()
 
     clc;
     clear;
@@ -9,15 +9,15 @@ function  test_logistic_regression()
     if 0
         algorithms = sgd_solver_list('ALL');  
     else
-        algorithms = {'SGD','SVRG','SVRG-LBFGS'};     
+        algorithms = {'SVRG','SVRG-SQN','SVRG-LBFGS'};     
     end       
     
     
     %% prepare dataset
-    if 1
+    if 0
         % generate synthtic data        
-        d = 10;
-        n = 100;
+        d = 50;
+        n = 1000;
         data = logistic_regression_data_generator(n, d);
         x_train = data.x_train;
         y_train = data.y_train;    
@@ -36,7 +36,8 @@ function  test_logistic_regression()
         y_test = data.y_test;          
         d = size(x_train,1);
         n = length(y_train);
-        w_opt = data.w_opt;
+        w_opt = data.w_star;
+        %w_opt = [];
         lambda = data.lambda;
         
     else
@@ -82,7 +83,8 @@ function  test_logistic_regression()
         % calculate solution
         w_opt = problem.calc_solution(problem, 1000);
     end
-    f_opt = problem.cost(w_opt); 
+    %f_opt = problem.cost(w_opt); 
+    f_opt = 7.0528403016600641e-02;
     fprintf('f_opt: %.24e\n', f_opt);    
      
 
@@ -111,7 +113,7 @@ function  test_logistic_regression()
             case {'SGD'} 
 
                 options.batch_size = batch_size;
-                options.step_init = 0.0001 * options.batch_size;
+                options.step_init = 0.1 * options.batch_size;
                 %options.step_alg = 'decay';
                 options.step_alg = 'fix';
 
@@ -124,7 +126,30 @@ function  test_logistic_regression()
                 options.step_init = 0.0001 * options.batch_size;
                 options.step_alg = 'fix';
 
-                [w_list{alg_idx}, info_list{alg_idx}] = svrg(problem, options);      
+                [w_list{alg_idx}, info_list{alg_idx}] = svrg(problem, options);     
+                
+            case {'SVRG-SQN'}       
+ 
+                options.batch_size = batch_size;
+                options.batch_hess_size = batch_size * 20;        
+                options.step_init = 0.0001 * options.batch_size;
+                options.step_alg = 'fix';
+                options.sub_mode = 'SVRG-SQN';
+                options.L = 20;
+                options.r = 20;
+
+                [w_list{alg_idx}, info_list{alg_idx}] = slbfgs(problem, options);
+                
+            case {'SVRG-LBFGS'}                  
+ 
+                options.batch_size = batch_size;
+                options.batch_hess_size = batch_size * 20;        
+                options.step_init = 0.0001 * options.batch_size;
+                options.step_alg = 'fix';
+                options.sub_mode = 'SVRG-LBFGS';
+                options.mem_size = 20;
+
+                [w_list{alg_idx}, info_list{alg_idx}] = slbfgs(problem, options);                    
                 
             case {'SAG'}
                 
@@ -218,28 +243,7 @@ function  test_logistic_regression()
 
                 [w_list{alg_idx}, info_list{alg_idx}] = slbfgs(problem, options);
 
-            case {'SVRG-SQN'}       
- 
-                options.batch_size = batch_size;
-                options.batch_hess_size = batch_size * 20;        
-                options.step_init = 0.0001 * options.batch_size;
-                options.step_alg = 'fix';
-                options.sub_mode = 'SVRG-SQN';
-                options.L = 20;
-                options.r = 20;
-
-                [w_list{alg_idx}, info_list{alg_idx}] = slbfgs(problem, options);
-                
-            case {'SVRG-LBFGS'}                  
- 
-                options.batch_size = batch_size;
-                options.batch_hess_size = batch_size * 20;        
-                options.step_init = 0.0001 * options.batch_size;
-                options.step_alg = 'fix';
-                options.sub_mode = 'SVRG-LBFGS';
-                options.mem_size = 20;
-
-                [w_list{alg_idx}, info_list{alg_idx}] = slbfgs(problem, options);      
+  
                 
             case {'SS-SVRG'}                  
  

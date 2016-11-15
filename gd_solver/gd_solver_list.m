@@ -1,4 +1,4 @@
-function [ algs ] = solver_list(category)
+function [ algs ] = gd_solver_list(category)
 % Return list of solvers.
 %
 % Inputs:

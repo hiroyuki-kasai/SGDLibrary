@@ -7,9 +7,10 @@ function  test_quadratic()
     
     %% Set algorithms
     if 0
-        algorithms = solver_list('ALL');  
+        algorithms = gd_solver_list('ALL');  
     else
-        algorithms = solver_list('EXACT');           
+        algorithms = gd_solver_list
+        ('EXACT');           
     end
 
      

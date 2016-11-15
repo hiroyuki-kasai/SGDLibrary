@@ -7,7 +7,8 @@ function  test_linear_regression()
     
     %% Set algorithms
     if 0
-        algorithms = solver_list('ALL');  
+        algorithms = sgd_solver_list
+        ('ALL');  
     else
         algorithms = {'SGD','SVRG','SQN'};
     end    
@@ -121,7 +122,7 @@ function  test_linear_regression()
         switch algorithms{alg_idx}
             case {'GD'}
                 
-                options.step = 0.1;
+                options.step_init = 0.1;
                 options.max_epoch = 10 * options.max_epoch;
                 [w_list{alg_idx}, info_list{alg_idx}] = gd(problem, options);
 
@@ -130,7 +131,7 @@ function  test_linear_regression()
             case {'SGD'} 
 
                 options.batch_size = batch_size;
-                options.step = 0.01 * options.batch_size;
+                options.step_init = 0.01 * options.batch_size;
                 %options.step_alg = 'decay';
                 options.step_alg = 'fix';
 
@@ -140,7 +141,7 @@ function  test_linear_regression()
             case {'SVRG'}
                 
                 options.batch_size = batch_size;
-                options.step = 0.01 * options.batch_size;
+                options.step_init = 0.01 * options.batch_size;
                 options.step_alg = 'fix';
 
                 [w_list{alg_idx}, info_list{alg_idx}] = svrg(problem, options);      
@@ -148,8 +149,8 @@ function  test_linear_regression()
             case {'SAG'}
                 
                 options.batch_size = batch_size;
-                %options.step = 0.00005 * options.batch_size;
-                options.step = 0.0001 * options.batch_size;
+                %options.step_init = 0.00005 * options.batch_size;
+                options.step_init = 0.0001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'SAG';                   
 
@@ -158,8 +159,8 @@ function  test_linear_regression()
             case {'SAGA'}
                 
                 options.batch_size = batch_size;
-                %options.step = 0.00005 * options.batch_size;
-                options.step = 0.000001 * options.batch_size;
+                %options.step_init = 0.00005 * options.batch_size;
+                options.step_init = 0.000001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'SAGA';                       
 
@@ -169,7 +170,7 @@ function  test_linear_regression()
             case {'AdaGrad'}
                 
                 options.batch_size = batch_size;
-                options.step = 0.02 * options.batch_size;
+                options.step_init = 0.02 * options.batch_size;
                 options.step_alg = 'fix';
                 options.epsilon = 0.00001;
                 options.sub_mode = 'AdaGrad';        
@@ -179,7 +180,7 @@ function  test_linear_regression()
             case {'RMSProp'}    
     
                 options.batch_size = batch_size;
-                options.step = 0.00001 * options.batch_size;
+                options.step_init = 0.00001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.epsilon = 0.00001;
                 options.sub_mode = 'RMSProp';
@@ -190,7 +191,7 @@ function  test_linear_regression()
             case {'AdaDelta'}                  
     
                 options.batch_size = batch_size;
-                options.step = 0.01 * options.batch_size;
+                options.step_init = 0.01 * options.batch_size;
                 options.step_alg = 'fix';
                 options.epsilon = 0.00001;
 
@@ -202,7 +203,7 @@ function  test_linear_regression()
             case {'Adam'}                 
 
                 options.batch_size = batch_size;
-                options.step = 0.00001 * options.batch_size;
+                options.step_init = 0.00001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Adam';
                 options.beta1 = 0.8;
@@ -214,7 +215,7 @@ function  test_linear_regression()
             case {'AdaMax'}                 
 
                 options.batch_size = batch_size;
-                options.step = 0.00001 * options.batch_size;
+                options.step_init = 0.00001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'AdaMax';
                 options.beta1 = 0.8;
@@ -229,7 +230,7 @@ function  test_linear_regression()
 
                 options.batch_size = batch_size;
                 options.batch_hess_size = batch_size * 20;        
-                options.step = 0.001 * options.batch_size;
+                options.step_init = 0.001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'SQN';        
                 options.L = 20;
@@ -241,7 +242,7 @@ function  test_linear_regression()
  
                 options.batch_size = batch_size;
                 options.batch_hess_size = batch_size * 20;        
-                options.step = 0.01 * options.batch_size;
+                options.step_init = 0.01 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'SVRG-SQN';
                 options.L = 20;
@@ -253,7 +254,7 @@ function  test_linear_regression()
  
                 options.batch_size = batch_size;
                 options.batch_hess_size = batch_size * 20;        
-                options.step = 0.01 * options.batch_size;
+                options.step_init = 0.01 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'SVRG-LBFGS';
                 options.mem_size = 20;
@@ -264,7 +265,7 @@ function  test_linear_regression()
  
                 options.batch_size = batch_size;
                 options.batch_hess_size = batch_size * 20;        
-                options.step = 0.0005 * options.batch_size;
+                options.step_init = 0.0005 * options.batch_size;
                 options.step_alg = 'fix';
                 r = d-1; 
                 if r < 1
@@ -277,7 +278,7 @@ function  test_linear_regression()
             case {'oBFGS-Inf'} 
 
                 options.batch_size = batch_size;
-                options.step = 0.0001 * options.batch_size;
+                options.step_init = 0.0001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Inf-mem';
                 options.regularized = false;
@@ -287,7 +288,7 @@ function  test_linear_regression()
             case {'oBFGS-Lim'}
 
                 options.batch_size = batch_size;
-                options.step = 0.00001 * options.batch_size;
+                options.step_init = 0.00001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Lim-mem';
                 options.mem_size = 20;
@@ -298,7 +299,7 @@ function  test_linear_regression()
             case {'Reg-oBFGS-Inf'}
 
                 options.batch_size = batch_size;
-                options.step = 0.0001 * options.batch_size;
+                options.step_init = 0.0001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Inf-mem';
                 options.regularized = true;  
@@ -309,7 +310,7 @@ function  test_linear_regression()
             case {'Reg-oBFGS-Lim'}
 
                 options.batch_size = batch_size;
-                options.step = 0.0001 * options.batch_size;
+                options.step_init = 0.0001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Lim-mem';
                 options.mem_size = 20;
@@ -321,7 +322,7 @@ function  test_linear_regression()
             case {'Damp-oBFGS-Inf'} % SDBFGS
 
                 options.batch_size = batch_size;
-                options.step = 0.0001 * options.batch_size;
+                options.step_init = 0.0001 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Inf-mem';
                 options.regularized = true;  
@@ -334,7 +335,7 @@ function  test_linear_regression()
             case {'Damp-oBFGS-Lim'}
 
                 options.batch_size = batch_size;
-                options.step = 0.01 * options.batch_size;
+                options.step_init = 0.01 * options.batch_size;
                 options.step_alg = 'fix';
                 options.sub_mode = 'Lim-mem';
                 options.regularized = true;  

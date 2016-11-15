@@ -7,9 +7,10 @@ function  test_logistic_regression()
      
     %% Set algorithms
     if 0
-        algorithms = solver_list('ALL');  
+        algorithms = gd_solver_list('ALL');  
     else
-        algorithms = [solver_list('Newton'), solver_list('BFGS')];           
+        algorithms = [gd_solver_list('Newton'), gd_solver_list
+            ('BFGS')];           
     end    
     
     
