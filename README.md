@@ -3,9 +3,9 @@
 
 Authors: [Hiroyuki Kasai](http://www.kasailab.com/)
 
-Last page update: November 04, 2016
+Last page update: January 12, 2017
 
-Latest library version: 1.0.4 (see Release notes for more info)
+Latest library version: 1.0.5 (see Release notes for more info)
 
 <br />
 
@@ -380,6 +380,8 @@ If you have any problems or questions, please contact the author: [Hiroyuki Kasa
 Release Notes
 --------------
 
+* Version 1.0.5 (jan. 12, 2017)
+    - Add some functions and modify items.
 * Version 1.0.4 (Nov. 04, 2016)
     - Integrate GDLibrary with SGDLibrary.
 * Version 1.0.3 (Nov. 04, 2016)
