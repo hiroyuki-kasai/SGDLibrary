@@ -380,7 +380,7 @@ If you have any problems or questions, please contact the author: [Hiroyuki Kasa
 Release Notes
 --------------
 
-* Version 1.0.5 (jan. 12, 2017)
+* Version 1.0.5 (Jan. 12, 2017)
     - Add some functions and modify items.
 * Version 1.0.4 (Nov. 04, 2016)
     - Integrate GDLibrary with SGDLibrary.
