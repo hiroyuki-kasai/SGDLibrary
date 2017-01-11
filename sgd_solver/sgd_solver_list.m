@@ -29,7 +29,8 @@ function [ algs ] = sgd_solver_list(category)
         case 'AD' 
             algs = adagrad_algs;            
         case 'ALL'
-            algs = [basic_algs, vr_algs, qnewton_algs, adagrad_algs, else_algs];
+            %algs = [basic_algs, vr_algs, qnewton_algs, adagrad_algs, else_algs];
+            algs = [basic_algs, vr_algs, qnewton_algs, adagrad_algs];
         otherwise
     end
     

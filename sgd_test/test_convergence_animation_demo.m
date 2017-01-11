@@ -126,7 +126,7 @@ function  test_convergence_animation_demo()
             case {'GD'}
                 
                 options.step_init = 0.1;
-                options.max_epoch = 10 * options.max_epoch;
+                options.max_iter = 10 * options.max_epoch;
                 [w_list{alg_idx}, info_list{alg_idx}] = gd(problem, options);
 
                 w_opt = w_list{alg_idx};

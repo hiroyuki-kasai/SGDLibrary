@@ -11,7 +11,7 @@ function [w, infos] = sgd(problem, options)
 % This file is part of SGDLibrary.
 %
 % Created by H.Kasai on Feb. 15, 2016
-% Modified by H.Kasai on Oct. 25, 2016
+% Modified by H.Kasai on Jan. 12, 2017
 
 
     % set dimensions and samples
@@ -107,9 +107,7 @@ function [w, infos] = sgd(problem, options)
     f_val = problem.cost(w);
     optgap = f_val - f_opt;
     infos.optgap = optgap;
-    grad = problem.full_grad(w);
-    gnorm = norm(grad);
-    infos.gnorm = gnorm;    
+    infos.gnorm = norm(problem.full_grad(w));    
     infos.cost = f_val;
     if store_w
         infos.w = w;       
@@ -155,8 +153,8 @@ function [w, infos] = sgd(problem, options)
         % calculate optimality gap
         f_val = problem.cost(w);
         optgap = f_val - f_opt;  
-        % calculate norm of gradient
-        gnorm = norm(grad);        
+        % calculate norm of full gradient
+        gnorm = norm(problem.full_grad(w));        
 
         % store infos
         infos.iter = [infos.iter epoch];

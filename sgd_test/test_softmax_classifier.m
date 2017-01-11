@@ -119,7 +119,7 @@ function  test_softmax_classifier()
             case {'GD'}
                 
                 options.step_init = 2;
-                options.max_epoch = 30 * options.max_epoch;
+                options.max_iter = 30 * options.max_epoch;
                 [w_list{alg_idx}, info_list{alg_idx}] = gd(problem, options);
 
             case {'SGD'} 

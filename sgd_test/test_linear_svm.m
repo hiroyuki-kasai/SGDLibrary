@@ -120,7 +120,7 @@ function  test_linear_svm()
             case {'GD'}
                 
                 options.step = 0.05;
-                options.max_epoch = 10*options.max_epoch;
+                options.max_iter = 10*options.max_epoch;
                 [w_list{alg_idx}, info_list{alg_idx}] = gd(problem, options);
 
             case {'SGD'} 

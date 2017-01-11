@@ -16,7 +16,7 @@ function [w, infos] = svrg(problem, options)
 % This file is part of SGDLibrary.
 %
 % Created by H.Kasai on Feb. 15, 2016
-% Modified by H.Kasai on Oct. 14, 2016
+% Modified by H.Kasai on Jan. 12, 2017
 
 
     % set dimensions and samples
@@ -118,6 +118,7 @@ function [w, infos] = svrg(problem, options)
     f_val = problem.cost(w);
     optgap = f_val - f_opt;
     infos.optgap = optgap;
+    infos.gnorm = norm(problem.full_grad(w));        
     infos.cost = f_val;
     if store_w
         infos.w = w;       
@@ -169,7 +170,9 @@ function [w, infos] = svrg(problem, options)
         epoch = epoch + 1;
         % calculate optgap
         f_val = problem.cost(w);
-        optgap = f_val - f_opt;        
+        optgap = f_val - f_opt; 
+        % calculate norm of full gradient
+        gnorm = norm(problem.full_grad(w));              
 
         % store infos
         infos.iter = [infos.iter epoch];
@@ -177,6 +180,7 @@ function [w, infos] = svrg(problem, options)
         infos.grad_calc_count = [infos.grad_calc_count grad_calc_count];
         infos.optgap = [infos.optgap optgap];
         infos.cost = [infos.cost f_val];
+        infos.gnorm = [infos.gnorm gnorm];            
         if store_w
             infos.w = [infos.w w];         
         end          

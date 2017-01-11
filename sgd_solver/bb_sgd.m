@@ -16,6 +16,7 @@ function [w, infos] = bb_sgd(problem, options)
 % This file is part of SGDLibrary.
 %
 % Created by H.Kasai on Nov. 07, 2016
+% Modified by H.Kasai on Jan. 12, 2017
 
 
     % set dimensions and samples
@@ -103,6 +104,7 @@ function [w, infos] = bb_sgd(problem, options)
     gnorm = norm(grad);
     infos.gnorm = gnorm;    
     infos.cost = f_val;
+    infos.gnorm = norm(problem.full_grad(w));        
     if store_w
         infos.w = w;       
     end
@@ -270,8 +272,8 @@ function [w, infos] = bb_sgd(problem, options)
         % calculate optimality gap
         f_val = problem.cost(w);
         optgap = f_val - f_opt;   
-        % calculate norm of gradient
-        gnorm = norm(grad);        
+        % calculate norm of full gradient
+        gnorm = norm(problem.full_grad(w));        
 
         % store infos
         infos.iter = [infos.iter epoch];

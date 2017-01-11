@@ -1,5 +1,5 @@
-function [w, infos] = subsamp_svrg(problem, options)
-% Sabsampled SVRG algorithm.
+function [w, infos] = svrg_adv(problem, options)
+% Stochastic Variance gradient descent (SVRG) algorithm.
 %
 % Inputs:
 %       problem     function (cost/grad/hess)
@@ -9,20 +9,20 @@ function [w, infos] = subsamp_svrg(problem, options)
 %       infos       information
 %
 % References:
-%       Subsampled SVRG:
-%       R. Kolte, M. Erdogdu and A. Ozgur, 
-%       "Accelerating SVRG via second-order information," 
-%       OPT2015, 2015.
+%       Rie Johnson and Tong Zhang, 
+%       "Accelerating Stochastic Gradient Descent using Predictive Variance Reduction,"
+%       NIPS, 2013.
+%    
+% This file is part of SGDLibrary.
 %
-%                   
-% Created by H.Kasai on Oct. 28, 2016
-% Modified by H.Kasai on Jan. 12, 2017
+% Created by H.Kasai on Feb. 15, 2016
+% Modified by H.Kasai on Oct. 14, 2016
 
 
     % set dimensions and samples
     d = problem.dim();
     n = problem.samples();
-    
+
     % extract options
     if ~isfield(options, 'step_init')
         step_init = 0.1;
@@ -60,10 +60,6 @@ function [w, infos] = subsamp_svrg(problem, options)
     else
         batch_size = options.batch_size;
     end
-    
-    if batch_size > n
-        batch_size = n;
-    end   
     num_of_bachces = floor(n / batch_size);        
     
     if ~isfield(options, 'max_epoch')
@@ -72,21 +68,17 @@ function [w, infos] = subsamp_svrg(problem, options)
         max_epoch = options.max_epoch;
     end 
     
-    if ~isfield(options, 'r')
-        r = inf;
+    if ~isfield(options, 'max_inner_iter')
+        max_inner_iter = num_of_bachces;
     else
-        r = options.r;
-    end   
-    
-    if r > d
-        r = d;
-    end
+        max_inner_iter = options.max_inner_iter;
+    end    
     
     if ~isfield(options, 'w_init')
         w = randn(d,1);
     else
         w = options.w_init;
-    end     
+    end   
     
     if ~isfield(options, 'f_opt')
         f_opt = -Inf;
@@ -106,15 +98,9 @@ function [w, infos] = subsamp_svrg(problem, options)
         verbose = options.verbose;
     end
     
-    if ~isfield(options, 'store_w')
-        store_w = false;
-    else
-        store_w = options.store_w;
-    end      
-    
     
     % initialize
-    iter = 0;    
+    iter = 0;
     epoch = 0;
     grad_calc_count = 0;
 
@@ -126,14 +112,7 @@ function [w, infos] = subsamp_svrg(problem, options)
     f_val = problem.cost(w);
     optgap = f_val - f_opt;
     infos.optgap = optgap;
-    infos.gnorm = norm(problem.full_grad(w));        
     infos.cost = f_val;
-    if store_w
-        infos.w = w;       
-    end     
-    
-    %
-    sample_size = round(10*r*log(d));    
     
     % set start time
     start_time = tic();
@@ -148,22 +127,12 @@ function [w, infos] = subsamp_svrg(problem, options)
             perm_idx = 1:n;
         end
 
-       % compute full gradient
+        % compute full gradient
         full_grad = problem.grad(w,1:n);
         % store w
         w0 = w;
         grad_calc_count = grad_calc_count + n;        
 
-        % calculated Hessian using subsamples every outer loop
-        sub_indices = datasample((1:n), sample_size);   
-        H = problem.hess(w, sub_indices);        
-        [u, sigma,~] = svd(H);
-        Q = u(:,1:r); 
-        gamma = sigma(r+1,r+1);
-        sigma = sigma(1:r,1:r);
-        Sing_inv_gamma = diag(1./diag(sigma)) - diag(ones(r,1)/gamma);
-        
-        
         for j=1:num_of_bachces
             
             % update step-size
@@ -176,12 +145,13 @@ function [w, infos] = subsamp_svrg(problem, options)
             indice_j = perm_idx(start_index:start_index+batch_size-1);
             grad = problem.grad(w, indice_j);
             grad_0 = problem.grad(w0, indice_j);
-            grad_est = full_grad + grad - grad_0;  
+            
+            %mod_sg = full_grad + grad - grad_0;
+            full_grad = full_grad + (grad - grad_0);
             
             % update w
-            v = -Q*(Sing_inv_gamma)*(Q' * grad_est) - (1/gamma)*grad_est;
-            w = w + step * v;
-                
+            %w = w - step * mod_sg;
+            w = w - step * full_grad;
             iter = iter + 1;
         end
         
@@ -189,14 +159,12 @@ function [w, infos] = subsamp_svrg(problem, options)
         elapsed_time = toc(start_time);
         
         % count gradient evaluations
-        grad_calc_count = grad_calc_count + j * batch_size + sample_size;        
+        grad_calc_count = grad_calc_count + j * batch_size;        
         % update epoch
         epoch = epoch + 1;
         % calculate optgap
         f_val = problem.cost(w);
-        optgap = f_val - f_opt; 
-        % calculate norm of full gradient
-        gnorm = norm(problem.full_grad(w));           
+        optgap = f_val - f_opt;        
 
         % store infos
         infos.iter = [infos.iter epoch];
@@ -204,14 +172,10 @@ function [w, infos] = subsamp_svrg(problem, options)
         infos.grad_calc_count = [infos.grad_calc_count grad_calc_count];
         infos.optgap = [infos.optgap optgap];
         infos.cost = [infos.cost f_val];
-        infos.gnorm = [infos.gnorm gnorm];           
-        if store_w
-            infos.w = [infos.w w];         
-        end           
 
         % display infos
         if verbose > 0
-            fprintf('Sub-sampled SVRG: Epoch = %03d, cost = %.16e, optgap = %.4e\n', epoch, f_val, optgap);
+            fprintf('SVRG ADV: Epoch = %03d, cost = %.24e, optgap = %.4e\n', epoch, f_val, optgap);
         end
     end
     
@@ -219,6 +183,7 @@ function [w, infos] = subsamp_svrg(problem, options)
         fprintf('Optimality gap tolerance reached: tol_optgap = %g\n', tol_optgap);
     elseif epoch == max_epoch
         fprintf('Max epoch reached: max_epochr = %g\n', max_epoch);
-    end      
+    end
+    
 end
 

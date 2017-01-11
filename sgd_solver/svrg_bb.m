@@ -16,6 +16,7 @@ function [w, infos] = svrg_bb(problem, options)
 % This file is part of SGDLibrary.
 %
 % Created by H.Kasai on Nov. 1, 2016
+% Modified by H.Kasai on Jan. 12, 2017
 
 
     % set dimensions and samples
@@ -99,6 +100,7 @@ function [w, infos] = svrg_bb(problem, options)
     f_val = problem.cost(w);
     optgap = f_val - f_opt;
     infos.optgap = optgap;
+    infos.gnorm = norm(problem.full_grad(w));        
     infos.cost = f_val;
     if store_w
         infos.w = w;       
@@ -127,7 +129,8 @@ function [w, infos] = svrg_bb(problem, options)
             % automatic step size selection based on Barzilai-Borwein (BB)
             w_diff = w - w0;
             g_diff = full_grad - full_grad_old;
-            step = 1/num_of_bachces * (w_diff' * w_diff) / (w_diff' * g_diff);        
+            step = 1/num_of_bachces * (w_diff' * w_diff) / (w_diff' * g_diff);   
+            fprintf('step:%f\n', step);
         else
             % compute full gradient
             full_grad = problem.grad(w,1:n);
@@ -159,7 +162,9 @@ function [w, infos] = svrg_bb(problem, options)
         epoch = epoch + 1;
         % calculate optgap
         f_val = problem.cost(w);
-        optgap = f_val - f_opt;        
+        optgap = f_val - f_opt;   
+        % calculate norm of full gradient
+        gnorm = norm(problem.full_grad(w));           
 
         % store infos
         infos.iter = [infos.iter epoch];
@@ -167,6 +172,7 @@ function [w, infos] = svrg_bb(problem, options)
         infos.grad_calc_count = [infos.grad_calc_count grad_calc_count];
         infos.optgap = [infos.optgap optgap];
         infos.cost = [infos.cost f_val];
+        infos.gnorm = [infos.gnorm gnorm];            
         if store_w
             infos.w = [infos.w w];         
         end          

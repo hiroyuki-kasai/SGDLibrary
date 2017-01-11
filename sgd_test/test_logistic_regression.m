@@ -105,7 +105,7 @@ function  test_logistic_regression()
             case {'GD'}
                 
                 options.step_init = 0.05;
-                options.max_epoch = options.max_epoch;
+                options.max_iter = options.max_epoch;
                 [w_list{alg_idx}, info_list{alg_idx}] = gd(problem, options);
 
             case {'SGD'} 

@@ -84,7 +84,9 @@ function [w, infos] = gd(problem, options)
 
     % initialise
     iter = 0;
-    S = eye(d);
+    if strcmp(step_alg, 'exact')
+        S = eye(d);
+    end
     
     % store first infos
     clear infos;
@@ -128,10 +130,15 @@ function [w, infos] = gd(problem, options)
             % diagonal scaling            
             h = problem.hess(w);
             S = diag(1./diag(h));
+            
+            % update w
+            w = w - step * S * grad;  
+        else
+            % update w
+            w = w - step * grad;            
         end
         
-        % update w
-        w = w - step * S * grad;
+
         
         % calculate gradient
         grad = problem.full_grad(w);

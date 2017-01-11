@@ -25,6 +25,7 @@ function [w, infos] = adagrad(problem, options)
 % This file is part of SGDLibrary.
 %
 % Created by H.Kasai on Oct. 17, 2016
+% Modified by H.Kasai on Jan. 12, 2017
 
 
     % set dimensions and samples
@@ -154,6 +155,7 @@ function [w, infos] = adagrad(problem, options)
     optgap = f_val - f_opt;
     infos.optgap = optgap;
     infos.cost = f_val;
+    infos.gnorm = norm(problem.full_grad(w));        
     if store_w
         infos.w = w;       
     end        
@@ -229,6 +231,8 @@ function [w, infos] = adagrad(problem, options)
         % calculate optgap
         f_val = problem.cost(w);
         optgap = f_val - f_opt;        
+        % calculate norm of full gradient
+        gnorm = norm(problem.full_grad(w));              
 
         % store infos
         infos.iter = [infos.iter epoch];
@@ -236,6 +240,7 @@ function [w, infos] = adagrad(problem, options)
         infos.grad_calc_count = [infos.grad_calc_count grad_calc_count];
         infos.optgap = [infos.optgap optgap];
         infos.cost = [infos.cost f_val];
+        infos.gnorm = [infos.gnorm gnorm];             
         if store_w
             infos.w = [infos.w w];         
         end          
