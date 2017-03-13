@@ -2,8 +2,8 @@ function [Problem] = sum_quadratic(A, b)
 % This file defines sum quadratic problem
 %
 % Inputs:
-%           A_i       a positive definite matrix of size dxd for sample i
-%           b_i       a column vector of size d for sample i
+%           A(d:d:n)    n matrix of size dxd for n samples
+%           b(d:n)      n column vectors of size d for n sample
 %
 % Output:
 %       Problem     problem instance. 
@@ -11,7 +11,7 @@ function [Problem] = sum_quadratic(A, b)
 %
 % The problem of interest is defined as
 %
-%           min f(w) = 1/n * sum_i^n 1/2 * w^T * A_i * w + b_i^T * w.
+%           min f(w) = 1/n * (sum_i^n 1/2 * w^T * A_i * w + b_i^T * w).
 %           where 
 %           w in R^d
 %
@@ -68,7 +68,6 @@ function [Problem] = sum_quadratic(A, b)
 
     Problem.full_hess = @full_hess; 
     function h = full_hess(x)
-        
         
         h = zeros(d,d);
         for i=1:n
