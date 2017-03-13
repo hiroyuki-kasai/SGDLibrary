@@ -31,6 +31,8 @@ function [w, infos] = sgd(problem, options)
     else
         if strcmp(options.step_alg, 'decay')
             step_alg = 'decay';
+        elseif strcmp(options.step_alg, 'decay-2')
+            step_alg = 'decay-2';            
         elseif strcmp(options.step_alg, 'fix')
             step_alg = 'fix';
         else
@@ -111,7 +113,12 @@ function [w, infos] = sgd(problem, options)
     infos.cost = f_val;
     if store_w
         infos.w = w;       
-    end      
+    end  
+    
+    % display infos
+    if verbose > 0
+        fprintf('SGD: Epoch = %03d, cost = %.16e, optgap = %.4e\n', epoch, f_val, optgap);
+    end    
 
     % set start time
     start_time = tic();
@@ -131,6 +138,8 @@ function [w, infos] = sgd(problem, options)
             % update step-size
             if strcmp(step_alg, 'decay')
                 step = step_init / (1 + step_init * lambda * iter);
+            elseif strcmp(step_alg, 'decay-2')
+                step = step_init / (1 + epoch);
             end     
             
             % calculate gradient

@@ -185,7 +185,8 @@ function [w, infos] = slbfgs(problem, options)
 
         if strcmp(sub_mode, 'SVRG-SQN') || strcmp(sub_mode, 'SVRG-LBFGS')
             % compute full gradient
-            full_grad_new = problem.grad(w,1:n);
+            %full_grad_new = problem.grad(w,1:n);
+            full_grad_new = problem.full_grad(w);
             % count gradient evaluations
             grad_calc_count = grad_calc_count + n; 
         end          
@@ -242,7 +243,7 @@ function [w, infos] = slbfgs(problem, options)
             u_new = u_new + w/L;
 
             % update LBFGS vectors Hessian at every L iteration for 'SQN' or 'SVRG-SQN'
-            % 'SVRG-LBFGS' do nothing because of L = Inf
+            % 'SVRG-LBFGS' does nothing because of L = Inf
             if(mod(total_iter,L)==0 && total_iter)                 
                 
                 % calcluate Hessian-vector product using subsamples

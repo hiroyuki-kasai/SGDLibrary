@@ -138,7 +138,8 @@ function [w, infos] = svrg(problem, options)
         end
 
         % compute full gradient
-        full_grad = problem.grad(w,1:n);
+        %full_grad = problem.grad(w,1:n);
+        full_grad = problem.full_grad(w);
         % store w
         w0 = w;
         grad_calc_count = grad_calc_count + n;        

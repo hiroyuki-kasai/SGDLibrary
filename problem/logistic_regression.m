@@ -45,7 +45,8 @@ function [Problem] = logistic_regression(x_train, y_train, x_test, y_test, varar
     function f = cost(w)
         % f = sum(log(1+exp(-y_train.*(w'*x_train)))/n_train,2)+ lambda * (w'*w) / 2; is replaced below 
         % becasuse log(sigmoid(a)) = log(1/(1+exp(-a))) = log1 - log(1+exp(-a)) = -log(1+exp(-a)).
-        f = -sum(log(sigmoid(y_train.*(w'*x_train)))/n_train,2) + lambda * (w'*w) / 2;
+        %f = -sum(log(sigmoid(y_train.*(w'*x_train)))/n_train,2) + lambda * (w'*w) / 2;
+        f = -sum(log(sigmoid(y_train.*(w'*x_train))),2)/n_train + lambda * (w'*w) / 2;
     end
 
     Problem.cost_batch = @cost_batch;
@@ -67,8 +68,17 @@ function [Problem] = logistic_regression(x_train, y_train, x_test, y_test, varar
         % (log(sigmoid(y_train.*(w'*x_train)))' = y_train.*x_train * 1/sigmoid(y_train.*(w'*x_train)) * (sigmoid(y_train.*(w'*x_train)))'
         %   = y_train.*x_train * 1/sigmoid(y_train.*(w'*x_train)) * (- sigmoid(y_train.*(w'*x_train)) * (1 - sigmoid(y_train.*(w'*x_train))))
         %   = -y_train.*x_train * (1 - sigmoid(y_train.*(w'*x_train)))
-        g = -sum(ones(d,1) * y_train(indices).*x_train(:,indices) * (ones(1,length(indices))-sigmoid(y_train(indices).*(w'*x_train(:,indices))))',2)/length(indices)+ lambda * w;
+        %g_old = -sum(ones(d,1) * y_train(indices).*x_train(:,indices) * (ones(1,length(indices))-sigmoid(y_train(indices).*(w'*x_train(:,indices))))',2)/length(indices)+ lambda * w;
         
+        e = exp(-1*y_train(indices)'.*(x_train(:,indices)'*w));
+        s = e./(1+e);
+        g = -(1/length(indices))*((s.*y_train(indices)')'*x_train(:,indices)')';
+        g = full(g) + lambda * w;
+        
+        %diff = norm(g_old - g);
+        %fprintf('%e\n', diff);
+        
+
     end
 
     Problem.full_grad = @full_grad;
@@ -115,6 +125,7 @@ function [Problem] = logistic_regression(x_train, y_train, x_test, y_test, varar
         
     end
 
+    %
     Problem.prediction = @prediction;
     function p = prediction(w)
         
@@ -144,6 +155,27 @@ function [Problem] = logistic_regression(x_train, y_train, x_test, y_test, varar
         options.step_alg = 'backtracking';
         [w_opt,~] = gd(problem, options);
         
+    end
+
+
+    %% for NIM
+    Problem.get_partial_samples = @get_partial_samples;
+    function [labels, samples] = get_partial_samples(indices)
+        samples = x_train(:,indices);
+        labels  = y_train(indices);
+    end
+
+    Problem.phi_prime = @phi_prime;
+    function [s] = phi_prime(w, indices)
+        e = exp(-1.0 * y_train(indices)' .* (x_train(:,indices)'*w));
+        s = e ./ (1.0+e);        
+    end
+
+    Problem.phi_double_prime = @phi_double_prime;
+    function [ss] = phi_double_prime(w, indices)
+        e = exp(-1.0 * y_train(indices)' .* (x_train(:,indices)'*w));
+        s = e ./ (1.0+e); 
+        ss = s .* (1.0 - s);
     end
 
 end
