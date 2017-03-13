@@ -3,9 +3,9 @@
 
 Authors: [Hiroyuki Kasai](http://www.kasailab.com/)
 
-Last page update: January 12, 2017
+Last page update: March 13, 2017
 
-Latest library version: 1.0.5 (see Release notes for more info)
+Latest library version: 1.0.6 (see Release notes for more info)
 
 <br />
 
@@ -110,6 +110,7 @@ optimization](https://arxiv.org/pdf/1607.01231v3.pdf),"  arXiv preprint arXiv:16
 * Logistic regression
 * Softmax classification (multinomial logistic regression)
     - Note that softmax classification problem does not support Hessian-vector product type algorithms, i.e., SQN, SVRG-SQN and SVRG-LBFGS.
+* Sum quadratic problem
 
 Additionally, the following problems are provided for gradient descent algorithms. 
 
@@ -380,6 +381,8 @@ If you have any problems or questions, please contact the author: [Hiroyuki Kasa
 Release Notes
 --------------
 
+* Version 1.0.6 (Mar. 13, 2017)
+    - Add some functions and modify items. Sum quadratic problem is added. 
 * Version 1.0.5 (Jan. 12, 2017)
     - Add some functions and modify items.
 * Version 1.0.4 (Nov. 04, 2016)
