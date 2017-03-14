@@ -39,7 +39,8 @@ function [Problem] = logistic_regression(x_train, y_train, x_test, y_test, varar
     Problem.name = @() 'logistic_regression';    
     Problem.dim = @() d;
     Problem.samples = @() n_train;
-    Problem.classes = @() 2;      
+    Problem.classes = @() 2;  
+    Problem.hessain_w_independent = @() false;
 
     Problem.cost = @cost;
     function f = cost(w)

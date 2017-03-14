@@ -3,7 +3,7 @@ function [Problem] = sum_quadratic(A, b)
 %
 % Inputs:
 %           A(d:d:n)    n matrix of size dxd for n samples
-%           b(d:n)      n column vectors of size d for n sample
+%           b(d:n)      n column vectors of size d for n samples
 %
 % Output:
 %       Problem     problem instance. 
@@ -30,7 +30,15 @@ function [Problem] = sum_quadratic(A, b)
     Problem.dim = @() d;
     Problem.samples = @() n;    
     Problem.A = @() A;     
-    Problem.b = @() b;       
+    Problem.b = @() b; 
+    Problem.hessain_w_independent = @() true;
+    
+    A_sum = zeros(d,d);
+    b_sum = zeros(d,1);
+    for j=1:n
+        A_sum = A_sum + A(:,:,j);
+        b_sum = b_sum + b(:,j);
+    end    
 
     Problem.cost = @cost;
     function f = cost(x)
@@ -93,5 +101,24 @@ function [Problem] = sum_quadratic(A, b)
         
     end
 
+    Problem.calc_solution = @calc_solution; 
+    function w_opt = calc_solution()
+        
+        A_inv = zeros(d,d);
+        for i=1:d
+            A_inv(i,i) = 1/(A_sum(i,i));
+        end
+        
+        w_opt = -A_inv * b_sum;
+        
+    end
+
+    Problem.calc_cn = @calc_cn; 
+    function cn = calc_cn()
+        
+        eig_values = eig(A_sum);
+        cn = max(eig_values)/min(eig_values);
+        
+    end
 end
 

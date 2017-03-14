@@ -33,6 +33,7 @@ function Problem = linear_regression(x_train, y_train, x_test, y_test, lambda)
     Problem.name = @() 'linear_regression';    
     Problem.dim = @() d;
     Problem.samples = @() n_train;
+    Problem.hessain_w_independent = @() true;
 
     Problem.cost = @cost;
     function f = cost(w)

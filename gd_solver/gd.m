@@ -11,7 +11,7 @@ function [w, infos] = gd(problem, options)
 % This file is part of GDLibrary and SGDLibrary.
 %
 % Created by H.Kasai on Feb. 15, 2016
-% Modified by H.Kasai on Nov. 01, 2016
+% Modified by H.Kasai on March. 14, 2017
 
 
     % set dimensions and samples
@@ -167,7 +167,7 @@ function [w, infos] = gd(problem, options)
        
         % print info
         if verbose
-            fprintf('GD: Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
+            fprintf('GD: Iter = %03d, cost = %.24e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
         end        
     end
     

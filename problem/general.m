@@ -19,7 +19,8 @@ function [Problem] = general(f_in, g_in, h_in, hv_in, d)
 
     Problem.name = @() 'general';  
     Problem.dim = @() d;
-    Problem.samples = @() 0;       
+    Problem.samples = @() 0; 
+    Problem.hessain_w_independent = @() false;
 
     Problem.cost = @cost;
     function f = cost(x)

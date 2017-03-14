@@ -37,7 +37,8 @@ function Problem = softmax_regression(x_train, y_train, x_test, y_test, lambda, 
     Problem.name = @() 'softmax_regression';
     Problem.dim = @() d*n_classes;
     Problem.samples = @() n_train;
-    Problem.classes = @() n_classes;    
+    Problem.classes = @() n_classes;   
+    Problem.hessain_w_independent = @() false;
 
     Problem.cost = @cost;
     function f = cost(w)

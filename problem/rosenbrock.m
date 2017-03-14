@@ -25,7 +25,8 @@ function [Problem] = rosenbrock(d)
 
     Problem.name = @() 'rosenbrock';    
     Problem.dim = @() d;
-    Problem.samples = @() n;    
+    Problem.samples = @() n; 
+    Problem.hessain_w_independent = @() false;
 
     Problem.cost = @cost;
     function f = cost(x)

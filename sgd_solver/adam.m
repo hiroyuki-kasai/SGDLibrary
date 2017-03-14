@@ -154,6 +154,11 @@ function [w, infos] = adam(problem, options)
     
     % set start time
     start_time = tic();
+    
+    % display infos
+    if verbose > 0
+        fprintf('Adam-%s: Epoch = %03d, cost = %.16e, optgap = %.4e\n', sub_mode, epoch, f_val, optgap);
+    end   
 
     % main loop
     while (optgap > tol_optgap) && (epoch < max_epoch)

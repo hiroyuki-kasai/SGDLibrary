@@ -115,10 +115,13 @@ function [w, infos] = bb_sgd(problem, options)
     perm_idx = randperm(Sample_end);
     perm_total_samples = total_samples(perm_idx);
     
-
     % set start time
     start_time = tic();
-
+    
+    % display infos
+    if verbose > 0
+        fprintf('BB SGD: Epoch = %03d, cost = %.16e, optgap = %.4e\n', epoch, f_val, optgap);
+    end       
     
     % main loop
     while (optgap > tol_optgap) && ~Sample_end_reached

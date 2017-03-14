@@ -124,6 +124,11 @@ function [w, infos] = svrg(problem, options)
         infos.w = w;       
     end    
     
+    % display infos
+    if verbose > 0
+        fprintf('SVRG: Epoch = %03d, cost = %.16e, optgap = %.4e\n', epoch, f_val, optgap);
+    end      
+    
     % set start time
     start_time = tic();
 

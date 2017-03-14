@@ -1,5 +1,5 @@
-function [w, infos] = sgd(problem, options)
-% Stochastic gradient descent algorithm.
+function [w, infos] = nim_LR(problem, options)
+% NIM algorithm.
 %
 % Inputs:
 %       problem     function (cost/grad/hess)
@@ -10,8 +10,7 @@ function [w, infos] = sgd(problem, options)
 %
 % This file is part of SGDLibrary.
 %
-% Created by H.Kasai on Feb. 15, 2016
-% Modified by H.Kasai on Oct. 25, 2016
+% Created by H.Kasai on March. 02, 2017
 
 
     % set dimensions and samples
@@ -19,10 +18,10 @@ function [w, infos] = sgd(problem, options)
     n = problem.samples();  
 
     % extract options
-    if ~isfield(options, 'step')
+    if ~isfield(options, 'step_init')
         step_init = 0.1;
     else
-        step_init = options.step;
+        step_init = options.step_init;
     end
     step = step_init;    
     
@@ -31,6 +30,8 @@ function [w, infos] = sgd(problem, options)
     else
         if strcmp(options.step_alg, 'decay')
             step_alg = 'decay';
+        elseif strcmp(options.step_alg, 'decay-2')
+            step_alg = 'decay-2';            
         elseif strcmp(options.step_alg, 'fix')
             step_alg = 'fix';
         else
@@ -51,14 +52,14 @@ function [w, infos] = sgd(problem, options)
     end        
 
     if ~isfield(options, 'batch_size')
-        batch_size = 1;
+        batch_size = 10;
     else
         batch_size = options.batch_size;
     end
     num_of_bachces = floor(n / batch_size);    
     
     if ~isfield(options, 'max_epoch')
-        max_epoch = inf;
+        max_epoch = 100;
     else
         max_epoch = options.max_epoch;
     end 
@@ -69,10 +70,10 @@ function [w, infos] = sgd(problem, options)
         w = options.w_init;
     end 
     
-    if ~isfield(options, 'f_sol')
-        f_sol = -Inf;
+    if ~isfield(options, 'f_opt')
+        f_opt = -Inf;
     else
-        f_sol = options.f_sol;
+        f_opt = options.f_opt;
     end 
     
     if ~isfield(options, 'permute_on')
@@ -87,10 +88,10 @@ function [w, infos] = sgd(problem, options)
         verbose = options.verbose;
     end
     
-    if ~isfield(options, 'store_sol')
-        store_sol = false;
+    if ~isfield(options, 'store_w')
+        store_w = false;
     else
-        store_sol = options.store_sol;
+        store_w = options.store_w;
     end      
     
     
@@ -98,6 +99,10 @@ function [w, infos] = sgd(problem, options)
     iter = 0;
     epoch = 0;
     grad_calc_count = 0;
+    
+    % prepare an array of gradients, and a valiable of average gradient
+    grad_array = zeros(d, num_of_bachces);
+    grad_ave = mean(grad_array, 2);    
 
     % store first infos
     clear infos;
@@ -105,12 +110,18 @@ function [w, infos] = sgd(problem, options)
     infos.time = 0;    
     infos.grad_calc_count = grad_calc_count;
     f_val = problem.cost(w);
-    optgap = f_val - f_sol;
+    optgap = f_val - f_opt;
     infos.optgap = optgap;
+    infos.gnorm = norm(problem.full_grad(w));    
     infos.cost = f_val;
-    if store_sol
+    if store_w
         infos.w = w;       
-    end      
+    end  
+    
+    % display infos
+    if verbose > 0
+        fprintf('NIM: Epoch = %03d, cost = %.16e, optgap = %.4e\n', epoch, f_val, optgap);
+    end    
 
     % set start time
     start_time = tic();
@@ -130,6 +141,8 @@ function [w, infos] = sgd(problem, options)
             % update step-size
             if strcmp(step_alg, 'decay')
                 step = step_init / (1 + step_init * lambda * iter);
+            elseif strcmp(step_alg, 'decay-2')
+                step = step_init / (1 + epoch);
             end     
             
             % calculate gradient
@@ -151,7 +164,9 @@ function [w, infos] = sgd(problem, options)
         epoch = epoch + 1;
         % calculate optimality gap
         f_val = problem.cost(w);
-        optgap = f_val - f_sol;        
+        optgap = f_val - f_opt;  
+        % calculate norm of full gradient
+        gnorm = norm(problem.full_grad(w));        
 
         % store infos
         infos.iter = [infos.iter epoch];
@@ -159,13 +174,14 @@ function [w, infos] = sgd(problem, options)
         infos.grad_calc_count = [infos.grad_calc_count grad_calc_count];
         infos.optgap = [infos.optgap optgap];
         infos.cost = [infos.cost f_val];
-        if store_sol
+        infos.gnorm = [infos.gnorm gnorm];         
+        if store_w
             infos.w = [infos.w w];         
         end           
 
         % display infos
         if verbose > 0
-            fprintf('SGD: Epoch = %03d, cost = %.16e, optgap = %.4e\n', epoch, f_val, optgap);
+            fprintf('NIM: Epoch = %03d, cost = %.16e, optgap = %.4e\n', epoch, f_val, optgap);
         end
 
     end

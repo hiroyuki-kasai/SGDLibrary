@@ -31,7 +31,8 @@ function [Problem] = quadratic(A, b)
     Problem.dim = @() d;
     Problem.samples = @() n;    
     Problem.A = @() A;     
-    Problem.b = @() b;       
+    Problem.b = @() b;  
+    Problem.hessain_w_independent = @() true;
 
     Problem.cost = @cost;
     function f = cost(x)
