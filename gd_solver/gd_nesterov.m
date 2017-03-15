@@ -108,7 +108,7 @@ function [w, infos] = gd_nesterov(problem, options)
     infos.cost = f_val;     
     optgap = f_val - f_opt;
     infos.optgap = optgap;
-    grad = problem.grad(w);
+    grad = problem.full_grad(w);
     gnorm = norm(grad);
     infos.gnorm = gnorm;
     if store_w
@@ -133,7 +133,7 @@ function [w, infos] = gd_nesterov(problem, options)
         end
 
         % calculate gradient
-        grad = problem.grad(w);
+        grad = problem.full_grad(w);
   
 
         % line search
@@ -155,7 +155,7 @@ function [w, infos] = gd_nesterov(problem, options)
         %w_prev = w;     
         
         % calculate gradient
-        %grad = problem.grad(w);        
+        %grad = problem.full_grad(w);        
         
         % update w
         w = w - step * grad;
@@ -163,7 +163,7 @@ function [w, infos] = gd_nesterov(problem, options)
 
         
         % calculate gradient
-        %grad = problem.grad(w);
+        %grad = problem.full_grad(w);
 
         % update iter        
         iter = iter + 1;

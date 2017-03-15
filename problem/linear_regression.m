@@ -107,6 +107,7 @@ function Problem = linear_regression(x_train, y_train, x_test, y_test, lambda)
         options.tol_gnorm = 1.0e-16;  
         options.step_alg = 'backtracking';
         [w_opt,~] = gd(problem, options);
+        %[w_opt,~] = ncg(problem, options);
         
     end
 
