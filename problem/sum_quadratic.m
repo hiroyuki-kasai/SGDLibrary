@@ -79,7 +79,7 @@ function [Problem] = sum_quadratic(A, b)
         
         h = zeros(d,d);
         for i=1:n
-            h = hess(x,i);
+            h = h + hess(x,i);
         end
         h = h/n;        
         
@@ -93,7 +93,7 @@ function [Problem] = sum_quadratic(A, b)
         h = zeros(d,d);
         for i=1:len
             index = indices(i);
-            h = hess(w,index);
+            h = h + hess(w,index);
         end
         h = h/len; 
         
