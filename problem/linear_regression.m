@@ -23,7 +23,7 @@ function Problem = linear_regression(x_train, y_train, x_test, y_test, lambda)
 % This file is part of GDLibrary and SGDLibrary.
 %
 % Created by H.Kasai on Feb. 17, 2016
-% Modified by H.Kasai on Oct. 25, 2016
+% Modified by H.Kasai on Mar. 16, 2016
 
 
     d = size(x_train, 1);
