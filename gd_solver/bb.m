@@ -85,7 +85,12 @@ function [w, infos] = bb(problem, options)
     p = - grad; 
     
     % set start time
-    start_time = tic();    
+    start_time = tic(); 
+    
+    % print info
+    if verbose
+        fprintf('BB: Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
+    end      
 
     % main loop
     while (optgap > tol_optgap) && (gnorm > tol_gnorm) && (iter < max_iter)        
@@ -146,16 +151,7 @@ function [w, infos] = bb(problem, options)
        
             % update w
             w = w + step * p;            
-            
         end
-
-%         if iter > 0
-%             y = glad - grad_old;
-%             step = -step * (grad_old' * y) ./ (y' * y);            
-%         end
-%         
-%         grad_old = grad; 
-%         w = w - step * grad;
 
         
         % calculate gradient        

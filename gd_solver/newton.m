@@ -42,14 +42,13 @@ function [w, infos] = newton(problem, options)
 
     % extract options
     if ~isfield(options, 'step_init')
-        step_init = 0.1;
+        step = 1;
     else
-        step_init = options.step_init;
+        step = options.step_init;
     end
-    step = step_init;
     
     if ~isfield(options, 'step_alg')
-        step_alg = 'backtracking';
+        step_alg = 'non-backtracking';
     else
         step_alg  = options.step_alg;
     end  
@@ -97,9 +96,12 @@ function [w, infos] = newton(problem, options)
     end    
     
     if ~isfield(options, 'sub_mode')
-        sub_mode = 'STANDARD';
+        sub_mode = 'INEXACT';
     else
-        sub_mode = options.sub_mode;
+        sub_mode = options.sub_mode;        
+        if (~strcmp(sub_mode, 'STANDARD')) && (~strcmp(sub_mode, 'CHOLESKY')) && (~strcmp(sub_mode, 'INEXACT')) 
+            sub_mode = 'INEXACT';
+        end
     end
     
     
@@ -128,46 +130,45 @@ function [w, infos] = newton(problem, options)
     end
     
     % set start time
-    start_time = tic();    
+    start_time = tic();  
+    
+    % print info
+    if verbose
+        fprintf('Newton (%s,%s): Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', sub_mode, step_alg, iter, f_val, gnorm, optgap);
+    end     
 
     % main loop
-    while (optgap > tol_optgap) && (gnorm > tol_gnorm) && (iter < max_iter)        
+    while (optgap > tol_optgap) && (gnorm > tol_gnorm) && (iter < max_iter)     
         
-        if strcmp(sub_mode, 'STANDARD')
-            % update w
-            w = w - d;            
-        elseif strcmp(sub_mode, 'DAMPED') || strcmp(sub_mode, 'CHOLESKY') 
-            
-            if strcmp(step_alg, 'backtracking')
-                rho = 1/2;
-                c = 1e-4;
-                step = backtracking_line_search(problem, -d, w, rho, c);
-            else
-                %
-            end
+        if strcmp(step_alg, 'backtracking')
+            rho = 1/2;
+            c = 1e-4;
+            step = backtracking_line_search(problem, -d, w, rho, c);
+        end    
 
-            % update w
-            w = w - step * d;            
-        end
-
+        % update w
+        w = w - step * d;          
+        
         % calculate gradient
         grad = problem.full_grad(w);
         % calculate hessian        
         hess = problem.full_hess(w);
         
-        % calcualte direction        
-        if strcmp(sub_mode, 'CHOLESKY') 
+        % calcualte direction  
+        if strcmp(sub_mode, 'STANDARD')
+             d = hess \ grad; 
+        elseif strcmp(sub_mode, 'CHOLESKY')
             [L, p] = chol(hess, 'lower');
             if p==0
                 d = L' \ ( L \ grad);
             else
                 d = grad;
             end
+        elseif strcmp(sub_mode, 'INEXACT')
+            [d, ~] = pcg(hess, grad, 1e-6, 1000);    
         else
-            d = hess \ grad;        
         end
-        
-        
+
         % update iter        
         iter = iter + 1;
         % calculate error
@@ -192,7 +193,7 @@ function [w, infos] = newton(problem, options)
        
         % print info
         if verbose
-            fprintf('Newton: Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
+            fprintf('Newton (%s,%s): Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', sub_mode, step_alg, iter, f_val, gnorm, optgap);
         end        
     end
     

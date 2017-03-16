@@ -125,7 +125,12 @@ function [w, infos] = lbfgs(problem, options)
     y_array = [];    
     
     % set start time
-    start_time = tic();    
+    start_time = tic();
+    
+    % print info
+    if verbose
+        fprintf('L-BFGS: Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
+    end     
 
     % main loop
     while (optgap > tol_optgap) && (gnorm > tol_gnorm) && (iter < max_iter) && ~stopping     

@@ -105,7 +105,12 @@ function [w, infos] = gd(problem, options)
     end
     
     % set start time
-    start_time = tic();    
+    start_time = tic();  
+    
+    % print info
+    if verbose
+        fprintf('GD: Iter = %03d, cost = %.24e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
+    end      
 
     % main loop
     while (optgap > tol_optgap) && (gnorm > tol_gnorm) && (iter < max_iter)        
@@ -138,7 +143,6 @@ function [w, infos] = gd(problem, options)
             w = w - step * grad;            
         end
         
-
         
         % calculate gradient
         grad = problem.full_grad(w);

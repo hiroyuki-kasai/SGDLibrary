@@ -120,7 +120,12 @@ function [w, infos] = gd_nesterov(problem, options)
     t = 1;
     
     % set start time
-    start_time = tic();    
+    start_time = tic();  
+    
+    % print info
+    if verbose
+        fprintf('GD Nesterov: Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
+    end     
 
     % main loop
     while (optgap > tol_optgap) && (gnorm > tol_gnorm) && (iter < max_iter)      
@@ -189,7 +194,7 @@ function [w, infos] = gd_nesterov(problem, options)
        
         % print info
         if verbose
-            fprintf('GD: Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
+            fprintf('GD Nesterov: Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
         end        
     end
     

@@ -127,7 +127,12 @@ function [w, infos] = bfgs(problem, options)
     end
     
     % set start time
-    start_time = tic();    
+    start_time = tic();  
+    
+    % print info
+    if verbose
+        fprintf('BFGS: Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
+    end      
 
     % main loop
     while (optgap > tol_optgap) && (gnorm > tol_gnorm) && (iter < max_iter) && ~stopping       

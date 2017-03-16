@@ -161,9 +161,13 @@ function [w, infos] = cg(problem, options)
     end    
     
     % set start time
-    start_time = tic();   
+    start_time = tic();  
     
-
+    % print info
+    if verbose
+        fprintf('CG (%s): Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', sub_mode, iter, f_val, gnorm, optgap);
+    end       
+    
     % main loop
     while (optgap > tol_optgap) && (gnorm > tol_gnorm) && (iter < max_iter)        
         
