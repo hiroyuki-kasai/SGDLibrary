@@ -360,7 +360,10 @@ Convergence behavior animation example (Linear regression problem)
 
 License
 -------
-The SGDLibrary is free and open source for academic/research purposes (non-commercial).
+- The SGDLibrary is **free**, **non-commercial** and **open** source.
+- The code provided iin SGDLibrary should only be used for **academic/research purposes**.
+- Third party files are included
+    - subsamp_newton: Originally created by Peng Xu and Jiyan Yang  in [Subsampled-Newton](https://github.com/git-xp/Subsampled-Newton). This is modifided to handle other problems like linear regression.  
 
 <br />
 
@@ -381,7 +384,7 @@ If you have any problems or questions, please contact the author: [Hiroyuki Kasa
 Release Notes
 --------------
 
-* Version 1.0.6 (Mar. 17, 2017)
+* Version 1.0.7 (Mar. 17, 2017)
     - Add some functions and modify items. 
 * Version 1.0.6 (Mar. 13, 2017)
     - Add some functions and modify items. Sum quadratic problem is added. 
