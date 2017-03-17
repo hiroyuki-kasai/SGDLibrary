@@ -114,7 +114,7 @@ function Problem = linear_regression(x_train, y_train, x_test, y_test, lambda)
     function w_opt = calc_solution(problem, maxiter, method)
         
         if nargin < 3
-            method = 'sg';
+            method = 'lbfgs';
         end        
         
         options.max_iter = maxiter;
@@ -131,6 +131,10 @@ function Problem = linear_regression(x_train, y_train, x_test, y_test, lambda)
             options.sub_mode = 'INEXACT';    
             options.step_alg = 'non-backtracking'; 
             [w_opt,~] = newton(problem, options);
+        else  
+            options.step_alg = 'backtracking';  
+            options.mem_size = 5;
+            [w_opt,~] = lbfgs(problem, options);              
         end
     end
 

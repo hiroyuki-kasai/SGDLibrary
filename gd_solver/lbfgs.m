@@ -22,7 +22,7 @@ function [w, infos] = lbfgs(problem, options)
 % This file is part of GDLibrary.
 %
 % Created by H.Kasai on Feb. 15, 2016
-% Modified by H.Kasai on Oct. 25, 2016
+% Modified by H.Kasai on Mar. 16, 2017
 
 
     % set dimensions and samples
@@ -211,7 +211,7 @@ function [w, infos] = lbfgs(problem, options)
             end  
         else
             w_corrupted = true;
-            w = infos.w(:,end);
+            w = w_old;
             stopping = true;            
         end
        
