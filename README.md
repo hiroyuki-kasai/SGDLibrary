@@ -3,9 +3,9 @@
 
 Authors: [Hiroyuki Kasai](http://www.kasailab.com/)
 
-Last page update: March 16, 2017
+Last page update: March 28, 2017
 
-Latest library version: 1.0.7 (see Release notes for more info)
+Latest library version: 1.0.8 (see Release notes for more info)
 
 <br />
 
@@ -55,7 +55,9 @@ International Conference on Artificial Intelligence and Statistics (AISTATS), pp
         - A. Mokhtari and A. Ribeiro, "[RES: Regularized stochastic BFGS algorithm](http://ieeexplore.ieee.org/document/6899692/)," IEEE Transactions on Signal Processing, vol. 62, no. 23, pp. 6089-6104, Dec., 2014.
     - Damp-oBFGS-Inf (Regularized damped oBFGS, Infinite memory) (denoted as "SDBFGS" in the paper below.)
         - X. Wang, S. Ma, D. Goldfarb and W. Liu, "[Stochastic quasi-Newton methods for nonconvex stochastic 
-optimization](https://arxiv.org/pdf/1607.01231v3.pdf),"  arXiv preprint arXiv:1607.01231, 2016.
+optimization](https://arxiv.org/pdf/1607.01231v3.pdf)," arXiv preprint arXiv:1607.01231, 2016.
+    - IQN (incremental Quasi-Newton method)
+        - A. Mokhtari, M. Eisen, and A. Ribeiro, "[An Incremental Quasi-Newton Method with a Local Superlinear Convergence Rate](https://arxiv.org/abs/1702.00709)," ICASSP2017, 2017.
 - **AdaGrad variants**
     - AdaGrad (Adaptive gradient algorithm)
         - J. Duchi, E. Hazan and Y. Singer, "[Adaptive subgradient methods for online learning and stochastic optimization](http://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf)," Journal of Machine Learning Research, 12, pp. 2121-2159, 2011.
@@ -97,6 +99,7 @@ optimization](https://arxiv.org/pdf/1607.01231v3.pdf),"  arXiv preprint arXiv:16
 |Adam|`adam`|`'Adam'`||
 |AdaMax|`adam`|`'AdaMax'`||
 |SVRG-BB|`svrg_bb`|||
+|IQN|`iqn`|||
 
 
 - Note that other algorithms could be configurable by selecting other combinations of sub_mode and options. 
@@ -362,8 +365,10 @@ License
 -------
 - The SGDLibrary is **free**, **non-commercial** and **open** source.
 - The code provided iin SGDLibrary should only be used for **academic/research purposes**.
+- The codes provided by original papers are included
+    - iqn.m: Originally created by A. Mokhtari. 
 - Third party files are included
-    - subsamp_newton: Originally created by Peng Xu and Jiyan Yang  in [Subsampled-Newton](https://github.com/git-xp/Subsampled-Newton). This is modifided to handle other problems like linear regression.  
+    - subsamp_newton.m: Originally created by Peng Xu and Jiyan Yang  in [Subsampled-Newton](https://github.com/git-xp/Subsampled-Newton). This is modifided to handle other problems like linear regression.  
 
 <br />
 
@@ -384,6 +389,8 @@ If you have any problems or questions, please contact the author: [Hiroyuki Kasa
 Release Notes
 --------------
 
+* Version 1.0.8 (Mar. 28, 2017)
+    - IQN (incremental Quasi-Newton method, iqn.m) is nely included. 
 * Version 1.0.7 (Mar. 17, 2017)
     - Add some functions and modify items. 
 * Version 1.0.6 (Mar. 13, 2017)
