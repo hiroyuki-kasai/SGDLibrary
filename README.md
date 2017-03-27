@@ -365,10 +365,10 @@ License
 -------
 - The SGDLibrary is **free**, **non-commercial** and **open** source.
 - The code provided iin SGDLibrary should only be used for **academic/research purposes**.
-- The codes provided by original papers are included
-    - iqn.m: Originally created by A. Mokhtari. 
-- Third party files are included
-    - subsamp_newton.m: Originally created by Peng Xu and Jiyan Yang  in [Subsampled-Newton](https://github.com/git-xp/Subsampled-Newton). This is modifided to handle other problems like linear regression.  
+- The codes provided by original papers are included. (Big thanks !!!)
+    - iqn.m: originally created by [A. Mokhtari](https://fling.seas.upenn.edu/~aryanm/wiki/index.php?n=Main.HomePage). 
+- Third party files are included.
+    - subsamp_newton.m: originally created by Peng Xu and Jiyan Yang  in [Subsampled-Newton](https://github.com/git-xp/Subsampled-Newton). This is modifided to handle other problems like linear regression.  
 
 <br />
 
