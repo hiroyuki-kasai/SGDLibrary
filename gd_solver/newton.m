@@ -42,10 +42,11 @@ function [w, infos] = newton(problem, options)
 
     % extract options
     if ~isfield(options, 'step_init')
-        step = 1;
+        step_init = 1;
     else
-        step = options.step_init;
+        step_init = options.step_init;
     end
+    step = step_init;
     
     if ~isfield(options, 'step_alg')
         step_alg = 'non-backtracking';
@@ -121,6 +122,9 @@ function [w, infos] = newton(problem, options)
     grad = problem.full_grad(w);
     gnorm = norm(grad);
     infos.gnorm = gnorm;
+    if isfield(problem, 'reg')
+        infos.reg = problem.reg(w);   
+    end  
     % calculate hessian
     hess = problem.full_hess(w);
     % calcualte direction    
@@ -144,10 +148,24 @@ function [w, infos] = newton(problem, options)
             rho = 1/2;
             c = 1e-4;
             step = backtracking_line_search(problem, -d, w, rho, c);
+        elseif strcmp(step_alg, 'tfocs_backtracking') 
+            if iter > 0
+                alpha = 1.05;
+                beta = 0.5; 
+                step = tfocs_backtracking_search(step, w, w_old, grad, grad_old, alpha, beta);
+            else
+                step = step_init;
+            end            
         end    
 
         % update w
-        w = w - step * d;          
+        w_old = w;        
+        w = w - step * d; 
+        
+        % proximal operator
+        if isfield(problem, 'prox')
+            w = problem.prox(w, step);
+        end          
         
         % calculate gradient
         grad = problem.full_grad(w);
@@ -186,7 +204,11 @@ function [w, infos] = newton(problem, options)
         infos.grad_calc_count = [infos.grad_calc_count iter*n];      
         infos.optgap = [infos.optgap optgap];        
         infos.cost = [infos.cost f_val];
-        infos.gnorm = [infos.gnorm gnorm]; 
+        infos.gnorm = [infos.gnorm gnorm];
+        if isfield(problem, 'reg')
+            reg = problem.reg(w);
+            infos.reg = [infos.reg reg];
+        end  
         if store_w
             infos.w = [infos.w w];         
         end        

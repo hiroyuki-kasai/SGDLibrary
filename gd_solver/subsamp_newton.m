@@ -72,7 +72,16 @@ function [w, infos] = subsamp_newton(problem, options)
         store_w = false;
     else
         store_w = options.store_w;
-    end    
+    end
+    
+    if ~isfield(options, 'step_init_alg')
+        % Do nothing
+    else
+        if strcmp(options.step_init_alg, 'bb_init')
+            % initialize by BB step-size
+            step_init = bb_init(problem, w);
+        end
+    end 
     
     if ~isfield(options, 'sub_mode')
         sub_mode = 'Uniform';
@@ -117,6 +126,9 @@ function [w, infos] = subsamp_newton(problem, options)
     grad = problem.full_grad(w);
     gnorm = norm(grad);
     infos.gnorm = gnorm;
+    if isfield(problem, 'reg')
+        infos.reg = problem.reg(w);   
+    end  
     
     if strcmp(sub_mode, 'RNS')
         rnorms = problem.x_norm();
@@ -172,6 +184,11 @@ function [w, infos] = subsamp_newton(problem, options)
         % update
         w = w + step * d;
         
+        % proximal operator
+        if isfield(problem, 'prox')
+            w = problem.prox(w, step);
+        end          
+        
         % update iter        
         iter = iter + 1;
         % calculate error
@@ -192,6 +209,10 @@ function [w, infos] = subsamp_newton(problem, options)
         infos.optgap = [infos.optgap optgap];        
         infos.cost = [infos.cost f_val];
         infos.gnorm = [infos.gnorm gnorm]; 
+        if isfield(problem, 'reg')
+            reg = problem.reg(w);
+            infos.reg = [infos.reg reg];
+        end 
         if store_w
             infos.w = [infos.w w];         
         end        

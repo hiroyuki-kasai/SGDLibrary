@@ -1,5 +1,5 @@
-function [w, infos] = gd(problem, options)
-% Full gradient descent algorithm.
+function [w, infos] = gd_nesterov(problem, options)
+% Full gradient descent algorithm with Nesterov acceleration .
 %
 % Inputs:
 %       problem     function (cost/grad/hess)
@@ -8,9 +8,9 @@ function [w, infos] = gd(problem, options)
 %       w           solution of w
 %       infos       information
 %
-% This file is part of GDLibrary and SGDLibrary.
+% This file is part of GDLibrary.
 %
-% Created by H.Kasai on Feb. 15, 2016
+% Created by H.Kasai on Nov. 01, 2016
 % Modified by H.Kasai on Apr. 17, 2017
 
 
@@ -25,7 +25,7 @@ function [w, infos] = gd(problem, options)
     else
         step_init = options.step_init;
     end
-    step = step_init;    
+    step = step_init;
     
     if ~isfield(options, 'step_alg')
         step_alg = 'backtracking';
@@ -79,7 +79,22 @@ function [w, infos] = gd(problem, options)
         sub_mode = 'STANDARD';
     else
         sub_mode = options.sub_mode;
-    end 
+    end  
+    
+    if ~isfield(options, 'S')
+        S = eye(d);
+    else
+        S = options.S;
+    end  
+    
+    ls_options.sub_mode = sub_mode;    
+    if strcmp(sub_mode, 'STANDARD')
+        %
+    elseif strcmp(sub_mode, 'SCALING')
+        ls_options.S = S;
+    else
+        %
+    end    
     
     if ~isfield(options, 'step_init_alg')
         % Do nothing
@@ -89,12 +104,10 @@ function [w, infos] = gd(problem, options)
             step_init = bb_init(problem, w);
         end
     end     
-   
+
+    
     % initialise
     iter = 0;
-    if strcmp(step_alg, 'exact')
-        S = eye(d);
-    end
     
     % store first infos
     clear infos;
@@ -108,27 +121,37 @@ function [w, infos] = gd(problem, options)
     grad = problem.full_grad(w);
     gnorm = norm(grad);
     infos.gnorm = gnorm;
-    if isfield(problem, 'reg')
-        infos.reg = problem.reg(w);   
-    end    
     if store_w
         infos.w = w;       
     end
+    
+    w_prev = w;
+    w_prev_old = [];  
+    t = 1;
     
     % set start time
     start_time = tic();  
     
     % print info
     if verbose
-        if ~isfield(problem, 'prox')
-            fprintf('GD: Iter = %03d, cost = %.24e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
-        else
-            fprintf('PG: Iter = %03d, cost = %.24e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
-        end
-    end      
+        fprintf('GD Nesterov: Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
+    end     
 
     % main loop
-    while (optgap > tol_optgap) && (gnorm > tol_gnorm) && (iter < max_iter)        
+    while (optgap > tol_optgap) && (gnorm > tol_gnorm) && (iter < max_iter)      
+        
+              
+        if iter > 1
+            tp = (1 + sqrt(1 + 4 * t^2))/2;
+            w = w_prev + ((t-1)/tp) * (w_prev - w_prev_old);
+            t = tp;
+            %[func_val, func_grad] = funcObj(x);
+        end
+
+        % calculate gradient
+        grad_old = grad;        
+        grad = problem.full_grad(w);
+  
 
         % line search
         if strcmp(step_alg, 'backtracking')
@@ -136,45 +159,43 @@ function [w, infos] = gd(problem, options)
             c = 1e-4;
             step = backtracking_line_search(problem, -grad, w, rho, c);
         elseif strcmp(step_alg, 'exact')
-            ls_options.sub_mode = sub_mode;
-            ls_options.S = S;
             step = exact_line_search(problem, 'GD', -grad, [], [], w, ls_options);
         elseif strcmp(step_alg, 'strong_wolfe')
             c1 = 1e-4;
             c2 = 0.9;
             step = strong_wolfe_line_search(problem, -grad, w, c1, c2);
-        elseif strcmp(step_alg, 'tfocs_backtracking') 
+        elseif strcmp(step_alg, 'TFOCS_style_backtracking') 
             if iter > 0
                 alpha = 1.05;
                 beta = 0.5; 
-                step = tfocs_backtracking_search(step, w, w_old, grad, grad_old, alpha, beta);
+                step = tfocs_style_backtracking_search(step, w, w_old, grad, grad_old, alpha, beta);
             else
                 step = step_init;
             end
         else
         end
         
-        w_old = w;
-        if strcmp(sub_mode, 'SCALING')
-            % diagonal scaling            
-            h = problem.full_hess(w);
-            S = diag(1./diag(h));
-            
-            % update w
-            w = w - step * S * grad;  
-        else
-            % update w
-            w = w - step * grad;            
-        end
+        % store
+        w_prev_old = w_prev;
+        %w_prev = w;     
+        
+        % calculate gradient
+        %grad = problem.full_grad(w);        
+        
+        % update w
+        w_old = w;  
+        w = w - step * grad;
+        w_prev = w;
+        
         
         % proximal operator
         if isfield(problem, 'prox')
             w = problem.prox(w, step);
         end
-        
+                
+
         % calculate gradient
-        grad_old = grad;
-        grad = problem.full_grad(w);
+        %grad = problem.full_grad(w);
 
         % update iter        
         iter = iter + 1;
@@ -194,21 +215,13 @@ function [w, infos] = gd(problem, options)
         infos.optgap = [infos.optgap optgap];        
         infos.cost = [infos.cost f_val];
         infos.gnorm = [infos.gnorm gnorm]; 
-        if isfield(problem, 'reg')
-            reg = problem.reg(w);
-            infos.reg = [infos.reg reg];
-        end        
         if store_w
             infos.w = [infos.w w];         
         end        
        
         % print info
         if verbose
-            if ~isfield(problem, 'prox')
-                fprintf('GD: Iter = %03d, cost = %.24e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
-            else
-                fprintf('PG: Iter = %03d, cost = %.24e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
-            end
+            fprintf('GD Nesterov: Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
         end        
     end
     

@@ -69,7 +69,7 @@ function [w, infos] = ncg(problem, options)
     end    
     
     if ~isfield(options, 'store_w')
-        store_w = false;
+        store_w = true;
     else
         store_w = options.store_w;
     end    
@@ -84,7 +84,16 @@ function [w, infos] = ncg(problem, options)
         S = eye(d);
     else
         S = options.S;
-    end  
+    end
+  
+    if ~isfield(options, 'step_init_alg')
+        % Do nothing
+    else
+        if strcmp(options.step_init_alg, 'bb_init')
+            % initialize by BB step-size
+            step_init = bb_init(problem, w);
+        end
+    end 
     
 
     % initialise
@@ -104,6 +113,9 @@ function [w, infos] = ncg(problem, options)
     grad = problem.full_grad(w);
     gnorm = norm(grad);
     infos.gnorm = gnorm;
+    if isfield(problem, 'reg')
+        infos.reg = problem.reg(w);   
+    end  
     if store_w
         infos.w = w;       
     end
@@ -133,17 +145,35 @@ function [w, infos] = ncg(problem, options)
             rho = 1/2;
             c = 1e-4;
             step = backtracking_line_search(problem, d_old, w, rho, c);
+        elseif strcmp(step_alg, 'exact')
+            ls_options.sub_mode = sub_mode;
+            ls_options.S = S;
+            step = exact_line_search(problem, 'GD', -grad, [], [], w, ls_options);            
         elseif strcmp(step_alg, 'strong_wolfe')
             c1 = 1e-4;
             c2 = 0.9;
             step = strong_wolfe_line_search(problem, d_old, w, c1, c2);
-        else
+        elseif strcmp(step_alg, 'tfocs_backtracking') 
+            if iter > 0
+                alpha = 1.05;
+                beta = 0.5; 
+                step = tfocs_backtracking_search(step, w, w_old, grad, grad_old, alpha, beta);
+            else
+                step = step_init;
+            end
+        else            
         end
         
         % update w
+        w_old = w;        
         w = w + step * S * d_old;
         
-        % store old info
+        % proximal operator
+        if isfield(problem, 'prox')
+            w = problem.prox(w, step);
+        end          
+        
+        % store old info   
         grad_old = grad;   
         % calculate gradient
         grad = problem.full_grad(w);        
@@ -186,7 +216,11 @@ function [w, infos] = ncg(problem, options)
             infos.grad_calc_count = [infos.grad_calc_count iter*n];      
             infos.optgap = [infos.optgap optgap];        
             infos.cost = [infos.cost f_val];
-            infos.gnorm = [infos.gnorm gnorm]; 
+            infos.gnorm = [infos.gnorm gnorm];
+            if isfield(problem, 'reg')
+                reg = problem.reg(w);
+                infos.reg = [infos.reg reg];
+            end  
             if store_w
                 infos.w = [infos.w w];         
             end  

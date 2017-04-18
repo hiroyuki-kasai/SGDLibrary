@@ -1,5 +1,5 @@
 function [w, infos] = gd_nesterov(problem, options)
-% Full gradient descent algorithm with Nesterov acceleration .
+% Full gradient descent algorithm with Nesterov acceleration.
 %
 % Inputs:
 %       problem     function (cost/grad/hess)
@@ -11,6 +11,7 @@ function [w, infos] = gd_nesterov(problem, options)
 % This file is part of GDLibrary.
 %
 % Created by H.Kasai on Nov. 01, 2016
+% Modified by H.Kasai on Apr. 17, 2017
 
 
     % set dimensions and samples
@@ -94,10 +95,26 @@ function [w, infos] = gd_nesterov(problem, options)
     else
         %
     end    
+    
+    if ~isfield(options, 'use_restart')
+        use_restart = true;
+    else    
+        use_restart = options.use_restart;
+    end
+    
+    if ~isfield(options, 'step_init_alg')
+        % Do nothing
+    else
+        if strcmp(options.step_init_alg, 'bb_init')
+            % initialize by BB step-size
+            step = bb_init(problem, w);
+        end
+    end     
 
     
     % initialise
     iter = 0;
+    theta = 1;
     
     % store first infos
     clear infos;
@@ -111,65 +128,40 @@ function [w, infos] = gd_nesterov(problem, options)
     grad = problem.full_grad(w);
     gnorm = norm(grad);
     infos.gnorm = gnorm;
+    if isfield(problem, 'reg')
+        infos.reg = problem.reg(w);   
+    end
     if store_w
         infos.w = w;       
     end
     
-    w_prev = w;
-    w_prev_old = [];  
-    t = 1;
+    y = w;
     
     % set start time
     start_time = tic();  
     
     % print info
     if verbose
-        fprintf('GD Nesterov: Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
+        if ~isfield(problem, 'prox')
+            fprintf('AG: Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
+        else
+            fprintf('APG: Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
+        end
     end     
 
     % main loop
     while (optgap > tol_optgap) && (gnorm > tol_gnorm) && (iter < max_iter)      
         
-        if iter > 1
-            tp = (1 + sqrt(1 + 4 * t^2))/2;
-            w = w_prev + ((t-1)/tp) * (w_prev - w_prev_old);
-            t = tp;
-            %[func_val, func_grad] = funcObj(x);
-        end
+        w_old = w;
+        y_old = y;
 
-        % calculate gradient
-        grad = problem.full_grad(w);
-  
-
-        % line search
-        if strcmp(step_alg, 'backtracking')
-            rho = 1/2;
-            c = 1e-4;
-            step = backtracking_line_search(problem, -grad, w, rho, c);
-        elseif strcmp(step_alg, 'exact')
-            step = exact_line_search(problem, 'GD', -grad, [], [], w, ls_options);
-        elseif strcmp(step_alg, 'strong_wolfe')
-            c1 = 1e-4;
-            c2 = 0.9;
-            step = strong_wolfe_line_search(problem, -grad, w, c1, c2);
-        else
-        end
+        w = y - step*grad;   
         
-        % store
-        w_prev_old = w_prev;
-        %w_prev = w;     
+        % proximal operator
+        if isfield(problem, 'prox')
+            w = problem.prox(w, step);
+        end        
         
-        % calculate gradient
-        %grad = problem.full_grad(w);        
-        
-        % update w
-        w = w - step * grad;
-        w_prev = w;
-
-        
-        % calculate gradient
-        %grad = problem.full_grad(w);
-
         % update iter        
         iter = iter + 1;
         % calculate error
@@ -188,14 +180,57 @@ function [w, infos] = gd_nesterov(problem, options)
         infos.optgap = [infos.optgap optgap];        
         infos.cost = [infos.cost f_val];
         infos.gnorm = [infos.gnorm gnorm]; 
+        if isfield(problem, 'reg')
+            reg = problem.reg(w);
+            infos.reg = [infos.reg reg];
+        end
         if store_w
             infos.w = [infos.w w];         
         end        
        
         % print info
         if verbose
-            fprintf('GD Nesterov: Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
-        end        
+            if ~isfield(problem, 'prox')
+                fprintf('AG: Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
+            else
+                fprintf('APG: Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
+            end                
+        end    
+        
+        % calculate nesterov step
+        theta = 2/(1 + sqrt(1+4/(theta^2)));
+        
+        if (use_restart && (y-w)'*(w-w_old)>0)
+            w = w_old;
+            y = w;
+            theta = 1;
+        else
+            y = w + (1-theta)*(w-w_old);
+        end
+        
+        % calculate gradient
+        grad_old = grad;        
+        grad = problem.full_grad(y);
+  
+
+        % line search
+        if strcmp(step_alg, 'backtracking')
+            rho = 1/2;
+            c = 1e-4;
+            step = backtracking_line_search(problem, -grad, w, rho, c);
+        elseif strcmp(step_alg, 'exact')
+            step = exact_line_search(problem, 'GD', -grad, [], [], w, ls_options);
+        elseif strcmp(step_alg, 'strong_wolfe')
+            c1 = 1e-4;
+            c2 = 0.9;
+            step = strong_wolfe_line_search(problem, -grad, w, c1, c2);
+        elseif strcmp(step_alg, 'tfocs_backtracking') 
+            c1 = 1.01;
+            c2 = 0.5; 
+            step = tfocs_backtracking_search(step, y, y_old, grad, grad_old, c1, c2);
+        else
+        end
+        
     end
     
     if gnorm < tol_gnorm

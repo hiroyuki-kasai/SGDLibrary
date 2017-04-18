@@ -90,7 +90,16 @@ function [w, infos] = cg(problem, options)
         store_w = false;
     else
         store_w = options.store_w;
-    end    
+    end
+    
+    if ~isfield(options, 'step_init_alg')
+        % Do nothing
+    else
+        if strcmp(options.step_init_alg, 'bb_init')
+            % initialize by BB step-size
+            step_init = bb_init(problem, w);
+        end
+    end 
     
     if ~isfield(options, 'sub_mode')
         sub_mode = 'STANDARD';
@@ -100,7 +109,7 @@ function [w, infos] = cg(problem, options)
     
     if ~isfield(options, 'M')
         if strcmp(sub_mode, 'PRECON')
-            h = problem.hess(w);
+            h = problem.full_hess(w);
             M = diag(diag(h));
         else
             M = eye(d);
@@ -134,6 +143,9 @@ function [w, infos] = cg(problem, options)
     grad = problem.full_grad(w);
     gnorm = norm(grad);
     infos.gnorm = gnorm;
+    if isfield(problem, 'reg')
+        infos.reg = problem.reg(w);   
+    end  
     if store_w
         infos.w = w;       
     end
@@ -184,13 +196,32 @@ function [w, infos] = cg(problem, options)
         elseif strcmp(step_alg, 'exact')
             ls_options.M = M;
             step = exact_line_search(problem, 'CG', p, r_old, y_old, w, ls_options);
+        elseif strcmp(step_alg, 'strong_wolfe')
+            c1 = 1e-4;
+            c2 = 0.9;
+            step = strong_wolfe_line_search(problem, -grad, w, c1, c2);
+        elseif strcmp(step_alg, 'tfocs_backtracking') 
+            if iter > 0
+                alpha = 1.05;
+                beta = 0.5; 
+                step = tfocs_backtracking_search(step, w, w_old, grad, grad_old, alpha, beta);
+            else
+                step = step_init;
+            end
         else
         end
         
         % update w
+        w_old = w;
         w = w + step * p;
         
+        % proximal operator
+        if isfield(problem, 'prox')
+            w = problem.prox(w, step);
+        end                  
+        
         % calculate gradient
+        grad_old = grad;
         grad = problem.full_grad(w);   
         
         
@@ -252,6 +283,10 @@ function [w, infos] = cg(problem, options)
         infos.optgap = [infos.optgap optgap];        
         infos.cost = [infos.cost f_val];
         infos.gnorm = [infos.gnorm gnorm]; 
+        if isfield(problem, 'reg')
+            reg = problem.reg(w);
+            infos.reg = [infos.reg reg];
+        end 
         if store_w
             infos.w = [infos.w w];         
         end        

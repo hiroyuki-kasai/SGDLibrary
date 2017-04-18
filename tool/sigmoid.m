@@ -5,6 +5,6 @@ function [y] = sigmoid(x)
 %
 % Created H.Kasai on Oct. 17, 2016
 
-    y = 1 ./ (1 + exp(-x));
+    y = 1.0 ./ (1.0 + exp(-x));
 end
 

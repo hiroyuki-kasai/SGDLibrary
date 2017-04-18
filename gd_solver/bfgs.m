@@ -92,6 +92,15 @@ function [w, infos] = bfgs(problem, options)
     else
         update_mode = options.update_mode;
     end  
+
+    if ~isfield(options, 'step_init_alg')
+        % Do nothing
+    else
+        if strcmp(options.step_init_alg, 'bb_init')
+            % initialize by BB step-size
+            step_init = bb_init(problem, w);
+        end
+    end 
     
     
     % initialise
@@ -111,6 +120,9 @@ function [w, infos] = bfgs(problem, options)
     grad = problem.full_grad(w);
     gnorm = norm(grad);
     infos.gnorm = gnorm;
+    if isfield(problem, 'reg')
+        infos.reg = problem.reg(w);   
+    end  
     if store_w
         infos.w = w;       
     end
@@ -149,19 +161,35 @@ function [w, infos] = bfgs(problem, options)
             step = backtracking_line_search(problem, p, w, rho, c);
         elseif strcmp(step_alg, 'exact')
             step = exact_line_search(problem, 'BFGS', p, [], [], w, []);
+        elseif strcmp(step_alg, 'strong_wolfe')
+            c1 = 1e-4;
+            c2 = 0.9;
+            step = strong_wolfe_line_search(problem, p, w, c1, c2);
+        elseif strcmp(step_alg, 'tfocs_backtracking') 
+            if iter > 0
+                alpha = 1.05;
+                beta = 0.5; 
+                step = tfocs_backtracking_search(step, w, w_old, grad, grad_old, alpha, beta);
+            else
+                step = step_init;
+            end
         else
         end
         
-        w_old = w;
         % update w
+        w_old = w;
         w = w + step * p;
         
+        % proximal operator
+        if isfield(problem, 'prox')
+            w = problem.prox(w, step);
+        end          
         
-        glad_old = grad;
-        glad = problem.full_grad(w);
+        grad_old = grad;
+        grad = problem.full_grad(w);
 
         s = w - w_old;
-        y = glad - glad_old;
+        y = grad - grad_old;
 
         if strcmp(update_mode, 'H')
             
@@ -176,7 +204,7 @@ function [w, infos] = bfgs(problem, options)
             InvHess = (eye(d) - rho*s*y') * InvHess * (eye(d) - rho*y*s') + (s*s')/(s'*y);    
             
             % Calculate serarch direction by Eq. (6.18)
-            p = - InvHess * glad;     
+            p = - InvHess * grad;     
         
         elseif  strcmp(update_mode, 'B')
             
@@ -237,6 +265,10 @@ function [w, infos] = bfgs(problem, options)
             infos.optgap = [infos.optgap optgap];        
             infos.cost = [infos.cost f_val];
             infos.gnorm = [infos.gnorm gnorm]; 
+            if isfield(problem, 'reg')
+                reg = problem.reg(w);
+                infos.reg = [infos.reg reg];
+            end 
             if store_w
                 infos.w = [infos.w w];         
             end   
