@@ -1,17 +1,18 @@
-function [Problem] = lasso(A, b, lambda)
-% This file defines the lasso (least absolute shrinkage and selection operator) problem for L1 norm. 
+function [Problem] = elastic_net(A, b, lambda1, lambda2)
+% This file defines the Elastic Net problem. 
 %
 % Inputs:
 %       A           dictionary matrix of size dxn.
 %       b           observation vector of size dx1.
-%       lambda      l1-regularized parameter. 
+%       lambda1     l1-regularized parameter. 
+%       lambda2     l2-regularized parameter. 
 % Output:
 %       Problem     problem instance. 
 %
 %
 % The problem of interest is defined as
 %
-%           min f(w) = 1/2 * || A * w - b ||_2^2 + lambda * || w ||_1 ).
+%           min f(w) = 1/2 * || A * w - b ||_2^2 + 1/2 * lambda2 * || w ||_2^2 + lambda1 * || w ||_1 ).
 %
 % "w" is the model parameter of size d vector.
 %
@@ -24,17 +25,19 @@ function [Problem] = lasso(A, b, lambda)
     d = size(A, 2);
     n = size(A, 2);
     
-    Problem.name = @() 'lasso';    
+    Problem.name = @() 'elastic net';    
     Problem.dim = @() d;
     Problem.samples = @() n;
     Problem.lambda = @() lambda;
     Problem.A = @() A;    
     Problem.b = @() b; 
     
-    AtA = A'*A;
-    Problem.AtA = @() AtA;
+    AtA_l2 = A'*A + lambda2*eye(n);
+    Problem.AtA_l2 = @() AtA_l2;
+    
     Atb = A'*b;
-    %L = max(eig(AtA));
+     
+    
     fprintf('Calculated Lipschitz constant (L), i.e., max(eig(AtA)), .... ')
     L = eigs(A'*A,1);
     fprintf('is L=%f.\n', L);
@@ -42,13 +45,13 @@ function [Problem] = lasso(A, b, lambda)
     
     Problem.prox = @l1_soft_thresh;
     function v = l1_soft_thresh(w, t)
-        v = soft_thresh(w, t * lambda);
+        v = soft_thresh(w, t * lambda1);
     end    
 
     Problem.cost = @cost;
     function f = cost(w)
         reg = reg(w);
-        f = 1/2 * sum((A * w - b).^2) + lambda * reg;
+        f = 1/2 * sum((A * w - b).^2) + 1/2 * lambda2 * norm(w,2)^2 + lambda1 * reg;
     end
 
     % calculate l1 norm
@@ -58,8 +61,10 @@ function [Problem] = lasso(A, b, lambda)
     end
 
     Problem.residual = @residual;
-    function r = residual(w)
-        r = - A * w + b;
+    function r = residual(w, i)
+        %r = - A * w + b;
+        %r = - AtA_l2 * w + Atb; 
+        r = - (A(:, i)' * A + lambda2) * w + A(:, i)'*b; 
     end
 
     Problem.cost_batch = @cost_batch;
@@ -69,8 +74,8 @@ function [Problem] = lasso(A, b, lambda)
 
     Problem.full_grad = @full_grad;
     function g = full_grad(w)
-        %g = A' * (A * w - b);
-        g = AtA * w - Atb;
+        %g = A' * (A * w + lambda2 - b);
+        g = AtA_l2 * w - Atb;
     end
 
     Problem.grad = @grad;
@@ -85,7 +90,7 @@ function [Problem] = lasso(A, b, lambda)
 
     Problem.full_hess = @full_hess; 
     function h = full_hess(w)
-        h = AtA;       
+        h = AtA_l2;       
     end
 
     Problem.hess_vec = @hess_vec; 

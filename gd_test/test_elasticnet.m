@@ -1,4 +1,4 @@
-function [] = test_lasso()
+function [] = test_elasticnet()
 
     clc;
     clear;
@@ -9,35 +9,25 @@ function [] = test_lasso()
     if 0
         algorithms = gd_solver_list('ALL');  
     else
-        algorithms = {'PG-BKT', 'PG-TFOCS-BKT', 'APG-BKT', 'APG-TFOCS-BKT', 'CD-LASSO', 'FISTA', 'ADMM-LASSO'}; 
+        algorithms = {'PG-BKT', 'PG-TFOCS-BKT', 'APG-BKT', 'APG-TFOCS-BKT', 'CD-EasticNet', 'FISTA'}; 
     end    
     
     
     %% prepare dataset
-    if 1   
-        n = 1280; 
-        d = 100;         
-        k = 15;                                     % cardinality of nonzero elements
-        [A,~] = qr(randn(n,d),0);                   
-        A = A';                                    
-        p = randperm(n); 
-        p = p(1:k);                                 % select location of k nonzeros
-        x0 = zeros(n,1); 
-        x0(p) = randn(k,1);                         
-        b = A*x0 + .02*randn(d, 1);                 % add random noise   
-        lambda_max = norm( A'*b, 'inf' );
-        lambda = 0.1*lambda_max;
-    else          
+    if 1
+        % generate synthtic data        
         n = 500; 
         d = 100; 
         A = randn(d,n); 
         b = randn(d,1); 
-        lambda = 5;
+        lambda1 = 5;
+        lambda2 = 1;
+    else
     end
     
     
     %% define problem definitions
-    problem = lasso(A, b, lambda);
+    problem = elastic_net(A, b, lambda1, lambda2);
 
     
     %% initialize
@@ -54,7 +44,7 @@ function [] = test_lasso()
         % general options for optimization algorithms   
         options.w_init = w_init;
         options.tol_gnorm = 1e-10;
-        options.max_iter = 100;
+        options.max_iter = 300;
         options.verbose = true;  
 
         switch algorithms{alg_idx}
@@ -91,9 +81,9 @@ function [] = test_lasso()
                 options.rho = 0.1;
                 [w_list{alg_idx}, info_list{alg_idx}] = admm_lasso(problem, options);    
                 
-            case {'CD-LASSO'}
+            case {'CD-EasticNet'}
                 
-                options.sub_mode = 'lasso';
+                options.sub_mode = 'elasticnet';
                 [w_list{alg_idx}, info_list{alg_idx}] = cd_lasso_elasticnet(problem, options);                   
                 
             case {'L-BFGS-BKT'}
@@ -105,6 +95,7 @@ function [] = test_lasso()
                 
                 options.step_alg = 'strong_wolfe';                  
                 [w_list{alg_idx}, info_list{alg_idx}] = lbfgs(problem, options);  
+                
                 
             case {'P-Newton-CHOLESKY'}
                 

@@ -105,6 +105,15 @@ function [w, infos] = newton(problem, options)
         end
     end
     
+    if ~isfield(options, 'step_init_alg')
+        % Do nothing
+    else
+        if strcmp(options.step_init_alg, 'bb_init')
+            % initialize by BB step-size
+            step_init = bb_init(problem, w);
+        end
+    end    
+    
     
     % initialise
     iter = 0;
@@ -168,6 +177,7 @@ function [w, infos] = newton(problem, options)
         end          
         
         % calculate gradient
+        grad_old = d;
         grad = problem.full_grad(w);
         % calculate hessian        
         hess = problem.full_hess(w);
