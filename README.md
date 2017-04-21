@@ -1,7 +1,7 @@
 # SGDLibrary : Stochastic Gradient Descent Library in MATLAB
 ----------
 
-Authors: [Hiroyuki Kasai](http://www.kasailab.com/)
+Authors: [Hiroyuki Kasai](http://kasai.kasailab.com/)
 
 Last page update: March 28, 2017
 
