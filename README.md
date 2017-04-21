@@ -125,35 +125,19 @@ Additionally, the following problems are provided for gradient descent algorithm
 
 Folders and files
 ---------
-
-- run_me_first.m
-    - The scipt that you need to run first.
-
-- demo.m and demo_ext.m
-    - Demonstration scripts to check and understand this package easily. 
-
-- problem/
-    - Problem definition files to be solved.
-                      
-- plotter/
-    - Contains plotting tools to show convergence results and various plots.
-                  
-- tool/
-    - Some utility tools for this project.
-
-- sgd_solver/
-    - Contains various stochastic optimization algorithms.
-
-- sgd_test/
-    - Some helpful test scripts using stochastic gradient algorithms to use this package.
-
-- gd_solver/
-    - Contains various gradient descent optimization algorithms.
-
-- gd_test/
-    - Some helpful test scripts using gradient descent algorithms to use this package.
-                  
-<br />                              
+<pre>
+./                      - Top directory.
+./README.md             - This readme file.
+./run_me_first.m        - The scipt that you need to run first.
+./demo.m                - Demonstration script to check and understand this package easily. 
+|plotter/               - Contains plotting tools to show convergence results and various plots.
+|tool/                  - Some auxiliary tools for this project.
+|problem/               - Problem definition files to be solved.
+|sgd_solver/            - Contains various stochastic optimization algorithms.
+|sgd_test/              - Some helpful test scripts to use this package.
+|gd_solver/             - Contains various gradient descent optimization algorithms.
+|gd_test/               - Some helpful test scripts using gradient descent algorithms to use this package.
+</pre>                       
 
 First to do
 ----------------------------
