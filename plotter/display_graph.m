@@ -1,4 +1,4 @@
-function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, info_list, scale)
+function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, info_list, scale, line, width)
 % SHow graphs of optimizations
 %
 % Inputs:
@@ -12,7 +12,7 @@ function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, inf
 % This file is part of GDLibrary and SGDLibrary.
 %
 % Created by H.Kasai on Oct. 23, 2016
-% Modified by H.Kasai on Nov. 02, 2016
+% Modified by H.Kasai on Apr. 24, 2017
 
     if nargin < 6
         scale_type = 'semilogy';
@@ -20,11 +20,28 @@ function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, inf
         scale_type = scale;
     end
     
+    if nargin < 7
+        line_type = 'line';
+    else
+        line_type = line;
+    end    
+    
+    if nargin < 8
+        linewidth = 2;
+    else
+        linewidth = width;
+    end      
+    
     % for plotting
-    linetype = {'r','b','c','g','m','y','r--','b--','c--','g--','m--','y--','r:','b:','c:','g:','m:','y:','r.','b.','c.','g.','m.','y.'};
+    if strcmp(line_type, 'line')
+        linetype = {'r','b','c','g','m','y','r--','b--','c--','g--','m--','y--','r:','b:','c:','g:','m:','y:','r.','b.','c.','g.','m.','y.'};
+    elseif strcmp(line_type, 'line-with-mark')
+        linetype = {'ro-','bo-','mo-','go-','co-','yo-','r*-','b*-','m*-','g*-','c*-','y*-','r+--','b+--','m+--','g+--','c+--','y+--','rs:','bs:','ms:','gs:','cs:','ys:','r.','b.','c.','g.','m.','y.'};
+    else
+    end
     fontsize = 16;
     markersize = 5;
-    linewidth = 2;    
+
 
     % initialize
     legend_str = cell(1);    
@@ -46,8 +63,10 @@ function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, inf
                 x_plot_data = info_list{alg_idx}.grad_calc_count; 
             elseif strcmp(x_category, 'time')
                 x_plot_data = info_list{alg_idx}.time;  
-            elseif strcmp(x_category, 'lambda') || strcmp(x_category, 'l1')
-                x_plot_data = w_list;                   
+            elseif strcmp(x_category, 'lambda') || strcmp(x_category, 'l1-norm')
+                x_plot_data = w_list;     
+            elseif strcmp(x_category, 'coeff_pos')
+                x_plot_data = [1:length(w_list{alg_idx})];                  
             else
             end
             
@@ -56,14 +75,18 @@ function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, inf
                 y_plot_data = info_list{alg_idx}.cost;
             elseif strcmp(y_category, 'optimality_gap')
                 y_plot_data = info_list{alg_idx}.optgap;
+            elseif strcmp(y_category, 'sol_optimality_gap')
+                y_plot_data = info_list{alg_idx}.sol_optgap;                
             elseif strcmp(y_category, 'gnorm')
                 y_plot_data = info_list{alg_idx}.gnorm;                
             elseif strcmp(y_category, 'K')
                 y_plot_data = info_list{alg_idx}.K;  
-            elseif strcmp(y_category, 'reg')
+            elseif strcmp(y_category, 'reg') || strcmp(y_category, 'l1-norm') || strcmp(y_category, 'trace_norm')
                 y_plot_data = info_list{alg_idx}.reg;  
-            elseif strcmp(y_category, 'coeff') || strcmp(y_category, 'aprox_err')
-                y_plot_data = info_list{1};                  
+            elseif strcmp(y_category, 'coeffs') || strcmp(y_category, 'aprox_err')
+                y_plot_data = info_list{1};     
+            elseif strcmp(y_category, 'coeff_amp') || strcmp(y_category, 'aprox_err')
+                y_plot_data = info_list{alg_idx};                     
             end
             
             if strcmp(scale_type, 'semilogy')
@@ -71,7 +94,11 @@ function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, inf
             elseif strcmp(scale_type, 'loglog')
                 loglog(x_plot_data, y_plot_data, linetype{alg_num}, 'MarkerSize', markersize, 'Linewidth', linewidth); hold on;                
             elseif strcmp(scale_type, 'linear')
-                plot(x_plot_data, y_plot_data, 'Linewidth', linewidth); hold on;
+                if strcmp(y_category, 'coeffs')
+                    plot(x_plot_data, y_plot_data, 'Linewidth', linewidth); hold on;
+                else
+                    plot(x_plot_data, y_plot_data, linetype{alg_num}, 'MarkerSize', markersize, 'Linewidth', linewidth); hold on;  
+                end
             else
                 error('Invalid scale type');
             end
@@ -96,8 +123,11 @@ function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, inf
         xlabel('Time', 'FontSize', fontsize);   
     elseif strcmp(x_category, 'lambda')
         xlabel('$$\lambda$$', 'FontSize', fontsize,'Interpreter', 'Latex'); 
-    elseif strcmp(x_category, 'l1')
+    elseif strcmp(x_category, 'l1-norm')
         xlabel('$$\ell$$-1 norm', 'FontSize', fontsize,'Interpreter', 'Latex');          
+    elseif strcmp(x_category, 'coeff_pos')
+        xlabel('Coefficient position', 'FontSize', fontsize);    
+    else
     end    
     
     % Y label    
@@ -105,19 +135,27 @@ function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, inf
         ylabel('Cost', 'FontSize', fontsize);
     elseif strcmp(y_category, 'optimality_gap')
         ylabel('Optimality gap', 'FontSize', fontsize);
+    elseif strcmp(y_category, 'sol_optimality_gap')
+        ylabel('Solution optimality gap', 'FontSize', fontsize);        
     elseif strcmp(y_category, 'gnorm')
         ylabel('Norm of gradient', 'FontSize', fontsize);   
     elseif strcmp(y_category, 'K')
         ylabel('Batch size', 'FontSize', fontsize);   
     elseif strcmp(y_category, 'reg')
-        ylabel('Regularizer', 'FontSize', fontsize);     
-    elseif strcmp(y_category, 'coeff')
+        ylabel('Regularizer', 'FontSize', fontsize);  
+    elseif strcmp(y_category, 'trace_norm')
+        ylabel('Trace (nuclear) norm', 'FontSize', fontsize);            
+    elseif strcmp(y_category, 'l1-norm')
+        ylabel('$$\ell$$-1 norm', 'FontSize', fontsize, 'Interpreter', 'Latex', 'FontName','Arial'); 
+    elseif strcmp(y_category, 'coeffs')
         ylabel('Coefficient', 'FontSize', fontsize);    
     elseif strcmp(y_category, 'aprox_err')
-        ylabel('Approximation error', 'FontSize', fontsize);           
+        ylabel('Approximation error', 'FontSize', fontsize); 
+    elseif strcmp(y_category, 'coeff_amp') 
+        ylabel('Coefficient amplitude', 'FontSize', fontsize);          
     end
     
-    if ~strcmp(y_category, 'coeff')
+    if ~strcmp(y_category, 'coeffs')
         legend(legend_str);
     end
     set(gca, 'FontSize', fontsize);      
