@@ -320,7 +320,7 @@ Example results of other problems
 
 - Linear regression problem  
 
-<img src="https://http://www.kasailab.com/Public/Github/SGDLibrary/images/linear_reg_results.png" width="900">
+<img src="http://http://www.kasailab.com/Public/Github/SGDLibrary/images/linear_reg_results.png" width="900">
 
 - Softmax classifier problem
 
