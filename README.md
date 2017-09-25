@@ -379,7 +379,7 @@ Release Notes
 * Version 1.0.9 (Sep. 25, 2017)
     - Proximal operator is newly added. 
     - Some new problems are added. 
-    - User-defined stepsize algorithm is supported. 
+    - User-defined stepsize algorithm is supported. See [test_stepsize_alg_demo.m](https://github.com/hiroyuki-kasai/SGDLibrary/blob/master/sgd_test/test_stepsize_alg_demo.m).
 * Version 1.0.8 (Mar. 28, 2017)
     - IQN (incremental Quasi-Newton method, iqn.m) is nely included. 
 * Version 1.0.7 (Mar. 17, 2017)
