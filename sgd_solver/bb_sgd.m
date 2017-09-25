@@ -1,9 +1,9 @@
-function [w, infos] = bb_sgd(problem, options)
+function [w, infos] = bb_sgd(problem, in_options)
 % Big batch stochastic gradient descent algorithm.
 %
 % Inputs:
 %       problem     function (cost/grad/hess)
-%       options     options
+%       in_options  options
 % Output:
 %       w           solution of w
 %       infos       information
@@ -22,84 +22,33 @@ function [w, infos] = bb_sgd(problem, options)
     % set dimensions and samples
     d = problem.dim();
     n = problem.samples();  
-
     
-    % extract options
-    if ~isfield(options, 'tol_optgap')
-        tol_optgap = 1.0e-12;
-    else
-        tol_optgap = options.tol_optgap;
-    end        
-
-    if ~isfield(options, 'batch_size')
-        batch_size = 10;
-    else
-        batch_size = options.batch_size;
-    end
+    % set local options 
+    local_options.step_alg = 'backtracking';
     
-    if ~isfield(options, 'max_epoch')
-        max_epoch = 100;
-    else
-        max_epoch = options.max_epoch;
-    end 
-    
-    if ~isfield(options, 'w_init')
-        w = randn(d,1);
-    else
-        w = options.w_init;
-    end 
-    
-    if ~isfield(options, 'f_opt')
-        f_opt = -Inf;
-    else
-        f_opt = options.f_opt;
-    end 
-    
-    if ~isfield(options, 'verbose')
-        verbose = false;
-    else
-        verbose = options.verbose;
-    end
-    
-    if ~isfield(options, 'store_w')
-        store_w = false;
-    else
-        store_w = options.store_w;
-    end      
-    
+    % merge options
+    options = mergeOptions(get_default_options(d), local_options);   
+    options = mergeOptions(options, in_options);     
     
     % initialize
     iter = 0;
     epoch = 0;
     grad_calc_count = 0;
-    K = batch_size;
+    w = options.w_init;
+    K = options.batch_size;
     delta_K = floor(K/10);  
     prev_end_index = 0;
     Sample_end_reached = 0;
     K_max_reached = 0;     
-    Sample_end = n * max_epoch;
+    Sample_end = n * options.max_epoch;
     
-
     % store first infos
-    clear infos;
-    infos.iter = epoch;
-    infos.time = 0;    
-    infos.grad_calc_count = grad_calc_count;
-    f_val = problem.cost(w);
-    optgap = f_val - f_opt;
-    infos.optgap = optgap;
-    infos.gnorm = norm(problem.full_grad(w));     
-    infos.cost = f_val;
-    if isfield(problem, 'reg')
-        infos.reg = problem.reg(w);   
-    end         
-    if store_w
-        infos.w = w;       
-    end
+    clear infos;    
+    [infos, f_val, optgap] = store_infos(problem, w, options, [], epoch, grad_calc_count, 0);
     infos.K = K;    
     
     % generate total random index
-    total_samples = repmat(1:n, [1 max_epoch]);    
+    total_samples = repmat(1:n, [1 options.max_epoch]);    
     perm_idx = randperm(Sample_end);
     perm_total_samples = total_samples(perm_idx);
     
@@ -107,12 +56,12 @@ function [w, infos] = bb_sgd(problem, options)
     start_time = tic();
     
     % display infos
-    if verbose > 0
+    if options.verbose > 0
         fprintf('BB SGD: Epoch = %03d, cost = %.16e, optgap = %.4e\n', epoch, f_val, optgap);
     end       
     
     % main loop
-    while (optgap > tol_optgap) && ~Sample_end_reached
+    while (optgap > options.tol_optgap) && ~Sample_end_reached
 
         if ~K_max_reached
             
@@ -144,8 +93,8 @@ function [w, infos] = bb_sgd(problem, options)
                     grad_ave =  problem.grad(w, indices);    
 
                     block_size = K;
-                    if block_size < batch_size
-                        block_size = batch_size;
+                    if block_size < options.batch_size
+                        block_size = options.batch_size;
                     elseif block_size > 500
                         block_size = 500;
                     end
@@ -236,12 +185,12 @@ function [w, infos] = bb_sgd(problem, options)
         prev_end_index = end_index;
         
         % do line search
-        if strcmp(step_alg, 'backtracking')        
+        if strcmp(options.step_alg, 'backtracking')        
             rho = 1/2;
             %c = 1e-4;
             c = 0.1;
             step = backtracking_line_search(problem, -grad, w, rho, c);
-        elseif strcmp(step_alg, 'strong_wolfe')
+        elseif strcmp(options.step_alg, 'strong_wolfe')
             c1 = 1e-4;
             c2 = 0.9;
             step = strong_wolfe_line_search(problem, -grad, w, c1, c2);            
@@ -258,41 +207,23 @@ function [w, infos] = bb_sgd(problem, options)
         % count gradient evaluations
         %grad_calc_count = grad_calc_count + num_of_bachces * batch_size;       
         grad_calc_count = prev_end_index;
-        % update epoch
         epoch = epoch + 1;
-        % calculate optimality gap
-        f_val = problem.cost(w);
-        optgap = f_val - f_opt;   
-        % calculate norm of full gradient
-        gnorm = norm(problem.full_grad(w));        
-
+      
         % store infos
-        infos.iter = [infos.iter epoch];
-        infos.time = [infos.time elapsed_time];
-        infos.grad_calc_count = [infos.grad_calc_count grad_calc_count];
-        infos.optgap = [infos.optgap optgap];
-        infos.cost = [infos.cost f_val];
-        infos.gnorm = [infos.gnorm gnorm]; 
-        if isfield(problem, 'reg')
-            reg = problem.reg(w);
-            infos.reg = [infos.reg reg];
-        end          
-        if store_w
-            infos.w = [infos.w w];         
-        end
+        [infos, f_val, optgap] = store_infos(problem, w, options, infos, epoch, grad_calc_count, elapsed_time);  
         infos.K = [infos.K K];           
 
         % display infos
-        if verbose > 0
+        if options.verbose > 0
             fprintf('BB SGD: Epoch = %03d, cost = %.16e, optgap = %.4e, K = %d\n', epoch, f_val, optgap, K);
         end
 
     end
     
-    if optgap < tol_optgap
-        fprintf('Optimality gap tolerance reached: tol_optgap = %g\n', tol_optgap);
+    if optgap < options.tol_optgap
+        fprintf('Optimality gap tolerance reached: tol_optgap = %g\n', options.tol_optgap);
     elseif Sample_end_reached
-        fprintf('Max epoch reached: max_epochr = %g\n', max_epoch);
+        fprintf('Max epoch reached: max_epochr = %g\n', options.max_epoch);
     end
     
 end

@@ -59,8 +59,8 @@ function [w, infos] = subsamp_svrg(problem, options)
         r = options.r;
     end   
     
-    if r > d
-        r = d;
+    if r > d + 1
+        r = d - 1;
     end
     
     if ~isfield(options, 'w_init')
@@ -70,9 +70,7 @@ function [w, infos] = subsamp_svrg(problem, options)
     end     
     
     if ~isfield(options, 'f_opt')
-        f_opt = -Inf;
-    else
-        f_opt = options.f_opt;
+        options.f_opt = -Inf;
     end     
     
     if ~isfield(options, 'permute_on')
@@ -88,9 +86,7 @@ function [w, infos] = subsamp_svrg(problem, options)
     end
     
     if ~isfield(options, 'store_w')
-        store_w = false;
-    else
-        store_w = options.store_w;
+        options.store_w = false;
     end      
     
     
@@ -98,23 +94,12 @@ function [w, infos] = subsamp_svrg(problem, options)
     total_iter = 0;    
     epoch = 0;
     grad_calc_count = 0;
+    w = options.w_init;
+    num_of_bachces = floor(n / options.batch_size);     
 
     % store first infos
-    clear infos;
-    infos.total_iter = epoch;
-    infos.time = 0;    
-    infos.grad_calc_count = grad_calc_count;
-    f_val = problem.cost(w);
-    optgap = f_val - f_opt;
-    infos.optgap = optgap;
-    infos.gnorm = norm(problem.full_grad(w));      
-    infos.cost = f_val;
-    if isfield(problem, 'reg')
-        infos.reg = problem.reg(w);   
-    end  
-    if store_w
-        infos.w = w;       
-    end     
+    clear infos;    
+    [infos, f_val, optgap] = store_infos(problem, w, options, [], epoch, grad_calc_count, 0);    
     
     %
     sample_size = round(10*r*log(d));    
@@ -182,28 +167,10 @@ function [w, infos] = subsamp_svrg(problem, options)
         
         % count gradient evaluations
         grad_calc_count = grad_calc_count + j * batch_size + sample_size;        
-        % update epoch
         epoch = epoch + 1;
-        % calculate optgap
-        f_val = problem.cost(w);
-        optgap = f_val - f_opt; 
-        % calculate norm of full gradient
-        gnorm = norm(problem.full_grad(w));           
-
+        
         % store infos
-        infos.total_iter = [infos.total_iter epoch];
-        infos.time = [infos.time elapsed_time];
-        infos.grad_calc_count = [infos.grad_calc_count grad_calc_count];
-        infos.optgap = [infos.optgap optgap];
-        infos.cost = [infos.cost f_val];
-        infos.gnorm = [infos.gnorm gnorm]; 
-        if isfield(problem, 'reg')
-            reg = problem.reg(w);
-            infos.reg = [infos.reg reg];
-        end          
-        if store_w
-            infos.w = [infos.w w];         
-        end           
+        [infos, f_val, optgap] = store_infos(problem, w, options, infos, epoch, grad_calc_count, elapsed_time);            
 
         % display infos
         if verbose > 0

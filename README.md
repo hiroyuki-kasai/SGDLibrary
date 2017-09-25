@@ -3,9 +3,9 @@
 
 Authors: [Hiroyuki Kasai](http://kasai.kasailab.com/)
 
-Last page update: Septermer 25, 2017
+Last page update: Septermer 26, 2017
 
-Latest library version: 1.0.9 (see Release notes for more info)
+Latest library version: 1.0.10 (see Release notes for more info)
 
 <br />
 
@@ -93,13 +93,14 @@ optimization](https://arxiv.org/pdf/1607.01231v3.pdf)," arXiv preprint arXiv:160
 |oLBFGS-Lim|`obfgs`|`'Lim-mem'`||
 |Reg-oBFGS-Inf|`obfgs`|`'Inf-mem'`|`regularized=true`|
 |Damp-oBFGS-Inf|`obfgs`|`'Inf-mem'`|`regularized=true` & `damped=true`|
+|IQN|`iqn`|||
 |AdaGrad|`adagrad`|`'AdaGrad'`||
 |RMSProp|`adagrad`|`'RMSProp'`||
 |AdaDelta|`adagrad`|`'AdaDelta'`||
 |Adam|`adam`|`'Adam'`||
 |AdaMax|`adam`|`'AdaMax'`||
 |SVRG-BB|`svrg_bb`|||
-|IQN|`iqn`|||
+
 
 
 - Note that other algorithms could be configurable by selecting other combinations of sub_mode and options. 
@@ -376,6 +377,9 @@ If you have any problems or questions, please contact the author: [Hiroyuki Kasa
 Release Notes
 --------------
 
+* Version 1.0.10 (Sep. 26, 2017)
+    - Options paramter in solvers is re-organized. 
+    - Separate the function to store statistics information from solver.
 * Version 1.0.9 (Sep. 25, 2017)
     - Proximal operator is newly added. 
     - Some new problems are added. 
