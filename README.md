@@ -3,9 +3,9 @@
 
 Authors: [Hiroyuki Kasai](http://kasai.kasailab.com/)
 
-Last page update: March 28, 2017
+Last page update: Septermer 25, 2017
 
-Latest library version: 1.0.8 (see Release notes for more info)
+Latest library version: 1.0.9 (see Release notes for more info)
 
 <br />
 
@@ -108,12 +108,15 @@ optimization](https://arxiv.org/pdf/1607.01231v3.pdf)," arXiv preprint arXiv:160
 
 ## <a name="supp_pro"> Supported problems </a>
 
-* Multidimensional linear regression
-* Linear SVM
-* Logistic regression
+* L2-norm regularized multidimensional linear regression
+* L2-norm regularized linear SVM
+* L2-norm regularized logistic regression
 * Softmax classification (multinomial logistic regression)
     - Note that softmax classification problem does not support Hessian-vector product type algorithms, i.e., SQN, SVRG-SQN and SVRG-LBFGS.
+* L1-norm regularized multidimensional linear regression
+* L1-norm regularized logistic regression
 * Sum quadratic problem
+
 
 Additionally, the following problems are provided for gradient descent algorithms. 
 
@@ -373,6 +376,10 @@ If you have any problems or questions, please contact the author: [Hiroyuki Kasa
 Release Notes
 --------------
 
+* Version 1.0.9 (Sep. 25, 2017)
+    - Proximal operator is newly added. 
+    - Some new problems are added. 
+    - User-defined stepsize algorithm is supported. 
 * Version 1.0.8 (Mar. 28, 2017)
     - IQN (incremental Quasi-Newton method, iqn.m) is nely included. 
 * Version 1.0.7 (Mar. 17, 2017)
