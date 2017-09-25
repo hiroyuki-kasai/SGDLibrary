@@ -98,7 +98,7 @@ function [ ] = display_regression_result(problem, w_opt, algorithms_list, w_list
             grid on
 
             % display legend by adjusting its position
-            ax=legend('Train data','Solution', 'Prediction',0);
+            ax=legend('Train data','Solution', 'Prediction');
             pos=get(ax,'position');
             pos(1)=pos(1)-0.01;
             set(ax,'position',pos)            

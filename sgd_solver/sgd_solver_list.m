@@ -8,16 +8,17 @@ function [ algs ] = sgd_solver_list(category)
 %
 % This file is part of GDLibrary.
 %
-% Created by H.Kasai on Nov. 0, 2016
+% Created by H.Kasai on Nov. 1, 2016
+% Modified by H.Kasai on Sep. 25, 2017
 
 
-    % supported algorithms by ‚SGDLibrary
+    % supported algorithms by SGDLibrary
     basic_algs = {'SGD'};
     vr_algs = {'SVRG','SAG','SAGA'};
     qnewton_algs = {'SQN','SVRG-SQN','SVRG-LBFGS','SS-SVRG', ...
         'oBFGS-Inf','oBFGS-Lim','Reg-oBFGS-Inf','Reg-oBFGS-Lim','Damp-oBFGS-Inf','Damp-oBFGS-Lim'};
     adagrad_algs = {'AdaGrad','RMSProp','AdaDelta','Adam','AdaMax'};
-    else_algs = {'SVRG-BB'};
+    else_algs = {'SVRG-BB','IQN'};
     
     switch category
         case 'BASIC' 

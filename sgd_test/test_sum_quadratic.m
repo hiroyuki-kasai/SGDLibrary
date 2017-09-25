@@ -9,7 +9,7 @@ function  test_sum_quadratic()
     if 0
         algorithms = sgd_solver_list('ALL');  
     else
-        algorithms = {'SGD','SVRG'};
+        algorithms = {'SGD','SVRG','IQN'};
     end
     
     

@@ -16,7 +16,7 @@ function [w, infos] = iqn(problem, options)
 % This file is part of SGDLibrary.
 %
 % Originally created by A. Mokhtari
-% Modified by H.Kasai on Mar. 13, 2017
+% Modified by H.Kasai on Sep. 25, 2017
 
 
     % set dimensions and samples
@@ -68,7 +68,7 @@ function [w, infos] = iqn(problem, options)
     
     
     % initialize
-    iter = 0;
+    total_iter = 0;
     epoch = 0;
     grad_calc_count = 0;
     
@@ -80,14 +80,17 @@ function [w, infos] = iqn(problem, options)
 
     % store first infos
     clear infos;
-    infos.iter = epoch;
+    infos.total_iter = epoch;
     infos.time = 0;    
     infos.grad_calc_count = grad_calc_count;
     f_val = problem.cost(w);
     optgap = f_val - f_opt;
     infos.optgap = optgap;
-    infos.gnorm = norm(problem.full_grad(w));    
+    infos.gnorm = norm(problem.full_grad(w));      
     infos.cost = f_val;
+    if isfield(problem, 'reg')
+        infos.reg = problem.reg(w);   
+    end  
     if store_w
         infos.w = w;       
     end  
@@ -123,13 +126,14 @@ function [w, infos] = iqn(problem, options)
     % main loop
     while (optgap > tol_optgap) && (epoch < max_epoch)
 
-        for j=1:n
+        for j = 1 : n
             
             id = mod(j,n)+1;
             
             % calculate gradient
             grad =  problem.grad(w, id);
             
+            % update w
             if norm(w - t(:,id)) > 0
                 s = w - t(:,id);
                 yy = grad-y(:,id);
@@ -150,9 +154,13 @@ function [w, infos] = iqn(problem, options)
             else
                 w = w;
             end
+            
+            % proximal operator
+            if isfield(problem, 'prox')
+                w = problem.prox(w, step);
+            end              
 
-            % update w
-            iter = iter + 1;
+            total_iter = total_iter + 1;
         end
         
         % measure elapsed time
@@ -169,12 +177,16 @@ function [w, infos] = iqn(problem, options)
         gnorm = norm(problem.full_grad(w));        
 
         % store infos
-        infos.iter = [infos.iter epoch];
+        infos.total_iter = [infos.total_iter epoch];
         infos.time = [infos.time elapsed_time];
         infos.grad_calc_count = [infos.grad_calc_count grad_calc_count];
         infos.optgap = [infos.optgap optgap];
         infos.cost = [infos.cost f_val];
-        infos.gnorm = [infos.gnorm gnorm];         
+        infos.gnorm = [infos.gnorm gnorm];     
+        if isfield(problem, 'reg')
+            reg = problem.reg(w);
+            infos.reg = [infos.reg reg];
+        end          
         if store_w
             infos.w = [infos.w w];         
         end           

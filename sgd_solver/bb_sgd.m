@@ -16,27 +16,15 @@ function [w, infos] = bb_sgd(problem, options)
 % This file is part of SGDLibrary.
 %
 % Created by H.Kasai on Nov. 07, 2016
-% Modified by H.Kasai on Jan. 12, 2017
+% Modified by H.Kasai on Sep. 25, 2017
 
 
     % set dimensions and samples
     d = problem.dim();
     n = problem.samples();  
 
+    
     % extract options
-    if ~isfield(options, 'step_init')
-        step_init = 0.1;
-    else
-        step_init = options.step_init;
-    end
-    step = step_init;    
-    
-    if ~isfield(options, 'step_alg')
-        step_alg = 'fix';
-    else
-        step_alg = options.step_alg;
-    end  
-    
     if ~isfield(options, 'tol_optgap')
         tol_optgap = 1.0e-12;
     else
@@ -100,11 +88,11 @@ function [w, infos] = bb_sgd(problem, options)
     f_val = problem.cost(w);
     optgap = f_val - f_opt;
     infos.optgap = optgap;
-    grad = problem.full_grad(w);
-    gnorm = norm(grad);
-    infos.gnorm = gnorm;    
+    infos.gnorm = norm(problem.full_grad(w));     
     infos.cost = f_val;
-    infos.gnorm = norm(problem.full_grad(w));        
+    if isfield(problem, 'reg')
+        infos.reg = problem.reg(w);   
+    end         
     if store_w
         infos.w = w;       
     end
@@ -162,7 +150,7 @@ function [w, infos] = bb_sgd(problem, options)
                         block_size = 500;
                     end
 
-                    % calculate variance of gradient from block by block based on Welfordfs method
+                    % calculate variance of gradient from block by block based on Welford?fs method
                     % to avoid big matrix calculation when K is large
                     for i=1:block_size:K
                         start_block_index = start_index + i - 1;
@@ -202,7 +190,7 @@ function [w, infos] = bb_sgd(problem, options)
                     % calculate inidivisual gradient, where grad_cur is big matrix
                     grad_cur =  problem.ind_grad(w, indices);  
                     
-                    % calculate variance of gradient by Welfordfs method
+                    % calculate variance of gradient by Welford?fs method
                     len_add = end_index - start_index + 1;
                     old_grad_ave = grad_ave;
                     grad_ave_rep = repmat(grad_ave, [1 len_add]);
@@ -214,7 +202,7 @@ function [w, infos] = bb_sgd(problem, options)
                     V_B = grad_var/(K-1);  
                 end
 
-                if grad_ave'*grad_ave >= V_B/K;
+                if grad_ave'*grad_ave >= V_B/K
                     K_determined = 1;
                 else
                     K = K + delta_K;
@@ -284,7 +272,11 @@ function [w, infos] = bb_sgd(problem, options)
         infos.grad_calc_count = [infos.grad_calc_count grad_calc_count];
         infos.optgap = [infos.optgap optgap];
         infos.cost = [infos.cost f_val];
-        infos.gnorm = [infos.gnorm gnorm];         
+        infos.gnorm = [infos.gnorm gnorm]; 
+        if isfield(problem, 'reg')
+            reg = problem.reg(w);
+            infos.reg = [infos.reg reg];
+        end          
         if store_w
             infos.w = [infos.w w];         
         end

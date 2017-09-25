@@ -16,38 +16,19 @@ function [w, infos] = subsamp_svrg(problem, options)
 %
 %                   
 % Created by H.Kasai on Oct. 28, 2016
-% Modified by H.Kasai on Jan. 12, 2017
+% Modified by H.Kasai on Sep. 25, 2017
 
 
     % set dimensions and samples
     d = problem.dim();
     n = problem.samples();
     
-    % extract options
-    if ~isfield(options, 'step_init')
-        step_init = 0.1;
+
+    % extract options    
+    if ~isfield(options, 'stepsizefun')
+        options.stepsizefun = @stepsize_alg;
     else
-        step_init = options.step_init;
     end
-    step = step_init;
-    
-    if ~isfield(options, 'step_alg')
-        step_alg = 'fix';
-    else
-        if strcmp(options.step_alg, 'decay')
-            step_alg = 'decay';
-        elseif strcmp(options.step_alg, 'fix')
-            step_alg = 'fix';
-        else
-            step_alg = 'decay';
-        end
-    end     
-    
-    if ~isfield(options, 'lambda')
-        lambda = 0.1;
-    else
-        lambda = options.lambda;
-    end 
     
     if ~isfield(options, 'tol_optgap')
         tol_optgap = 1.0e-12;
@@ -114,20 +95,23 @@ function [w, infos] = subsamp_svrg(problem, options)
     
     
     % initialize
-    iter = 0;    
+    total_iter = 0;    
     epoch = 0;
     grad_calc_count = 0;
 
     % store first infos
     clear infos;
-    infos.iter = epoch;
+    infos.total_iter = epoch;
     infos.time = 0;    
     infos.grad_calc_count = grad_calc_count;
     f_val = problem.cost(w);
     optgap = f_val - f_opt;
     infos.optgap = optgap;
-    infos.gnorm = norm(problem.full_grad(w));        
+    infos.gnorm = norm(problem.full_grad(w));      
     infos.cost = f_val;
+    if isfield(problem, 'reg')
+        infos.reg = problem.reg(w);   
+    end  
     if store_w
         infos.w = w;       
     end     
@@ -169,12 +153,10 @@ function [w, infos] = subsamp_svrg(problem, options)
         Sing_inv_gamma = diag(1./diag(sigma)) - diag(ones(r,1)/gamma);
         
         
-        for j=1:num_of_bachces
+        for j = 1 : num_of_bachces
             
             % update step-size
-            if strcmp(step_alg, 'decay')
-                step = step_init / (1 + step_init * lambda * iter);
-            end                  
+            step = options.stepsizefun(total_iter, options);                
          
             % calculate variance reduced gradient
             start_index = (j-1) * batch_size + 1;
@@ -186,8 +168,13 @@ function [w, infos] = subsamp_svrg(problem, options)
             % update w
             v = -Q*(Sing_inv_gamma)*(Q' * grad_est) - (1/gamma)*grad_est;
             w = w + step * v;
+            
+            % proximal operator
+            if isfield(problem, 'prox')
+                w = problem.prox(w, step);
+            end              
                 
-            iter = iter + 1;
+            total_iter = total_iter + 1;
         end
         
         % measure elapsed time
@@ -204,12 +191,16 @@ function [w, infos] = subsamp_svrg(problem, options)
         gnorm = norm(problem.full_grad(w));           
 
         % store infos
-        infos.iter = [infos.iter epoch];
+        infos.total_iter = [infos.total_iter epoch];
         infos.time = [infos.time elapsed_time];
         infos.grad_calc_count = [infos.grad_calc_count grad_calc_count];
         infos.optgap = [infos.optgap optgap];
         infos.cost = [infos.cost f_val];
-        infos.gnorm = [infos.gnorm gnorm];           
+        infos.gnorm = [infos.gnorm gnorm]; 
+        if isfield(problem, 'reg')
+            reg = problem.reg(w);
+            infos.reg = [infos.reg reg];
+        end          
         if store_w
             infos.w = [infos.w w];         
         end           

@@ -56,7 +56,11 @@ function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, inf
             if strcmp(x_category, 'numofgrad')
                 x_plot_data = info_list{alg_idx}.grad_calc_count;
             elseif strcmp(x_category, 'iter')
-                x_plot_data = info_list{alg_idx}.iter;  
+                if isfield(info_list{alg_idx}, 'iter')
+                    x_plot_data = info_list{alg_idx}.iter; 
+                elseif isfield(info_list{alg_idx}, 'total_iter')
+                    x_plot_data = info_list{alg_idx}.total_iter; 
+                end                   
             elseif strcmp(x_category, 'epoch')
                 x_plot_data = info_list{alg_idx}.epoch;                    
             elseif strcmp(x_category, 'grad_calc_count')
@@ -119,6 +123,8 @@ function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, inf
         xlabel('Iteration', 'FontSize', fontsize);  
     elseif strcmp(x_category, 'epoch')
         xlabel('Epoch', 'FontSize', fontsize);    
+    elseif strcmp(x_category, 'grad_calc_count')
+        xlabel('Number of gradient calculations', 'FontSize', fontsize);            
     elseif strcmp(x_category, 'time')
         xlabel('Time', 'FontSize', fontsize);   
     elseif strcmp(x_category, 'lambda')

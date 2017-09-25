@@ -7,10 +7,9 @@ function  test_linear_regression()
     
     %% Set algorithms
     if 0
-        algorithms = sgd_solver_list
-        ('ALL');  
+        algorithms = sgd_solver_list('ALL');  
     else
-        algorithms = {'SGD','SVRG','SQN'};
+        algorithms = {'SGD','SVRG','SQN','IQN'};
     end    
 
      
@@ -342,7 +341,15 @@ function  test_linear_regression()
                 options.delta = 0.1;
                 options.damped = true;
 
-                [w_list{alg_idx}, info_list{alg_idx}] = obfgs(problem, options);                    
+                [w_list{alg_idx}, info_list{alg_idx}] = obfgs(problem, options);   
+                
+           case {'IQN'} 
+
+                options.w_init = w_init;
+                options.step_init = 1;
+                options.step_alg = 'fix';
+
+                [w_list{alg_idx}, info_list{alg_idx}] = iqn(problem, options);                      
 
             otherwise
                 warn_str = [algorithms{alg_idx}, ' is not supported.'];
@@ -367,10 +374,12 @@ function  test_linear_regression()
     y_pred_list = cell(length(algorithms),1);
     mse_list = cell(length(algorithms),1);    
     for alg_idx=1:length(algorithms)    
-        % predict class
-        y_pred_list{alg_idx} = problem.prediction(w_list{alg_idx});
-        % calculate accuracy
-        mse_list{alg_idx} = problem.mse(y_pred_list{alg_idx}); 
+        if ~isempty(w_list{alg_idx})
+            % predict class
+            y_pred_list{alg_idx} = problem.prediction(w_list{alg_idx});
+            % calculate accuracy
+            mse_list{alg_idx} = problem.mse(y_pred_list{alg_idx}); 
+        end
     end 
     if plot_flag
         display_regression_result(problem, w_opt, algorithms, w_list, y_pred_list, mse_list, x_train, y_train, x_test, y_test);      

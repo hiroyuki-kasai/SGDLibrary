@@ -9,7 +9,7 @@ function  test_linear_svm()
     if 0
         algorithms = solver_list('ALL');  
     else
-        algorithms = {'SGD','SVRG','SQN'};
+        algorithms = {'SGD','SVRG','SQN','IQN'};
     end   
     
 
@@ -336,7 +336,15 @@ function  test_linear_svm()
                 options.delta = 0.1;
                 options.damped = true;
 
-                [w_list{alg_idx}, info_list{alg_idx}] = obfgs(problem, options);                    
+                [w_list{alg_idx}, info_list{alg_idx}] = obfgs(problem, options);     
+                
+           case {'IQN'} 
+
+                options.w_init = w_init;
+                options.step_init = 1;
+                options.step_alg = 'fix';
+
+                [w_list{alg_idx}, info_list{alg_idx}] = iqn(problem, options);                     
 
             otherwise
                 warn_str = [algorithms{alg_idx}, ' is not supported.'];
@@ -361,17 +369,21 @@ function  test_linear_svm()
     y_pred_list = cell(length(algorithms),1);
     accuracy_list = cell(length(algorithms),1);    
     for alg_idx=1:length(algorithms)  
-        p = problem.prediction(w_list{alg_idx});
-        % calculate accuracy
-        accuracy_list{alg_idx} = problem.accuracy(p); 
-        
-        fprintf('Classificaiton accuracy: %s: %.4f\n', algorithms{alg_idx}, problem.accuracy(p));        
-        
-        % convert from {1,-1} to {1,2}
-        p(p==-1) = 2;
-        p(p==1) = 1;
-        % predict class
-        y_pred_list{alg_idx} = p;
+        if ~isempty(w_list{alg_idx})        
+            p = problem.prediction(w_list{alg_idx});
+            % calculate accuracy
+            accuracy_list{alg_idx} = problem.accuracy(p); 
+
+            fprintf('Classificaiton accuracy: %s: %.4f\n', algorithms{alg_idx}, problem.accuracy(p));        
+
+            % convert from {1,-1} to {1,2}
+            p(p==-1) = 2;
+            p(p==1) = 1;
+            % predict class
+            y_pred_list{alg_idx} = p;
+        else
+            fprintf('Classificaiton accuracy: %s: Not supported\n', algorithms{alg_idx});   
+        end
     end 
     
     % convert from {1,-1} to {1,2}

@@ -141,7 +141,7 @@ function [ ] = display_classification_result(problem, algorithms_list, w_list, y
         grid on
             
         % display legend by adjusting its position
-        ax=legend(legend_str,0);
+        ax=legend(legend_str);
         pos=get(ax,'position');
         pos(1)=pos(1)-0.001;
         set(ax,'position',pos)            
@@ -168,7 +168,7 @@ function [ ] = display_classification_result(problem, algorithms_list, w_list, y
         grid on
             
         % display legend by adjusting its position
-        ax=legend(legend_str,0);
+        ax=legend(legend_str);
         pos=get(ax,'position');
         pos(1)=pos(1)-0.001;
         set(ax,'position',pos)            
@@ -212,7 +212,7 @@ function [ ] = display_classification_result(problem, algorithms_list, w_list, y
             grid on
 
             % display legend by adjusting its position
-            ax=legend(legend_str,0);
+            ax=legend(legend_str);
             pos=get(ax,'position');
             pos(1)=pos(1)-0.001;
             set(ax,'position',pos)            
