@@ -25,7 +25,8 @@ function test_stepsize_alg_demo()
     %% define problem definitions
     problem = logistic_regression(data.x_train, data.y_train, data.x_test, data.y_test); 
     
-    % define
+    
+    %% define user-defined stepsize algorithm
     function step = my_stepalg(iter, options)
         step = options.step_init / (10 + iter*0.5);
     end       
@@ -45,7 +46,7 @@ function test_stepsize_alg_demo()
     options.step_alg = 'decay-2';
     [w_sgd_decay2, info_sgd_decay2] = sgd(problem, options);       
     
-    options.stepsizefun = @my_stepalg;
+    options.stepsizefun = @my_stepalg;  % set my_stepalg (user-defined stepsize algorithm)
     [w_sgd_my, info_sgd_my] = sgd(problem, options);      
     
     
