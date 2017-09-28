@@ -45,7 +45,7 @@ Note that this SGDLibrary internally contains the [GDLibrary](https://github.com
     - SAGA
         - A. Defazio, F. Bach, and S. Lacoste-Julien, "[SAGA: A fast incremental gradient method with support for non-strongly convex composite objectives](https://papers.nips.cc/paper/5258-saga-a-fast-incremental-gradient-method-with-support-for-non-strongly-convex-composite-objectives.pdf),", NIPS, 2014.
     - SARAH
-        - L. M. Nguyen, J. Liu, K. Scheinberg, and M. Tak??, "[SARAH: A novel method for machine learning problems using stochastic recursive gradient](https://arxiv.org/abs/1703.00102)," ICML, 2017
+        - L. M. Nguyen, J. Liu, K. Scheinberg, and M. Takac, "[SARAH: A novel method for machine learning problems using stochastic recursive gradient](https://arxiv.org/abs/1703.00102)," ICML, 2017
 - **Quasi-Newton variants**
     - SQN (stochastic quasi-Newton)
         - R. H. Byrd, ,S. L. Hansen J. Nocedal, and Y. Singer, "[A stochastic quasi-Newton method 
@@ -97,7 +97,7 @@ optimization](https://arxiv.org/pdf/1607.01231v3.pdf)," arXiv preprint arXiv:160
 |SVRG|`svrg`|||
 |SAG|`sag`|`'SAG'`||
 |SAGA|`sag`|`'SAGA'`||
-|SARAG|`sarah`|||
+|SARAH|`sarah`|||
 |SQN|`slbfg`s|`'SQN'`||
 |SVRG-SQN|`slbfgs`|`'SVRG-SQN'`||
 |SVRG-LBFGS|`slbfgs`|`'SVRG-LBFGS'`||
