@@ -86,23 +86,23 @@ function [w, infos] = adam(problem, in_options)
             % increment total iteration numbers
             total_iter = total_iter + 1;
             
-            % Update biased first moment estimate
+            % update biased first moment estimate
             m = options.beta1.*m + (1 - options.beta1).*grad;
             
             if strcmp(options.sub_mode, 'Adam')
-                % Update biased second raw moment estimate
+                % update biased second raw moment estimate
                 v = options.beta2.*v + (1 - options.beta2).*(grad.^2);
-                % Compute bias-corrected fist moment estimate
+                % compute bias-corrected fist moment estimate
                 m_hat = m./(1 - options.beta1^total_iter);
-                % Compute bias-corrected second raw moment estimate
+                % compute bias-corrected second raw moment estimate
                 v_hat = v./(1 - options.beta2^total_iter);    
                 
                 % update w
                 w = w - step * m_hat ./ (sqrt(v_hat) + options.epsilon);                
             else % 'AdaMax'
-                % Update the exponentially weighted infinity norm
+                % update the exponentially weighted infinity norm
                 u = max(options.beta2.*u, abs(grad));       
-                % Compute the bias-corrected fist moment estimate
+                % compute the bias-corrected fist moment estimate
                 m_hat = m./(1 - options.beta1^total_iter);  
                 
                 % update w

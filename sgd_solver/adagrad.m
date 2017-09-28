@@ -92,7 +92,7 @@ function [w, infos] = adagrad(problem, in_options)
             grad = problem.grad(w,indice_j);
             
             if strcmp(options.sub_mode, 'AdaGrad')
-                % Update historical gradients
+                % update historical gradients
                 gradHist = gradHist + grad.^2;
                 
                 % update w
