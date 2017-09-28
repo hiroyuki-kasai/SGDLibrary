@@ -9,15 +9,14 @@ function [ algs ] = sgd_solver_list(category)
 % This file is part of GDLibrary.
 %
 % Created by H.Kasai on Nov. 1, 2016
-% Modified by H.Kasai on Sep. 25, 2017
+% Modified by H.Kasai on Sep. 28, 2017
 
 
     % supported algorithms by SGDLibrary
-    basic_algs = {'SGD'};
+    basic_algs = {'SGD','SGD-CM','SGD-CM-NAG','AdaGrad','RMSProp','AdaDelta','Adam','AdaMax'};
     vr_algs = {'SVRG','SAG','SAGA'};
     qnewton_algs = {'SQN','SVRG-SQN','SVRG-LBFGS','SS-SVRG', ...
         'oBFGS-Inf','oBFGS-Lim','Reg-oBFGS-Inf','Reg-oBFGS-Lim','Damp-oBFGS-Inf','Damp-oBFGS-Lim'};
-    adagrad_algs = {'AdaGrad','RMSProp','AdaDelta','Adam','AdaMax'};
     else_algs = {'SVRG-BB','IQN'};
     
     switch category
@@ -26,12 +25,9 @@ function [ algs ] = sgd_solver_list(category)
         case 'VR' 
             algs = vr_algs;
         case 'QN' 
-            algs = qnewton_algs;
-        case 'AD' 
-            algs = adagrad_algs;            
+            algs = qnewton_algs;        
         case 'ALL'
-            %algs = [basic_algs, vr_algs, qnewton_algs, adagrad_algs, else_algs];
-            algs = [basic_algs, vr_algs, qnewton_algs, adagrad_algs];
+            algs = [basic_algs, vr_algs, qnewton_algs, else_algs];
         otherwise
     end
     

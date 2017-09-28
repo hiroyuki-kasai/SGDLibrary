@@ -10,6 +10,7 @@ function step = stepsize_alg(iter, options)
 % This file is part of SGDLibrary.
 %
 % Created by H.Kasai on Sep. 25, 2017
+% Modified by H.Kasai on Sep. 28, 2017
 
 
     % extract options
@@ -25,7 +26,9 @@ function step = stepsize_alg(iter, options)
         if strcmp(options.step_alg, 'decay')
             step_alg = 'decay';
         elseif strcmp(options.step_alg, 'decay-2')
-            step_alg = 'decay-2';            
+            step_alg = 'decay-2';    
+        elseif strcmp(options.step_alg, 'decay-3')
+            step_alg = 'decay-3';              
         elseif strcmp(options.step_alg, 'fix')
             step_alg = 'fix';
         else
@@ -47,6 +50,8 @@ function step = stepsize_alg(iter, options)
         step = step_init / (1 + step_init * lambda * iter);
     elseif strcmp(step_alg, 'decay-2')
         step = step_init / (1 + iter);
+    elseif strcmp(step_alg, 'decay-3')
+        step = step_init / (lambda + iter);        
     end 
     
 end

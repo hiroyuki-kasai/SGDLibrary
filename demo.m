@@ -29,7 +29,8 @@ function  demo()
     
     %% perform algorithms SGD and SVRG 
     options.w_init = data.w_init;    
-    options.step_init = 0.01;       
+    options.step_init = 0.01; 
+    options.verbose = 2;
     [w_sgd, info_sgd] = sgd(problem, options);  
     [w_svrg, info_svrg] = svrg(problem, options);
     

@@ -3,9 +3,9 @@
 
 Authors: [Hiroyuki Kasai](http://kasai.kasailab.com/)
 
-Last page update: Septermer 26, 2017
+Last page update: Septermer 28, 2017
 
-Latest library version: 1.0.10 (see Release notes for more info)
+Latest library version: 1.0.11 (see Release notes for more info)
 
 <br />
 
@@ -20,9 +20,23 @@ Note that this SGDLibrary internally contains the [GDLibrary](https://github.com
 ## <a name="supp_solver"> List of the algorithms available in SGDLibrary </a>
 
 
-- **SGD** (stochastic gradient descent)
-    - H. Robbins and S. Monro, "[A stochastic approximation method](https://www.jstor.org/stable/pdf/2236626.pdf)," The annals of mathematical statistics, vol. 22, no. 3, pp. 400-407, 1951.
-    - L. Bottou, "[Online learning and stochastic approximations](http://leon.bottou.org/publications/pdf/online-1998.pdf)," Edited by David Saad, Cambridge University Press, Cambridge, UK, 1998.
+- **SGD variants** (stochastic gradient descent)
+    - Vanila SGD
+        - H. Robbins and S. Monro, "[A stochastic approximation method](https://www.jstor.org/stable/pdf/2236626.pdf)," The annals of mathematical statistics, vol. 22, no. 3, pp. 400-407, 1951.
+        - L. Bottou, "[Online learning and stochastic approximations](http://leon.bottou.org/publications/pdf/online-1998.pdf)," Edited by David Saad, Cambridge University Press, Cambridge, UK, 1998.
+    - SGD-CM (SGD with classical momentum)
+    - SGD-CM-NAG (SGD with classical momentum and Nesterov's Accelerated Gradient)
+        - I. Sutskever, J. Martens, G. Dahl and G. Hinton, "[On the importance of initialization and momentum in deep learning](https://dl.acm.org/citation.cfm?id=3043064)," ICML, 2013.
+    - AdaGrad (Adaptive gradient algorithm)
+        - J. Duchi, E. Hazan and Y. Singer, "[Adaptive subgradient methods for online learning and stochastic optimization](http://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf)," Journal of Machine Learning Research, 12, pp. 2121-2159, 2011.
+    - AdaDelta
+        - M. D.Zeiler, "[AdaDelta: An adaptive learning rate method](http://arxiv.org/abs/1212.5701)," arXiv preprint arXiv:1212.5701, 2012.
+    - RMSProp
+        - T. Tieleman and G. Hinton, "Lecture 6.5 - RMSProp", COURSERA: Neural Networks for Machine Learning, Technical report, 2012.
+    - Adam
+        - D. Kingma and J. Ba, "[Adam: A method for stochastic optimization](http://arxiv.org/pdf/1412.6980.pdf)," International Conference for Learning Representation (ICLR), 2015.
+    - AdaMax
+        - D. Kingma and J. Ba, "[Adam: A method for stochastic optimization](http://arxiv.org/pdf/1412.6980.pdf)," International Conference for Learning Representation (ICLR), 2015.
 - **Variance reduction variants**
     - SVRG (stochastic variance reduced gradient)
         - R. Johnson and T. Zhang, "[Accelerating stochastic gradient descent using predictive variance reduction](http://papers.nips.cc/paper/4937-accelerating-stochastic-gradient-descent-using-predictive-variance-reduction.pdf)," NIPS, 2013.
@@ -58,17 +72,6 @@ International Conference on Artificial Intelligence and Statistics (AISTATS), pp
 optimization](https://arxiv.org/pdf/1607.01231v3.pdf)," arXiv preprint arXiv:1607.01231, 2016.
     - IQN (incremental Quasi-Newton method)
         - A. Mokhtari, M. Eisen, and A. Ribeiro, "[An Incremental Quasi-Newton Method with a Local Superlinear Convergence Rate](https://arxiv.org/abs/1702.00709)," ICASSP2017, 2017.
-- **AdaGrad variants**
-    - AdaGrad (Adaptive gradient algorithm)
-        - J. Duchi, E. Hazan and Y. Singer, "[Adaptive subgradient methods for online learning and stochastic optimization](http://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf)," Journal of Machine Learning Research, 12, pp. 2121-2159, 2011.
-    - AdaDelta
-        - M. D.Zeiler, "[AdaDelta: An adaptive learning rate method](http://arxiv.org/abs/1212.5701)," arXiv preprint arXiv:1212.5701, 2012.
-    - RMSProp
-        - T. Tieleman and G. Hinton, "Lecture 6.5 - RMSProp", COURSERA: Neural Networks for Machine Learning, Technical report, 2012.
-    - Adam
-        - D. Kingma and J. Ba, "[Adam: A method for stochastic optimization](http://arxiv.org/pdf/1412.6980.pdf)," International Conference for Learning Representation (ICLR), 2015.
-    - AdaMax
-        - D. Kingma and J. Ba, "[Adam: A method for stochastic optimization](http://arxiv.org/pdf/1412.6980.pdf)," International Conference for Learning Representation (ICLR), 2015.
 - **Else**
     - SVRG-BB (stochastic variance reduced gradient with Barzilai-Borwein)
         - C. Tan, S. Ma, Y. Dai, Y. Qian, "[Barzilai-Borwein step size for stochastic gradient descent](https://arxiv.org/pdf/1605.04131v2.pdf)," NIPS, 2016.
@@ -82,6 +85,13 @@ optimization](https://arxiv.org/pdf/1607.01231v3.pdf)," arXiv preprint arXiv:160
 |Algorithm name in example codes| function | `options.sub_mode` | other `options` |
 |---|---|---|---|
 |SGD|`sgd`|||
+|SGD-CM|`sgd_cm`|`'CM'`||
+|SGD-CM-NAG|`sgd_cm`|`'CM-NAG'`||
+|AdaGrad|`adagrad`|`'AdaGrad'`||
+|RMSProp|`adagrad`|`'RMSProp'`||
+|AdaDelta|`adagrad`|`'AdaDelta'`||
+|Adam|`adam`|`'Adam'`||
+|AdaMax|`adam`|`'AdaMax'`||
 |SVRG|`svrg`|||
 |SAG|`sag`|`'SAG'`||
 |SAGA|`sag`|`'SAGA'`||
@@ -94,11 +104,6 @@ optimization](https://arxiv.org/pdf/1607.01231v3.pdf)," arXiv preprint arXiv:160
 |Reg-oBFGS-Inf|`obfgs`|`'Inf-mem'`|`regularized=true`|
 |Damp-oBFGS-Inf|`obfgs`|`'Inf-mem'`|`regularized=true` & `damped=true`|
 |IQN|`iqn`|||
-|AdaGrad|`adagrad`|`'AdaGrad'`||
-|RMSProp|`adagrad`|`'RMSProp'`||
-|AdaDelta|`adagrad`|`'AdaDelta'`||
-|Adam|`adam`|`'Adam'`||
-|AdaMax|`adam`|`'AdaMax'`||
 |SVRG-BB|`svrg_bb`|||
 
 
@@ -377,6 +382,8 @@ If you have any problems or questions, please contact the author: [Hiroyuki Kasa
 Release Notes
 --------------
 
+* Version 1.0.11 (Sep. 28, 2017)
+    - SGD-CM and SGD-CM-NAG are nely added.
 * Version 1.0.10 (Sep. 26, 2017)
     - Options paramter in solvers is re-organized. 
     - Separate the function to store statistics information from solver.

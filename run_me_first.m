@@ -31,4 +31,12 @@ cd gd_test/;
 addpath(genpath(pwd));
 cd ..;
 
+[version, release_date] = sgdlibrary_version();
+fprintf('##########################################################\n');
+fprintf('###                                                    ###\n');
+fprintf('###                Welcome to SGDLibrary               ###\n');
+fprintf('###        (version:%s, released:%s)      ###\n', version, release_date);
+fprintf('###                                                    ###\n');
+fprintf('##########################################################\n');
+
 
