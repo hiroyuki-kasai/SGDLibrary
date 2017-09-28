@@ -14,7 +14,7 @@ function [ algs ] = sgd_solver_list(category)
 
     % supported algorithms by SGDLibrary
     basic_algs = {'SGD','SGD-CM','SGD-CM-NAG','AdaGrad','RMSProp','AdaDelta','Adam','AdaMax'};
-    vr_algs = {'SVRG','SAG','SAGA'};
+    vr_algs = {'SVRG','SAG','SAGA','SARAH'};
     qnewton_algs = {'SQN','SVRG-SQN','SVRG-LBFGS','SS-SVRG', ...
         'oBFGS-Inf','oBFGS-Lim','Reg-oBFGS-Inf','Reg-oBFGS-Lim','Damp-oBFGS-Inf','Damp-oBFGS-Lim'};
     else_algs = {'SVRG-BB','IQN'};

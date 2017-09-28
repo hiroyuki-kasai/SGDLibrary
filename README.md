@@ -3,9 +3,9 @@
 
 Authors: [Hiroyuki Kasai](http://kasai.kasailab.com/)
 
-Last page update: Septermer 28, 2017
+Last page update: Septermer 29, 2017
 
-Latest library version: 1.0.11 (see Release notes for more info)
+Latest library version: 1.0.12 (see Release notes for more info)
 
 <br />
 
@@ -44,6 +44,8 @@ Note that this SGDLibrary internally contains the [GDLibrary](https://github.com
         - N. L. Roux, M. Schmidt, and F. R. Bach, "[A stochastic gradient method with an exponential convergence rate for finite training sets](https://papers.nips.cc/paper/4633-a-stochastic-gradient-method-with-an-exponential-convergence-_rate-for-finite-training-sets.pdf)," NIPS, 2012.
     - SAGA
         - A. Defazio, F. Bach, and S. Lacoste-Julien, "[SAGA: A fast incremental gradient method with support for non-strongly convex composite objectives](https://papers.nips.cc/paper/5258-saga-a-fast-incremental-gradient-method-with-support-for-non-strongly-convex-composite-objectives.pdf),", NIPS, 2014.
+    - SARAH
+        - L. M. Nguyen, J. Liu, K. Scheinberg, and M. Tak??, "[SARAH: A novel method for machine learning problems using stochastic recursive gradient](https://arxiv.org/abs/1703.00102)," ICML, 2017
 - **Quasi-Newton variants**
     - SQN (stochastic quasi-Newton)
         - R. H. Byrd, ,S. L. Hansen J. Nocedal, and Y. Singer, "[A stochastic quasi-Newton method 
@@ -95,6 +97,7 @@ optimization](https://arxiv.org/pdf/1607.01231v3.pdf)," arXiv preprint arXiv:160
 |SVRG|`svrg`|||
 |SAG|`sag`|`'SAG'`||
 |SAGA|`sag`|`'SAGA'`||
+|SARAG|`sarah`|||
 |SQN|`slbfg`s|`'SQN'`||
 |SVRG-SQN|`slbfgs`|`'SVRG-SQN'`||
 |SVRG-LBFGS|`slbfgs`|`'SVRG-LBFGS'`||
@@ -382,6 +385,8 @@ If you have any problems or questions, please contact the author: [Hiroyuki Kasa
 Release Notes
 --------------
 
+* Version 1.0.12 (Sep. 29, 2017)
+    - SARAH is nely added.
 * Version 1.0.11 (Sep. 28, 2017)
     - SGD-CM and SGD-CM-NAG are nely added.
 * Version 1.0.10 (Sep. 26, 2017)
