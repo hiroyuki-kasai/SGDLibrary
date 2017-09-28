@@ -44,8 +44,8 @@ Note that this SGDLibrary internally contains the [GDLibrary](https://github.com
         - N. L. Roux, M. Schmidt, and F. R. Bach, "[A stochastic gradient method with an exponential convergence rate for finite training sets](https://papers.nips.cc/paper/4633-a-stochastic-gradient-method-with-an-exponential-convergence-_rate-for-finite-training-sets.pdf)," NIPS, 2012.
     - SAGA
         - A. Defazio, F. Bach, and S. Lacoste-Julien, "[SAGA: A fast incremental gradient method with support for non-strongly convex composite objectives](https://papers.nips.cc/paper/5258-saga-a-fast-incremental-gradient-method-with-support-for-non-strongly-convex-composite-objectives.pdf),", NIPS, 2014.
-    - SARAH
-        - L. M. Nguyen, J. Liu, K. Scheinberg, and M. Takac, "[SARAH: A novel method for machine learning problems using stochastic recursive gradient](https://arxiv.org/abs/1703.00102)," ICML, 2017
+    - SARAH (StochAstic Recusive gRadient algoritHm)
+        - L. M. Nguyen, J. Liu, K. Scheinberg, and M. Takac, "[SARAH: A novel method for machine learning problems using stochastic recursive gradient](https://arxiv.org/abs/1703.00102)," ICML, 2017.
 - **Quasi-Newton variants**
     - SQN (stochastic quasi-Newton)
         - R. H. Byrd, ,S. L. Hansen J. Nocedal, and Y. Singer, "[A stochastic quasi-Newton method 
