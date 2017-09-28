@@ -9,7 +9,7 @@ function [w, infos] = sarah(problem, in_options)
 %       infos       information
 %
 % References:
-%       L. M. Nguyen, J. Liu, K. Scheinberg, and M. Tak??, 
+%       L. M. Nguyen, J. Liu, K. Scheinberg, and M. Takac, 
 %       "SARAH: A novel method for machine learning problems using stochastic recursive gradient,"
 %       ICML, 2017.
 %    
