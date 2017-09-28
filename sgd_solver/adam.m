@@ -18,6 +18,7 @@ function [w, infos] = adam(problem, in_options)
 %                   
 % Created by H.Kasai on Oct. 17, 2016
 % Modified by H.Kasai on Sep. 25, 2017
+% Note that partial code is originaly created by M.Pak (See https://github.com/mp4096/adawhatever)
 
 
     % set dimensions and samples
@@ -85,7 +86,7 @@ function [w, infos] = adam(problem, in_options)
             % increment total iteration numbers
             total_iter = total_iter + 1;
             
-            % Update biased fist moment estimate
+            % Update biased first moment estimate
             m = options.beta1.*m + (1 - options.beta1).*grad;
             
             if strcmp(options.sub_mode, 'Adam')
