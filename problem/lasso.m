@@ -19,6 +19,7 @@ function [Problem] = lasso(A, b, lambda)
 % This file is part of GDLibrary and SGDLibrary.
 %
 % Created by H.Kasai on Apr. 17, 2017
+% Modified by H.Kasai on Sep. 25, 2017
 
 
     d = size(A, 2);
@@ -75,7 +76,8 @@ function [Problem] = lasso(A, b, lambda)
 
     Problem.grad = @grad;
     function g = grad(w, indices)
-        error('Not implemted yet.');
+        A_partial = A(:,indices);
+        g = A_partial' * (A_partial * w - b);        
     end
 
     Problem.hess = @hess; 
@@ -93,6 +95,37 @@ function [Problem] = lasso(A, b, lambda)
         error('Not implemted yet.');
     end
 
-
+    Problem.calc_solution = @calc_solution;
+    function w_opt = calc_solution(problem, method, options_in)
+        
+        if nargin < 2
+            method = 'gd_nesterov';
+        end        
+        
+        options.max_iter = options_in.max_iter;
+        options.w_init = options_in.w_init;
+        options.verbose = true;
+        options.tol_optgap = 1.0e-24;
+        options.tol_gnorm = 1.0e-16;
+        options.step_alg = 'backtracking';
+        
+        if strcmp(method, 'sg')
+            [w_opt,~] = gd(problem, options);
+        elseif strcmp(method, 'cg')
+            [w_opt,~] = ncg(problem, options);
+        elseif strcmp(method, 'newton')
+            options.sub_mode = 'INEXACT';    
+            options.step_alg = 'non-backtracking'; 
+            [w_opt,~] = newton(problem, options);
+        elseif strcmp(method, 'gd_nesterov')
+            options.step_alg = 'backtracking';
+            options.step_init_alg = 'bb_init';
+            [w_opt,~] = gd_nesterov(problem, options);            
+        else 
+            options.step_alg = 'backtracking';  
+            options.mem_size = 5;
+            [w_opt,~] = lbfgs(problem, options);              
+        end
+    end
 end
 
