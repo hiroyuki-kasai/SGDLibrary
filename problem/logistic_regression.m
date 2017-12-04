@@ -23,7 +23,7 @@ function [Problem] = logistic_regression(x_train, y_train, x_test, y_test, varar
 % This file is part of GDLibrary and SGDLibrary.
 %
 % Created by H.Kasai on Feb. 17, 2016
-% Modified by H.Kasai on Mar. 16, 2017
+% Modified by H.Kasai on Dec. 05, 2017
 
 
     if nargin < 5
