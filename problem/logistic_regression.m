@@ -50,7 +50,14 @@ function [Problem] = logistic_regression(x_train, y_train, x_test, y_test, varar
         %f_old = sum(log(1+exp(-y_train.*(w'*x_train)))/n_train,2)+ lambda * (w'*w) / 2; %is replaced below 
         % becasuse log(sigmoid(a)) = log(1/(1+exp(-a))) = log1 - log(1+exp(-a)) = -log(1+exp(-a)).
         %f = -sum(log(sigmoid(y_train.*(w'*x_train)))/n_train,2) + lambda * (w'*w) / 2;
-        f = -sum(log(sigmoid(y_train.*(w'*x_train))),2)/n_train + lambda * (w'*w) / 2;
+        
+%         Commented out below due to avoid '-Inf' values of g by HK on 2017/12/5
+%         f = -sum(log(sigmoid(y_train.*(w'*x_train))),2)/n_train + lambda * (w'*w) / 2;
+
+%         The above is replaced with below by HK on 2017/12/5
+        sigmod_result = sigmoid(y_train.*(w'*x_train));
+        sigmod_result = sigmod_result + (sigmod_result<eps).*eps;
+        f = -sum(log(sigmod_result),2)/n_train + lambda * (w'*w) / 2;
     end
 
     Problem.cost_batch = @cost_batch;
@@ -64,7 +71,7 @@ function [Problem] = logistic_regression(x_train, y_train, x_test, y_test, varar
     function g = grad(w, indices)
         
         % org code
-        % g = -sum(((ones(d,1) * (sigmoid(-y_train(indices).*(w'*x_train(:,indices))) .* y_train(indices))) .* x_train(:,indices))/length(indices),2) + lambda * w;
+        %g = -sum(((ones(d,1) * (sigmoid(-y_train(indices).*(w'*x_train(:,indices))) .* y_train(indices))) .* x_train(:,indices))/length(indices),2) + lambda * w;
         %
         % (log(1+exp(-y_train.*(w'*x_train)))' = -y_train.*x_train * (exp(-y_train.*(w'*x_train))/(1+exp(-y_train.*(w'*x_train))))
         %   = -y_train.*x_train * (1 - sigmoid(y_train.*(w'*x_train)))
@@ -72,12 +79,15 @@ function [Problem] = logistic_regression(x_train, y_train, x_test, y_test, varar
         % (log(sigmoid(y_train.*(w'*x_train)))' = y_train.*x_train * 1/sigmoid(y_train.*(w'*x_train)) * (sigmoid(y_train.*(w'*x_train)))'
         %   = y_train.*x_train * 1/sigmoid(y_train.*(w'*x_train)) * (- sigmoid(y_train.*(w'*x_train)) * (1 - sigmoid(y_train.*(w'*x_train))))
         %   = -y_train.*x_train * (1 - sigmoid(y_train.*(w'*x_train)))
-        %g_old = -sum(ones(d,1) * y_train(indices).*x_train(:,indices) * (ones(1,length(indices))-sigmoid(y_train(indices).*(w'*x_train(:,indices))))',2)/length(indices)+ lambda * w;
         
-        e = exp(-1*y_train(indices)'.*(x_train(:,indices)'*w));
-        s = e./(1+e);
-        g = -(1/length(indices))*((s.*y_train(indices)')'*x_train(:,indices)')';
-        g = full(g) + lambda * w;
+%         Replace the commented-out lines with below (although it is a bit slower) due to avoid 'NAN' values of g by HK on 2017/12/5
+        g = -sum(ones(d,1) * y_train(indices).*x_train(:,indices) * (ones(1,length(indices))-sigmoid(y_train(indices).*(w'*x_train(:,indices))))',2)/length(indices)+ lambda * w;
+        
+%         Commented out below due to avoid 'NAN' values of g by HK on 2017/12/5
+%         e = exp(-1*y_train(indices)'.*(x_train(:,indices)'*w));
+%         s = e./(1+e);
+%         g = -(1/length(indices))*((s.*y_train(indices)')'*x_train(:,indices)')';
+%         g = full(g) + lambda * w;
         
     end
 
