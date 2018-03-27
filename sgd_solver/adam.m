@@ -17,7 +17,7 @@ function [w, infos] = adam(problem, in_options)
 % This file is part of SGDLibrary.
 %                   
 % Created by H.Kasai on Oct. 17, 2016
-% Modified by H.Kasai on Sep. 25, 2017
+% Modified by H.Kasai on Mar. 25, 2018
 % Note that partial code is originaly created by M.Pak (See https://github.com/mp4096/adawhatever)
 
 
@@ -110,7 +110,7 @@ function [w, infos] = adam(problem, in_options)
             end
             
             % proximal operator
-            if isfield(problem, 'prox')
+            if ismethod(problem, 'prox')
                 w = problem.prox(w, step);
             end              
             

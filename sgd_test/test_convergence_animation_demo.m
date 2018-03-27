@@ -16,7 +16,7 @@ function  test_convergence_animation_demo()
      
     %% prepare dataset
     if 1
-        n = 100;
+        n = 1000;
         d = 1;
         std = 0.55;
         
@@ -115,7 +115,7 @@ function  test_convergence_animation_demo()
         options.w_init = w_init;
         options.tol = 10^-24;
         options.max_epoch = 100;
-        options.verbose = true;
+        options.verbose = 2;
         options.lambda = lambda;
         options.permute_on = 1; 
         options.f_opt = problem.cost(w_opt);
@@ -123,11 +123,11 @@ function  test_convergence_animation_demo()
         
 
         switch algorithms{alg_idx}
-            case {'GD'}
+            case {'SD'}
                 
                 options.step_init = 0.1;
                 options.max_iter = 10 * options.max_epoch;
-                [w_list{alg_idx}, info_list{alg_idx}] = gd(problem, options);
+                [w_list{alg_idx}, info_list{alg_idx}] = sd(problem, options);
 
                 w_opt = w_list{alg_idx};
 

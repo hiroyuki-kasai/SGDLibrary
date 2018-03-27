@@ -62,7 +62,9 @@ function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, inf
                     x_plot_data = info_list{alg_idx}.total_iter; 
                 end                   
             elseif strcmp(x_category, 'epoch')
-                x_plot_data = info_list{alg_idx}.epoch;                    
+                x_plot_data = info_list{alg_idx}.epoch;      
+            elseif strcmp(x_category, 'inner_iter')
+                x_plot_data = info_list{alg_idx}.subinfos.inner_iter;                  
             elseif strcmp(x_category, 'grad_calc_count')
                 x_plot_data = info_list{alg_idx}.grad_calc_count; 
             elseif strcmp(x_category, 'time')
@@ -91,6 +93,8 @@ function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, inf
                 y_plot_data = info_list{1};     
             elseif strcmp(y_category, 'coeff_amp') || strcmp(y_category, 'aprox_err')
                 y_plot_data = info_list{alg_idx};                     
+            elseif strcmp(y_category, 'dnorm')
+                y_plot_data = info_list{alg_idx}.subinfos.dnorm;                 
             end
             
             if strcmp(scale_type, 'semilogy')
@@ -132,7 +136,9 @@ function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, inf
     elseif strcmp(x_category, 'l1-norm')
         xlabel('$$\ell$$-1 norm', 'FontSize', fontsize,'Interpreter', 'Latex');          
     elseif strcmp(x_category, 'coeff_pos')
-        xlabel('Coefficient position', 'FontSize', fontsize);    
+        xlabel('Coefficient position', 'FontSize', fontsize); 
+    elseif strcmp(x_category, 'inner_iter')
+        xlabel('Inner Iteration', 'FontSize', fontsize);         
     else
     end    
     
@@ -158,7 +164,9 @@ function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, inf
     elseif strcmp(y_category, 'aprox_err')
         ylabel('Approximation error', 'FontSize', fontsize); 
     elseif strcmp(y_category, 'coeff_amp') 
-        ylabel('Coefficient amplitude', 'FontSize', fontsize);          
+        ylabel('Coefficient amplitude', 'FontSize', fontsize);  
+    elseif strcmp(y_category, 'dnorm')
+        ylabel('Norm of direction', 'FontSize', fontsize);         
     end
     
     if ~strcmp(y_category, 'coeffs')

@@ -15,7 +15,8 @@ function [w, infos] = sarah(problem, in_options)
 %    
 % This file is part of SGDLibrary.
 %
-% Created by H.Kasai on Sep. 29, 2016
+% Created by H.Kasai on Sep. 29, 2017
+% MOdified by H.Kasai on Mar. 25, 2018
 
 
     % set dimensions and samples
@@ -34,6 +35,7 @@ function [w, infos] = sarah(problem, in_options)
     total_iter = 0;
     epoch = 0;
     grad_calc_count = 0;
+    subinfos = [];     
     w = options.w_init;
     w_prev = w;
     num_of_bachces = floor(n / options.batch_size);  
@@ -56,7 +58,7 @@ function [w, infos] = sarah(problem, in_options)
     
     % display infos
     if options.verbose > 0
-        fprintf('SVRG:%s Epoch = %03d, cost = %.16e, optgap = %.4e\n', options.sub_mode, epoch, f_val, optgap);
+        fprintf('SARAH:%s Epoch = %03d, cost = %.24e, optgap = %.4e\n', options.sub_mode, epoch, f_val, optgap);
     end      
     
     % set start time
@@ -79,6 +81,14 @@ function [w, infos] = sarah(problem, in_options)
         % update w with full gradient
         w = w - step * v0;
         v = v0;
+        
+        if mode_plus_flag
+            norm_v0 = norm(v0);
+        end
+        
+        if options.store_subinfo
+            [subinfos, f_val, optgap] = store_subinfos(problem, w, v, options, subinfos, epoch, total_iter, grad_calc_count, 0);           
+        end         
 
         for j = 1 : num_of_bachces
             
@@ -108,8 +118,19 @@ function [w, infos] = sarah(problem, in_options)
         
             total_iter = total_iter + 1;
             
+            % store sub infos
+            if options.store_subinfo
+                % measure elapsed time
+                elapsed_time = toc(start_time);                
+                [subinfos, f_val, optgap] = store_subinfos(problem, w, v, options, subinfos, epoch, total_iter, grad_calc_count, elapsed_time);           
+            end
+            
+            
             if mode_plus_flag
-                if norm(v) <= options.gamma * norm(v0)
+                if norm(v) <= options.gamma * norm_v0
+                    if options.verbose > 1
+                        fprintf('\tSkipped at Inner iter = %04d\n', j);
+                    end
                     break;
                 end
             end
@@ -136,6 +157,8 @@ function [w, infos] = sarah(problem, in_options)
     elseif epoch == options.max_epoch
         fprintf('Max epoch reached: max_epochr = %g\n', options.max_epoch);
     end
+    
+    infos.subinfos = subinfos;
     
 end
 

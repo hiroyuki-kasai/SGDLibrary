@@ -1,4 +1,4 @@
-function  demo()
+function demo()
 % demonstration file for SGDLibrary.
 %
 % This file illustrates how to use this library in case of linear

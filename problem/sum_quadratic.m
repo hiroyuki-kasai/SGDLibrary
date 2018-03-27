@@ -1,5 +1,6 @@
-function [Problem] = sum_quadratic(A, b)
-% This file defines sum quadratic problem
+classdef sum_quadratic
+%function [Problem] = sum_quadratic(A, b)
+% This file defines sum quadratic problem class
 %
 % Inputs:
 %           A(d:d:n)    n matrix of size dxd for n samples
@@ -21,104 +22,117 @@ function [Problem] = sum_quadratic(A, b)
 % This file is part of SGDLibrary.
 %
 % Created by H.Kasai on Mar. 13, 2017
+% Modified by H.Kasai on Mar. 25, 2018
 
 
-    d = size(b,1);
-    n = size(b,2);
+    properties
+        name;    
+        dim;
+        samples;
+        lambda;
+        d;
+        n;
+        A;
+        b;
+        A_sum;
+        b_sum;
+        hessain_w_independent;
+    end
     
-    Problem.name = @() 'sum_quadratic';    
-    Problem.dim = @() d;
-    Problem.samples = @() n;    
-    Problem.A = @() A;     
-    Problem.b = @() b; 
-    Problem.hessain_w_independent = @() true;
-    
-    A_sum = zeros(d,d);
-    b_sum = zeros(d,1);
-    for j=1:n
-        A_sum = A_sum + A(:,:,j);
-        b_sum = b_sum + b(:,j);
-    end    
+    methods
+        function obj = sum_quadratic(A, b) 
 
-    Problem.cost = @cost;
-    function f = cost(x)
+            obj.A = A;
+            obj.b = b;            
 
-        f = 0;
-        for i=1:n
-            f = f + 1/2 * x' * A(:,:,i) * x + b(:,i)' * x;
+            obj.d = size(obj.b,1);
+            obj.n = size(obj.b,2);
+
+            obj.name = 'sum_quadratic';    
+            obj.dim = obj.d;
+            obj.samples = obj.n;    
+            obj.hessain_w_independent = true;
+
+            obj.A_sum = zeros(obj.d,obj.d);
+            obj.b_sum = zeros(obj.d,1);
+            for j=1:obj.n
+                obj.A_sum = obj.A_sum + obj.A(:,:,j);
+                obj.b_sum = obj.b_sum + obj.b(:,j);
+            end    
         end
-        f = f/n;
-    end
 
-    Problem.grad = @grad;
-    function g = grad(x, indices)
-        
-        g = A(:,:,indices) * x + b(:,indices);
-        
-    end  
+        function f = cost(obj, x)
 
-    Problem.full_grad = @full_grad;
-    function g = full_grad(x)
-        
-        g = zeros(d,1);
-        for i=1:n
-            g = g + grad(x,i);
+            f = 0;
+            for i=1:obj.n
+                f = f + 1/2 * x' * obj.A(:,:,i) * x + obj.b(:,i)' * x;
+            end
+            f = f/obj.n;
         end
-        g = g/n;
-    end 
 
-    Problem.hess = @hess; 
-    function h = hess(x, indices)
-        
-        h = A(:,:,indices);
-        
-    end
+        function g = grad(obj, x, indices)
 
-    Problem.full_hess = @full_hess; 
-    function h = full_hess(x)
-        
-        h = zeros(d,d);
-        for i=1:n
-            h = h + hess(x,i);
+            g = obj.A(:,:,indices) * x + obj.b(:,indices);
+
+        end  
+
+        function g = full_grad(obj, x)
+
+            g = zeros(obj.d,1);
+            for i=1:obj.n
+                g = g + obj.grad(x,i);
+            end
+            g = g/obj.n;
+        end 
+
+        function h = hess(obj, x, indices)
+
+            h = obj.A(:,:,indices);
+
         end
-        h = h/n;        
-        
-    end
 
-    Problem.hess_vec = @hess_vec; 
-    function hv = hess_vec(w, v, indices)
-        
-        len = length(indices);
-        
-        h = zeros(d,d);
-        for i=1:len
-            index = indices(i);
-            h = h + hess(w,index);
+        function h = full_hess(obj, x)
+
+            h = zeros(obj.d,obj.d);
+            for i=1:obj.n
+                h = h + obj.hess(x,i);
+            end
+            h = h/obj.n;        
+
         end
-        h = h/len; 
-        
-        hv = h*v;
-        
-    end
 
-    Problem.calc_solution = @calc_solution; 
-    function w_opt = calc_solution()
-        
-        A_inv = zeros(d,d);
-        for i=1:d
-            A_inv(i,i) = 1/(A_sum(i,i));
+        function hv = hess_vec(obj, w, v, indices)
+
+            len = length(indices);
+
+            h = zeros(obj.d,obj.d);
+            for i=1:len
+                index = indices(i);
+                h = h + obj.hess(w,index);
+            end
+            h = h/len; 
+
+            hv = h*v;
+
         end
-        
-        w_opt = -A_inv * b_sum;
-        
-    end
 
-    Problem.calc_cn = @calc_cn; 
-    function cn = calc_cn()
-        
-        eig_values = eig(A_sum);
-        cn = max(eig_values)/min(eig_values);
-        
+        function w_opt = calc_solution(obj)
+
+            A_inv = zeros(obj.d,obj.d);
+            for i=1:d
+                A_inv(i,i) = 1/(obj.A_sum(i,i));
+            end
+
+            w_opt = -A_inv * obj.b_sum;
+
+        end
+
+        function cn = calc_cn()
+
+            eig_values = eig(obj.A_sum);
+            cn = max(eig_values)/min(eig_values);
+
+        end
     end
 end
 

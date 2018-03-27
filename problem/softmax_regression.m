@@ -1,5 +1,5 @@
-function Problem = softmax_regression(x_train, y_train, x_test, y_test, lambda, num_class)
-% This file defines softmax regression (multinomial logistic regression) problem.
+classdef softmax_regression
+% This file defines softmax regression (multinomial logistic regression) problem class.
 %
 % Inputs:
 %       x_train     train data matrix of x of size dxn.
@@ -18,7 +18,7 @@ function Problem = softmax_regression(x_train, y_train, x_test, y_test, lambda, 
 %           where 
 %           f_i(w) = - sum_l I(y_i=l) log P(y_i=l|x_i,w) + lambda/2 * w^2,
 %           where 
-%           P(y_i=l|x_i,w) = w' * x_i - log (sum_{l=1}^n_classes exp(w' * x_i)).
+%           P(y_i=l|x_i,w) = w' * x_i - log (sum_{l=1}^num_class exp(w' * x_i)).
 %
 % "w" is the 'vectorized' model parameter of size d x num_class matrix.
 %
@@ -29,98 +29,145 @@ function Problem = softmax_regression(x_train, y_train, x_test, y_test, lambda, 
 % Modified by H.Kasai on Oct. 25, 2016
 
 
-    d = size(x_train, 1);
-    n_classes = num_class;
-    n_train = length(y_train);    
-    n_test = length(y_test);
+    properties
+        name;    
+        dim;
+        samples;
+        lambda;
+        hessain_w_independent;
+        d;
+        n_train;
+        n_test;
+        x_train;
+        y_train;
+        x_test;
+        y_test; 
+        num_class;
+        x_norm;
+        x;
+        classes;
+    end
     
-    Problem.name = @() 'softmax_regression';
-    Problem.dim = @() d*n_classes;
-    Problem.samples = @() n_train;
-    Problem.classes = @() n_classes;   
-    Problem.hessain_w_independent = @() false;
+    methods    
+    
+        function obj = softmax_regression(x_train, y_train, x_test, y_test, num_class, varargin)    
+            
+            obj.x_train = x_train;
+            obj.y_train = y_train;
+            obj.x_test = x_test;
+            obj.y_test = y_test; 
+            obj.num_class = num_class;
+            
+            if nargin < 6
+                obj.lambda = 0.1;
+            else
+                obj.lambda = varargin{1};
+            end 
+            
+            obj.d = size(x_train, 1);
+            obj.n_train = length(obj.y_train);    
+            obj.n_test = length(obj.y_test);            
 
-    Problem.cost = @cost;
-    function f = cost(w)
-        
-        w_mat = reshape(w, [d n_classes]);
-        
-        % calculate log P(y_train=l|X,W) = W'X - log (sum_{l=1}^n_classes exp(W'X))
-        log_p = w_mat'*x_train - ones(n_classes, 1) * logsumexp(w_mat'*x_train); 
+            obj.name = 'softmax_regression';
+            obj.dim = obj.d * obj.num_class;
+            obj.samples = obj.n_train;
+            obj.hessain_w_independent = false;
+            obj.x_norm = sum(obj.x_train.^2,1);
+            obj.x = obj.x_train; 
+            obj.classes = obj.num_class;
+        end
 
-        % calculate 1/N sum_n sum_l I(y_train=l) log P(y_train=l|X,W)
-        y_train = logical(y_train);        
-        logprob = sum(log_p(y_train))/n_train; 
-        
-        % calculate cost
-        f = -logprob + lambda * (w'*w) / 2;
-        
-    end
+        function f = cost(obj, w)
 
-    Problem.grad = @grad;
-    function g = grad(w, indices)
-        
-        w_mat = reshape(w, [d n_classes]);
+            w_mat = reshape(w, [obj.d obj.num_class]);
 
-        % calculate log P(y_train=l|X,W) = W'X - log (sum_{l=1}^n_classes exp(W'X))        
-        log_p = w_mat'*x_train(:,indices) - ones(n_classes, 1) * logsumexp(w_mat'*x_train(:,indices)); 
-        % calculate  1{y_train=l} - P(y_train=l|X,W) because exp(log(P))=P.
-        p = y_train(:,indices) - exp(log_p);
-        % calculate x_train p'
-        g = x_train(:,indices) * p';
-        g = g(:) / length(indices);
-        g = -g + lambda * w;
-        
-    end
+            % calculate log P(y_train=l|X,W) = W'X - log (sum_{l=1}^num_class exp(W'X))
+            log_p = w_mat'*obj.x_train - ones(obj.num_class, 1) * logsumexp(w_mat'*obj.x_train); 
 
-    Problem.full_grad = @full_grad;
-    function g = full_grad(w)
-        
-        g = grad(w, 1:n_train);
-        
-    end
+            % calculate 1/N sum_n sum_l I(y_train=l) log P(y_train=l|X,W)
+            y_train_new = logical(obj.y_train);        
+            logprob = sum(log_p(y_train_new))/obj.n_train; 
 
-    Problem.hess = @hess; % To Do
-    function h = hess(w, indices)
-        
-        warning('not supported');
-        
-    end
+            % calculate cost
+            f = -logprob + obj.lambda * (w'*w) / 2;
 
-    Problem.hess_vec = @hess_vec; % To Do
-    function hv = hess_vec(w, v, indices)
-        
-        warning('not supported');
-        
-    end
+        end
 
-    Problem.prediction = @prediction;
-    function max_class = prediction(w)
-        
-        w_mat = reshape(w, [d n_classes]);        
-        p = w_mat' * x_test;
-        [~, max_class] = max(p, [], 1);
-        
-    end
+        function g = grad(obj, w, indices)
 
-    Problem.accuracy = @accuracy;
-    function a = accuracy(class_pred)
-        
-        [~, class_test] = max(y_test, [], 1);
-        a = sum(class_pred == class_test) / n_test; 
-        
-    end
+            w_mat = reshape(w, [obj.d obj.num_class]);
 
-    Problem.calc_solution = @calc_solution;
-    function w_star = calc_solution(problem, maxiter)
-        
-        options.max_iter = maxiter;
-        options.verbose = true;
-        options.tol_optgap = 1.0e-24;        
-        options.tol_gnorm = 1.0e-16;    
-        options.step_alg = 'backtracking';        
-        [w_star,~] = gd(problem, options);
-        
+            % calculate log P(y_train=l|X,W) = W'X - log (sum_{l=1}^num_class exp(W'X))        
+            log_p = w_mat'*obj.x_train(:,indices) - ones(obj.num_class, 1) * logsumexp(w_mat'*obj.x_train(:,indices)); 
+            % calculate  1{y_train=l} - P(y_train=l|X,W) because exp(log(P))=P.
+            p = obj.y_train(:,indices) - exp(log_p);
+            % calculate x_train p'
+            g = obj.x_train(:,indices) * p';
+            g = g(:) / length(indices);
+            g = -g + obj.lambda * w;
+
+        end
+
+        function g = full_grad(obj, w)
+
+            g = obj.grad(w, 1:obj.n_train);
+
+        end
+
+        function h = hess(obj, w, indices) % To Do
+
+            warning('not supported');
+
+        end
+
+        function hv = hess_vec(obj, w, v, indices) % To Do
+
+            warning('not supported');
+
+        end
+
+        function max_class = prediction(obj, w)
+
+            w_mat = reshape(w, [obj.d obj.num_class]);        
+            p = w_mat' * obj.x_test;
+            [~, max_class] = max(p, [], 1);
+
+        end
+
+        function a = accuracy(obj, class_pred)
+
+            [~, class_test] = max(obj.y_test, [], 1);
+            a = sum(class_pred == class_test) / obj.n_test; 
+
+        end
+
+        function w_opt = calc_solution(obj, maxiter, method)
+            
+            if nargin < 3
+                method = 'lbfgs';
+            end                   
+
+            options.max_iter = maxiter;
+            options.verbose = true;
+            options.tol_optgap = 1.0e-24;        
+            options.tol_gnorm = 1.0e-16;   
+            
+            options.step_alg = 'backtracking';        
+            if strcmp(method, 'sd')
+                [w_opt,~] = sd(obj, options);
+            elseif strcmp(method, 'cg')
+                [w_opt,~] = ncg(obj, options);
+            elseif strcmp(method, 'newton')
+                options.sub_mode = 'INEXACT';    
+                options.step_alg = 'non-backtracking'; 
+                [w_opt,~] = newton(obj, options);
+            else 
+                options.step_alg = 'backtracking';  
+                options.mem_size = 5;
+                [w_opt,~] = lbfgs(obj, options);              
+            end
+
+        end
     end
 
 end

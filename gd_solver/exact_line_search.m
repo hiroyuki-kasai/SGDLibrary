@@ -1,4 +1,4 @@
-function [ alpha ] = exact_line_search(problem, solver, p, r, y, x, options)
+function alpha = exact_line_search(problem, solver, p, r, y, x, options)
 % Exact line search for quadratic function
 %
 % Reference:
@@ -24,7 +24,7 @@ function [ alpha ] = exact_line_search(problem, solver, p, r, y, x, options)
     alpha = 1;
 
     switch solver
-        case 'GD'
+        case 'SD'
             grad = problem.full_grad(x);      
             
             switch problem.name()

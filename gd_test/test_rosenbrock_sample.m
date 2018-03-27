@@ -1,4 +1,4 @@
-function  test_general()
+function  test_rosenbrock_sample()
 
     clc;
     clear;
@@ -6,53 +6,25 @@ function  test_general()
 
     
     %% Set algorithms
-    if 0
-        algorithms = gd_solver_list('ALL');  
-    else
-        %algorithms = gd_solver_list('BFGS'); 
-        algorithms = {'L-BFGS-WOLFE','SD-STD','SD-BKT','Newton-STD','Newton-DAMP','Newton-CHOLESKY','NCG-BTK'};
-    end
-
-     
-    %% set cost, gradient and hessian
-    if 0
-        % f = x(1)^2 + 2 * x(2)^2
-        % This is equivalent to the quadratic case wheree A = [1,0; 0,2] and b = [0;0].
-        d = 2;
-        f = @(x) x(1)^2 + 2 * x(2)^2;
-        g = @(x) [2 * x(1); 4 * x(2)];   
-        h = @(x) [2 0; 0 4];  
-        w_init = [2; 1];
-        
-    elseif 0
-        % f = 100 * x(1)^4 + 0.01 * x(2)^4
-        d = 2;
-        f = @(x) 100 * x(1)^4 + 0.01 * x(2)^4;
-        g = @(x) [400 * x(1)^3; 0.04 * x(2)^3];   
-        h = @(x) [1200 * x(1)^2, 0; 0 0.12 * x(2)^2];  
-        w_init = [1; 1];     
-        
-    elseif 1
-        % f = sqrt(1+(1).^2) + sqrt(1+x(2).^2)
-        d = 2;
-        f = @(x) sqrt(1+x(1).^2) + sqrt(1+x(2).^2);
-        g = @(x) [x(1)/sqrt(x(1).^2+1); x(2)/sqrt(x(2).^2+1)];   
-        h = @(x) [1/(x(1).^2+1).^1.5,0; 0, 1/(x(2).^2+1).^1.5];  
-        w_init = [10; 10]; 
-        
-    end
+    algorithms = {'SD-STD','SD-BKT','Newton-STD','Newton-DAMP','Newton-CHOLESKY'};
+    
+    
+    % initialize
+    d = 2;
+    %w_init = zeros(d,1);
+    w_init = [2;5];
     
     
     %% define problem definitions
-    problem = general(f, g, h, [], d);
+    problem = rosenbrock(d);
     
     
-    % Calculate the solution
-    fminunc_options.TolFun = 1e-36;
-    [w_opt,f_opt] = fminunc(f, w_init, fminunc_options);
-    fprintf('%f, %f, %f\n', w_opt(1), w_opt(2), f_opt);      
+    % obtain optimal solution
+    w_opt = problem.calc_solution(); 
+    f_opt = problem.cost(w_opt); 
+    fprintf('f_opt: %.24e at (%f,%f)\n', f_opt, w_opt(1), w_opt(2));     
 
-    
+   
     % initialize
     w_list = cell(1);    
     info_list = cell(1);
@@ -75,7 +47,7 @@ function  test_general()
             case {'SD-STD'}
                 
                 options.step_alg = 'fix';
-                options.step_init = 1;
+                options.step_init = 0.00001;
                 [w_list{alg_idx}, info_list{alg_idx}] = sd(problem, options);
 
             case {'SD-BKT'}
@@ -232,7 +204,7 @@ function  test_general()
         
     end
     
- 
+    
     %% plot all
     close all;
     
@@ -247,7 +219,7 @@ function  test_general()
         w_history{alg_idx} = info_list{alg_idx}.w;
         cost_history{alg_idx} = info_list{alg_idx}.cost;
     end    
-    draw_convergence_sequence(problem, w_opt, algorithms, w_history, cost_history);  
+    draw_convergence_sequence(problem, w_opt, algorithms, w_history, cost_history);        
 
 end
 

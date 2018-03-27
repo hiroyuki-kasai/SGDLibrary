@@ -35,7 +35,7 @@ cd ..;
 fprintf('##########################################################\n');
 fprintf('###                                                    ###\n');
 fprintf('###                Welcome to SGDLibrary               ###\n');
-fprintf('###        (version:%s, released:%s)      ###\n', version, release_date);
+fprintf('###      (version:%s, released:%s)      ###\n', version, release_date);
 fprintf('###                                                    ###\n');
 fprintf('##########################################################\n');
 

@@ -12,6 +12,7 @@ function options = get_default_options(d)
     options.permute_on      = 1;
     options.verbose         = 0;
     options.store_w         = false;
+    options.store_subinfo   = false;
 
 end
 

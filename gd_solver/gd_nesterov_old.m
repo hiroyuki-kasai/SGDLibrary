@@ -134,7 +134,7 @@ function [w, infos] = gd_nesterov(problem, options)
     
     % print info
     if verbose
-        fprintf('GD Nesterov: Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
+        fprintf('SD Nesterov: Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
     end     
 
     % main loop
@@ -159,7 +159,7 @@ function [w, infos] = gd_nesterov(problem, options)
             c = 1e-4;
             step = backtracking_line_search(problem, -grad, w, rho, c);
         elseif strcmp(step_alg, 'exact')
-            step = exact_line_search(problem, 'GD', -grad, [], [], w, ls_options);
+            step = exact_line_search(problem, 'SD', -grad, [], [], w, ls_options);
         elseif strcmp(step_alg, 'strong_wolfe')
             c1 = 1e-4;
             c2 = 0.9;
@@ -221,7 +221,7 @@ function [w, infos] = gd_nesterov(problem, options)
        
         % print info
         if verbose
-            fprintf('GD Nesterov: Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
+            fprintf('SD Nesterov: Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
         end        
     end
     

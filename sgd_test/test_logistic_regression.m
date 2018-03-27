@@ -80,7 +80,7 @@ function  test_logistic_regression()
     if norm(w_opt)
     else
         % calculate solution
-        w_opt = problem.calc_solution(problem, 1000);
+        w_opt = problem.calc_solution(1000);
     end
     f_opt = problem.cost(w_opt); 
     fprintf('f_opt: %.24e\n', f_opt);    
@@ -102,11 +102,11 @@ function  test_logistic_regression()
         
         
         switch algorithms{alg_idx}
-            case {'GD'}
+            case {'SD'}
                 
                 options.step_init = 0.05;
                 options.max_iter = options.max_epoch;
-                [w_list{alg_idx}, info_list{alg_idx}] = gd(problem, options);
+                [w_list{alg_idx}, info_list{alg_idx}] = sd(problem, options);
 
             case {'SGD'} 
 

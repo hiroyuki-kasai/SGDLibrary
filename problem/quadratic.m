@@ -1,5 +1,5 @@
-function [Problem] = quadratic(A, b)
-% This file defines quadratic problem
+classdef quadratic
+% This file defines quadratic problem class
 %
 % Inputs:
 %           A       a positive definite matrix of size dxd
@@ -21,51 +21,60 @@ function [Problem] = quadratic(A, b)
 % This file is part of GDLibrary.
 %
 % Created by H.Kasai on Oct. 29, 2016
-% Modified by H.Kasai on Oct. 31, 2016
+% Modified by H.Kasai on Mar. 25, 2018
 
-
-    d = length(b);
-    n = d;
+    properties
+        d;
+        n;  
+        name;
+        dim;
+        samples;
+        A;
+        b;
+        hessain_w_independent;
+    end
     
-    Problem.name = @() 'quadratic';    
-    Problem.dim = @() d;
-    Problem.samples = @() n;    
-    Problem.A = @() A;     
-    Problem.b = @() b;  
-    Problem.hessain_w_independent = @() true;
+    methods
+        function obj = quadratic(A, b)
+            obj.d = length(b);
+            obj.n = obj.d;
 
-    Problem.cost = @cost;
-    function f = cost(x)
+            obj.name = 'quadratic';    
+            obj.dim = obj.d;
+            obj.samples = obj.n;    
+            obj.A = A;     
+            obj.b = b;  
+            obj.hessain_w_independent = true;            
+        end
 
-        f = 1/2 * x' * A * x - b' * x;
-    end
+        function f = cost(obj, x)
 
-    Problem.grad = @grad;
-    function g = grad(x)
-        
-        g = A * x - b;
-        
-    end  
+            f = 1/2 * x' * obj.A * x - obj.b' * x;
+        end
 
-    Problem.full_grad = @full_grad;
-    function g = full_grad(x)
-        
-        g = grad(x);
-        
-    end 
+        function g = grad(x)
 
-    Problem.hess = @hess; 
-    function h = hess(x)
-        
-        h = A;
-        
-    end
+            g = obj.A * x - obj.b;
 
-    Problem.full_hess = @full_hess; 
-    function h = full_hess(x)
-        
-        h = hess(x);
-        
+        end  
+
+        function g = full_grad(obj, x)
+
+            g = obj.grad(x);
+
+        end 
+
+        function h = hess(obj, x)
+
+            h = obj.A;
+
+        end
+
+        function h = full_hess(obj, x)
+
+            h = hess(x);
+
+        end
     end
 
 end

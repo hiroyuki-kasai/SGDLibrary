@@ -39,7 +39,7 @@ function [] = test_lasso_cv()
 
             options.step_alg = 'tfocs_backtracking';
             options.step_init_alg = 'bb_init';
-            solver = @gd_nesterov; 
+            solver = @sd_nesterov; 
 
         case {'FISTA'}
 

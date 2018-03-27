@@ -16,7 +16,7 @@ function [w, infos] = subsamp_svrg(problem, options)
 %
 %                   
 % Created by H.Kasai on Oct. 28, 2016
-% Modified by H.Kasai on Sep. 25, 2017
+% Modified by H.Kasai on Mar. 25, 2018
 
 
     % set dimensions and samples
@@ -155,7 +155,7 @@ function [w, infos] = subsamp_svrg(problem, options)
             w = w + step * v;
             
             % proximal operator
-            if isfield(problem, 'prox')
+            if ismethod(problem, 'prox')
                 w = problem.prox(w, step);
             end              
                 

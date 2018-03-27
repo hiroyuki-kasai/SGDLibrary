@@ -16,7 +16,7 @@ function [w, infos] = iqn(problem, in_options)
 % This file is part of SGDLibrary.
 %
 % Originally created by A. Mokhtari
-% Modified by H.Kasai on Sep. 25, 2017
+% Modified by H.Kasai on Mar. 25, 2018
 
 
     % set dimensions and samples
@@ -107,7 +107,7 @@ function [w, infos] = iqn(problem, in_options)
             end
             
             % proximal operator
-            if isfield(problem, 'prox')
+            if ismethod(problem, 'prox')
                 w = problem.prox(w, step);
             end              
 

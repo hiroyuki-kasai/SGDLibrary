@@ -12,7 +12,7 @@ function [ algs ] = gd_solver_list(category)
 
 
     % supported algorithms by GDLibrary
-    gd_algs = {'GD-STD','GD-BKT','GD-EXACT','GD-WOLFE','GD-SCALE-EXACT'};
+    gd_algs = {'SD-STD','SD-BKT','SD-EXACT','SD-WOLFE','SD-SCALE-EXACT'};
     newton_algs = {'Newton-STD','Newton-DAMP','Newton-CHOLESKY'};
     cg_algs = {'CG-PRELIM','CG-BKT','CG-EXACT','CG-PRECON-EXACT'};
     ncg_algs = {'NCG-BTK','NCG-WOLFE'};
@@ -21,11 +21,11 @@ function [ algs ] = gd_solver_list(category)
                     'L-BFGS-BKT','L-BFGS-EXACT','L-BFGS-WOLFE'}; 
     other_algs = {'BB'};
     
-    linesearch_algs = {'GD-BKT','GD-WOLFE','NCG-BTK','NCG-WOLFE','BFGS-B-BKT','BFGS-H-BKT','DAMPED-BFGS-BKT','L-BFGS-BKT','L-BFGS-WOLFE'};
-    exact_algs = {'GD-EXACT','GD-SCALE-EXACT','CG-EXACT','CG-PRECON-EXACT','BFGS-B-EXACT','BFGS-H-EXACT','DAMPED-BFGS-EXACT','L-BFGS-EXACT'};    
+    linesearch_algs = {'SD-BKT','SD-WOLFE','NCG-BTK','NCG-WOLFE','BFGS-B-BKT','BFGS-H-BKT','DAMPED-BFGS-BKT','L-BFGS-BKT','L-BFGS-WOLFE'};
+    exact_algs = {'SD-EXACT','SD-SCALE-EXACT','CG-EXACT','CG-PRECON-EXACT','BFGS-B-EXACT','BFGS-H-EXACT','DAMPED-BFGS-EXACT','L-BFGS-EXACT'};    
     
     switch category
-        case 'GD'
+        case 'SD'
             algs = gd_algs;
         case 'CG'
             algs = cg_algs;  

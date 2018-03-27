@@ -90,7 +90,7 @@ function [w, infos] = cd_lasso_elasticnet(problem, options)
     grad = problem.full_grad(w);
     gnorm = norm(grad);
     infos.gnorm = gnorm;
-    if isfield(problem, 'reg')
+    if ismethod(problem, 'reg')
         infos.reg = problem.reg(w);   
     end    
     if store_w
@@ -151,7 +151,7 @@ function [w, infos] = cd_lasso_elasticnet(problem, options)
         infos.optgap = [infos.optgap optgap];        
         infos.cost = [infos.cost f_val];
         infos.gnorm = [infos.gnorm gnorm]; 
-        if isfield(problem, 'reg')
+        if ismethod(problem, 'reg')
             reg = problem.reg(w);
             infos.reg = [infos.reg reg];
         end        

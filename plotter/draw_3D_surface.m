@@ -1,4 +1,4 @@
-function [ w_min, f_min, f_max ] = draw_3D_surface(cost, n, x_min, x_max, y_min, y_max)
+function [w_min, f_min, f_max] = draw_3D_surface(problem, n, x_min, x_max, y_min, y_max, octave_flag)
 % Draw 3D surface.
 %
 % Inputs:
@@ -17,6 +17,7 @@ function [ w_min, f_min, f_max ] = draw_3D_surface(cost, n, x_min, x_max, y_min,
 % This file is part of SGDLibrary.
 %
 % Created by H.Kasai on Oct. 28, 2016
+% Modified by H.Kasai on Mar. 27, 2018
 
 
     N = n;    
@@ -26,14 +27,16 @@ function [ w_min, f_min, f_max ] = draw_3D_surface(cost, n, x_min, x_max, y_min,
     YY = repmat(yy, [1 N]);
 
     w = [XX(1,1); YY(1,1)];
-    f_min = cost(w);
-    f_max = cost(w);    
+    f_min = problem.cost(w);
+    f_max = problem.cost(w);   
+    
+    ZZ = zeros(N, N);
     
     for j=1:N
         for i=1:N
            %ZZ(i,j) = -2 * XX(i,j)^2 + XX(i,j) * YY(i,j)^2 + 4 * XX(i,j)^4;
            w = [XX(i,j); YY(i,j)];
-           ZZ(i,j) = cost(w);
+           ZZ(i,j) = problem.cost(w);
            if ZZ(i,j) < f_min
                w_min = w;
                f_min = ZZ(i,j);
@@ -49,11 +52,13 @@ function [ w_min, f_min, f_max ] = draw_3D_surface(cost, n, x_min, x_max, y_min,
     
     %figure
     surf(XX,YY,ZZ); hold on
-    p = plot3(w_min(1),w_min(2), f_min, 'oy','MarkerFaceColor','y', 'MarkerSize', 6); hold off    
+    plot3(w_min(1),w_min(2), f_min, 'oy','MarkerFaceColor','y', 'MarkerSize', 6); hold off    
     xlabel('x(1)')
     ylabel('x(2)')    
-    zlabel('cost')    
-    alpha(.5)
+    zlabel('cost')   
+    if ~octave_flag
+        alpha(.5)
+    end
     %legend('Optimal solution');
 end
 

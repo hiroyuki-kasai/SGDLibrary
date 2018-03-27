@@ -80,7 +80,7 @@ function  test_softmax_classifier()
 
     
     %% define problem definitions
-    problem = softmax_regression(x_train, y_train, x_test, y_test, lambda, l);
+    problem = softmax_regression(x_train, y_train, x_test, y_test, l, lambda);
 
    
     %% initialize
@@ -95,7 +95,7 @@ function  test_softmax_classifier()
     if norm(w_opt)
     else
         % calculate solution
-        w_opt = problem.calc_solution(problem, 1000);
+        w_opt = problem.calc_solution(1000);
     end
     f_opt = problem.cost(w_opt); 
     fprintf('f_opt: %.24e\n', f_opt);   
@@ -116,11 +116,11 @@ function  test_softmax_classifier()
         options.f_opt = f_opt;
         
         switch algorithms{alg_idx}
-            case {'GD'}
+            case {'SD'}
                 
                 options.step_init = 2;
                 options.max_iter = 30 * options.max_epoch;
-                [w_list{alg_idx}, info_list{alg_idx}] = gd(problem, options);
+                [w_list{alg_idx}, info_list{alg_idx}] = sd(problem, options);
 
             case {'SGD'} 
 

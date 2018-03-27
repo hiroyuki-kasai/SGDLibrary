@@ -1,5 +1,5 @@
-function Problem = l1_linear_regression(x_train, y_train, x_test, y_test, lambda)
-% This file defines l1-regularized linear regression problem
+classdef l1_linear_regression
+% This file defines l1-regularized linear regression problem class
 %
 % Inputs:
 %       x_train     train data matrix of x of size dxn.
@@ -23,157 +23,174 @@ function Problem = l1_linear_regression(x_train, y_train, x_test, y_test, lambda
 % This file is part of GDLibrary and SGDLibrary.
 %
 % Created by H.Kasai on Sep. 25, 2017
+% Modified by H.Kasai on March 24, 2018
 
 
-    d = size(x_train, 1);
-    n_train = length(y_train);
-    n_test = length(y_test);      
-   
-    Problem.name = @() 'linear_regression';    
-    Problem.dim = @() d;
-    Problem.samples = @() n_train;
-    Problem.lambda = @() lambda;    
-    Problem.hessain_w_independent = @() true;
-    Problem.x_norm = @() sum(x_train.^2,1);
-    Problem.x = @() x_train;    
-
-    Problem.prox = @l1_soft_thresh;
-    function v = l1_soft_thresh(w, t)
-        v = soft_thresh(w, t * lambda);
-    end       
-    
-    Problem.cost = @cost;
-    function f = cost(w)
-
-        f = sum((w'*x_train-y_train).^2)/ (2 * n_train) + lambda * norm(w,1);
-        
+    properties
+        name;    
+        dim;
+        samples;
+        lambda;
+        hessain_w_independent;
+        d;
+        n_train;
+        n_test;
+        x_train;
+        y_train;
+        x_test;
+        y_test;
+        x_norm;
+        x;          
     end
 
-    Problem.cost_batch = @cost_batch;
-    function f = cost_batch(w, indices)
         
-        f = sum((w'*x_train-y_train).^2)/ (2 * n_train) + lambda * norm(w,1);
-        
-    end
+    methods
+        function obj = l1_linear_regression(x_train, y_train, x_test, y_test, varargin)
+            
+            obj.x_train = x_train;
+            obj.y_train = y_train;
+            obj.x_test = x_test;
+            obj.y_test = y_test;            
 
-    % calculate l1 norm
-    Problem.reg = @reg;
-    function r = reg(w)
-        r = norm(w,1);
-    end
+            if nargin < 5
+                obj.lambda = 0.1;
+            else
+                obj.lambda = varargin{1};
+            end            
+            
+            obj.d = size(obj.x_train, 1);
+            obj.n_train = length(obj.y_train);
+            obj.n_test = length(obj.y_test);      
 
-    Problem.grad = @grad;
-    function g = grad(w, indices)
-
-        residual = w'*x_train(:,indices)-y_train(indices);
-        g = x_train(:,indices) * residual'/length(indices);
-        
-    end
-
-    Problem.full_grad = @full_grad;
-    function g = full_grad(w)
-
-        g = grad(w, 1:n_train);
-        
-    end
-
-    Problem.ind_grad = @ind_grad;
-    function g = ind_grad(w, indices)
- 
-        residual = w'*x_train(:,indices)-y_train(indices);
-        g = x_train(:,indices) * diag(residual);
-         
-    end
-
-    Problem.hess = @hess; 
-    function h = hess(w, indices)
-%         % original code
-%         h = 0;
-%         len = length(indices);
-%         for ii=1:len
-%             idx = indices(ii);
-%             xx = x_train(:,indices(:,idx));
-%             h = h + xx * xx';
-%         end
-%         h = h/len + lambda * eye(d);
-        
-        h = 1/length(indices) * x_train(:,indices) * (x_train(:,indices)');
-    end
-
-    Problem.full_hess = @full_hess; 
-    function h = full_hess(w)
-        
-        h = hess(w, 1:n_train);
-        
-    end
-
-    Problem.hess_vec = @hess_vec; 
-    function hv = hess_vec(w, v, indices)
-        
-        hv = 1/length(indices) * x_train(:,indices) * ((x_train(:,indices)'*v));
-        
-    end
-
-    Problem.prediction = @prediction;
-    function p = prediction(w)
-        p = w' * x_test;        
-    end
-
-    Problem.mse = @mse;
-    function e = mse(y_pred)
-        
-        e = sum((y_pred-y_test).^2)/ (2 * n_test);
-        
-    end
-
-
-    %% for Sub-sampled Newton
-    Problem.diag_based_hess = @diag_based_hess;
-    function h = diag_based_hess(w, indices, square_hess_diag)
-        X = x_train(:,indices)';
-        h = X' * diag(square_hess_diag) * X /length(indices);
-    end  
-
-    Problem.calc_square_hess_diag = @calc_square_hess_diag;
-    function square_hess_diag = calc_square_hess_diag(w, indices)
-        len = nnz(indices);
-        square_hess_diag = ones(len,1);
-    end 
-
-
-
-    Problem.calc_solution = @calc_solution;
-    function w_opt = calc_solution(problem, method, options_in)
-        
-        if nargin < 2
-            method = 'gd_nesterov';
-        end        
-        
-        options.max_iter = options_in.max_iter;
-        options.w_init = options_in.w_init;
-        options.verbose = true;
-        options.tol_optgap = 1.0e-24;
-        options.tol_gnorm = 1.0e-16;
-        options.step_alg = 'backtracking';
-        
-        if strcmp(method, 'sg')
-            [w_opt,~] = gd(problem, options);
-        elseif strcmp(method, 'cg')
-            [w_opt,~] = ncg(problem, options);
-        elseif strcmp(method, 'newton')
-            options.sub_mode = 'INEXACT';    
-            options.step_alg = 'non-backtracking'; 
-            [w_opt,~] = newton(problem, options);
-        elseif strcmp(method, 'gd_nesterov')
-            options.step_alg = 'backtracking';
-            options.step_init_alg = 'bb_init';
-            [w_opt,~] = gd_nesterov(problem, options);            
-        else 
-            options.step_alg = 'backtracking';  
-            options.mem_size = 5;
-            [w_opt,~] = lbfgs(problem, options);              
+            obj.name = 'linear_regression';    
+            obj.dim = obj.d;
+            obj.samples = obj.n_train;
+            obj.hessain_w_independent = true;
+            obj.x_norm = sum(x_train.^2,1);
+            obj.x = x_train;            
         end
-    end
 
+        function v = l1_soft_thresh(obj, w, t)
+            v = soft_thresh(w, t * obj.lambda);
+        end       
+
+        function f = cost(obj, w)
+
+            f = sum((w'*obj.x_train-obj.y_train).^2)/ (2 * obj.n_train) + obj.lambda * norm(w,1);
+
+        end
+
+        function f = cost_batch(obj, w, indices)
+
+            f = sum((w'*obj.x_train-obj.y_train).^2)/ (2 * obj.n_train) + obj.lambda * norm(w,1);
+
+        end
+
+        % calculate l1 norm
+        function r = reg(obj, w)
+            r = norm(w,1);
+        end
+
+        function g = grad(obj, w, indices)
+
+            residual = w'*obj.x_train(:,indices)-obj.y_train(indices);
+            g = obj.x_train(:,indices) * residual'/length(indices);
+
+        end
+
+        function g = full_grad(obj, w)
+
+            g = obj.grad(w, 1:obj.n_train);
+
+        end
+
+        function g = ind_grad(obj, w, indices)
+
+            residual = w'*obj.x_train(:,indices)-obj.y_train(indices);
+            g = obj.x_train(:,indices) * diag(residual);
+
+        end
+
+        function h = hess(obj, w, indices)
+    %         % original code
+    %         h = 0;
+    %         len = length(indices);
+    %         for ii=1:len
+    %             idx = indices(ii);
+    %             xx = x_train(:,indices(:,idx));
+    %             h = h + xx * xx';
+    %         end
+    %         h = h/len + lambda * eye(d);
+
+            h = 1/length(indices) * obj.x_train(:,indices) * (obj.x_train(:,indices)');
+        end
+
+        function h = full_hess(obj, w)
+
+            h = obj.hess(w, 1:obj.n_train);
+
+        end
+
+        function hv = hess_vec(obj, w, v, indices)
+
+            hv = 1/length(indices) * obj.x_train(:,indices) * ((obj.x_train(:,indices)'*v));
+
+        end
+
+        function p = prediction(obj, w)
+            p = w' * obj.x_test;        
+        end
+
+        function e = mse(obj, y_pred)
+
+            e = sum((y_pred-obj.y_test).^2)/ (2 * obj.n_test);
+
+        end
+
+
+        %% for Sub-sampled Newton
+        function h = diag_based_hess(obj, w, indices, square_hess_diag)
+            X = obj.x_train(:,indices)';
+            h = X' * diag(square_hess_diag) * X /length(indices);
+        end  
+
+        function square_hess_diag = calc_square_hess_diag(obj, w, indices)
+            len = nnz(indices);
+            square_hess_diag = ones(len,1);
+        end 
+
+        function w_opt = calc_solution(obj, method, options_in)
+
+            if nargin < 2
+                method = 'sd_nesterov';
+            end        
+
+            options.max_iter = options_in.max_iter;
+            options.w_init = options_in.w_init;
+            options.verbose = true;
+            options.tol_optgap = 1.0e-24;
+            options.tol_gnorm = 1.0e-16;
+            options.step_alg = 'backtracking';
+
+            if strcmp(method, 'sd')
+                [w_opt,~] = sd(obj, options);
+            elseif strcmp(method, 'cg')
+                [w_opt,~] = ncg(obj, options);
+            elseif strcmp(method, 'newton')
+                options.sub_mode = 'INEXACT';    
+                options.step_alg = 'non-backtracking'; 
+                [w_opt,~] = newton(obj, options);
+            elseif strcmp(method, 'sd_nesterov')
+                options.step_alg = 'backtracking';
+                options.step_init_alg = 'bb_init';
+                [w_opt,~] = sd_nesterov(obj, options);            
+            else 
+                options.step_alg = 'backtracking';  
+                options.mem_size = 5;
+                [w_opt,~] = lbfgs(obj, options);              
+            end
+        end
+
+    end
 end
 

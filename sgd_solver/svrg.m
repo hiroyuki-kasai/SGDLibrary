@@ -16,7 +16,7 @@ function [w, infos] = svrg(problem, in_options)
 % This file is part of SGDLibrary.
 %
 % Created by H.Kasai on Feb. 15, 2016
-% Modified by H.Kasai on Sep. 25, 2017
+% Modified by H.Kasai on Mar. 25, 2018
 
 
     % set dimensions and samples
@@ -34,6 +34,7 @@ function [w, infos] = svrg(problem, in_options)
     total_iter = 0;
     epoch = 0;
     grad_calc_count = 0;
+    subinfos = [];      
     w = options.w_init;
     num_of_bachces = floor(n / options.batch_size);  
     
@@ -67,7 +68,11 @@ function [w, infos] = svrg(problem, in_options)
         full_grad = problem.full_grad(w);
         % store w
         w0 = w;
-        grad_calc_count = grad_calc_count + n;        
+        grad_calc_count = grad_calc_count + n;
+        
+        if options.store_subinfo
+            [subinfos, f_val, optgap] = store_subinfos(problem, w, full_grad, options, subinfos, epoch, total_iter, grad_calc_count, 0);           
+        end         
 
         for j = 1 : num_of_bachces
             
@@ -81,14 +86,22 @@ function [w, infos] = svrg(problem, in_options)
             grad_0 = problem.grad(w0, indice_j);
             
             % update w
-            w = w - step * (full_grad + grad - grad_0);
+            v = full_grad + grad - grad_0;
+            w = w - step * v;
             
             % proximal operator
-            if isfield(problem, 'prox')
+            if ismethod(problem, 'prox')
                 w = problem.prox(w, step);
             end  
         
             total_iter = total_iter + 1;
+            
+            % store sub infos
+            if options.store_subinfo
+                % measure elapsed time
+                elapsed_time = toc(start_time);                
+                [subinfos, f_val, optgap] = store_subinfos(problem, w, v, options, subinfos, epoch, total_iter, grad_calc_count, elapsed_time);           
+            end            
         end
         
         % measure elapsed time
@@ -113,5 +126,6 @@ function [w, infos] = svrg(problem, in_options)
         fprintf('Max epoch reached: max_epochr = %g\n', options.max_epoch);
     end
     
+    infos.subinfos = subinfos;    
 end
 

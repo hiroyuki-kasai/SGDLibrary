@@ -76,25 +76,25 @@ function [] = test_l1_logistic_regression()
                 
                 options.step_alg = 'backtracking';
                 options.step_init_alg = 'bb_init';
-                [w_list{alg_idx}, info_list{alg_idx}] = gd(problem, options);
+                [w_list{alg_idx}, info_list{alg_idx}] = sd(problem, options);
                 
             case {'PG-TFOCS-BKT'}
                 
                 options.step_alg = 'tfocs_backtracking';
                 options.step_init_alg = 'bb_init';
-                [w_list{alg_idx}, info_list{alg_idx}] = gd(problem, options);     
+                [w_list{alg_idx}, info_list{alg_idx}] = sd(problem, options);     
                 
             case {'APG-BKT'}
                 
                 options.step_alg = 'backtracking';
                 options.step_init_alg = 'bb_init';
-                [w_list{alg_idx}, info_list{alg_idx}] = gd_nesterov(problem, options);
+                [w_list{alg_idx}, info_list{alg_idx}] = sd_nesterov(problem, options);
                 
             case {'APG-TFOCS-BKT'}
                 
                 options.step_alg = 'tfocs_backtracking';
                 options.step_init_alg = 'bb_init';
-                [w_list{alg_idx}, info_list{alg_idx}] = gd_nesterov(problem, options);  
+                [w_list{alg_idx}, info_list{alg_idx}] = sd_nesterov(problem, options);  
                 
             case {'L-BFGS-BKT'}
                 

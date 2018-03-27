@@ -12,7 +12,8 @@ function [w, infos] = admm_lasso(problem, options)
 %
 % Originall code from
 % https://web.stanford.edu/~boyd/papers/admm/lasso/lasso.html.
-% Modified by H.Kasai on Apr. 18, 2017
+% Originally modified by H.Kasai on Apr. 18, 2017
+% Modified by H.Kasai on Mar. 25, 2018
 
 
     % set dimensions and samples
@@ -101,7 +102,7 @@ function [w, infos] = admm_lasso(problem, options)
     grad = problem.full_grad(w);
     gnorm = norm(grad);
     infos.gnorm = gnorm;
-    if isfield(problem, 'reg')
+    if ismethod(problem, 'reg')  
         infos.reg = problem.reg(w);   
     end    
     if store_w
@@ -156,7 +157,7 @@ function [w, infos] = admm_lasso(problem, options)
         infos.optgap = [infos.optgap optgap];        
         infos.cost = [infos.cost f_val];
         infos.gnorm = [infos.gnorm gnorm]; 
-        if isfield(problem, 'reg')
+        if ismethod(problem, 'reg')
             reg = problem.reg(w);
             infos.reg = [infos.reg reg];
         end        

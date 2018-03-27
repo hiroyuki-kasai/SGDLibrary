@@ -9,7 +9,7 @@ function  test_linear_regression()
     if 0
         algorithms = sgd_solver_list('ALL');  
     else
-        algorithms = {'SGD','SVRG','SQN','IQN'};
+        algorithms = {'SGD','SVRG','IQN'};
     end    
 
      
@@ -119,11 +119,11 @@ function  test_linear_regression()
         
 
         switch algorithms{alg_idx}
-            case {'GD'}
+            case {'SD'}
                 
                 options.step_init = 0.1;
                 options.max_iter = 10 * options.max_epoch;
-                [w_list{alg_idx}, info_list{alg_idx}] = gd(problem, options);
+                [w_list{alg_idx}, info_list{alg_idx}] = sd(problem, options);
 
                 w_opt = w_list{alg_idx};
 

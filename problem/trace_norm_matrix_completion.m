@@ -1,5 +1,5 @@
-function [Problem] = trace_norm_matrix_completion(A, mask, lambda)
-% This file defines a matrix completion problem with trace (nuclear) norm minimization. 
+classdef trace_norm_matrix_completion
+% This file defines a class of a matrix completion problem with trace (nuclear) norm minimization. 
 %
 % Inputs:
 %       A           Full observation matrix. A.*mask is to be completed. 
@@ -19,69 +19,86 @@ function [Problem] = trace_norm_matrix_completion(A, mask, lambda)
 % This file is part of GDLibrary and SGDLibrary.
 %
 % Created by H.Kasai on Apr. 17, 2017
+% Modified by H.Kasai on Mar. 25, 2018
 
 
-    m = size(A, 1);
-    n = size(A, 2);
+    properties
+        name;    
+        dim;
+        samples;
+        lambda;
+        m;
+        n;
+        A;
+        mask;
+    end
     
-    Problem.name = @() 'matrix completion';  
-    Problem.dim = @() m*n;
-    Problem.samples = @() n;
-    Problem.lambda = @() lambda;
-    
-    Problem.prox = @trace_norm;
-    function v = trace_norm(w, t)
-        v = svd_shrink(w, t * lambda, [m n]);
-    end    
+    methods
+        function obj = trace_norm_matrix_completion(A, mask, varargin)
 
-    Problem.cost = @cost;
-    function f = cost(w)
-        L = reshape(w, [m n]);
-        diff = (L - A.*mask) .* (A.*mask ~= 0);
-        trace_norm = reg(w);
+            obj.A = A;
+            obj.mask = mask;
+            
+            if nargin < 3
+                obj.lambda = 0.1;
+            else
+                obj.lambda = varargin{1};
+            end              
+            
+            obj.m = size(obj.A, 1);
+            obj.n = size(obj.A, 2);
 
-        f = 1/2 * norm(diff, 'fro') + lambda * trace_norm;
-    end
+            obj.name = 'matrix completion';  
+            obj.dim = obj.m * obj.n;
+            obj.samples = obj.n;
+        end
 
-    % calculate trace norm
-    Problem.reg = @reg;
-    function r = reg(w)
-        L = reshape(w, [m n]);
-        [~,S,~] = svd(L,'econ');
-        s = diag(S);
-        r = sum(s);
-    end
+        function v = prox(obj, w, t)
+            v = svd_shrink(w, t * obj.lambda, [obj.m obj.n]);
+        end    
 
-    Problem.cost_batch = @cost_batch;
-    function f = cost_batch(w, indices)
-        error('Not implemted yet.');        
-    end
+        function f = cost(obj, w)
+            L = reshape(w, [obj.m obj.n]);
+            diff = (L - obj.A.*obj.mask) .* (obj.A.*obj.mask ~= 0);
+            trace_norm = reg(obj, w);
 
-    Problem.full_grad = @full_grad;
-    function g = full_grad(w)
-        L = reshape(w, [m n]);
-        G = (L - A.*mask) .* (A.*mask ~= 0);
-        g = G(:);
-    end
+            f = 1/2 * norm(diff, 'fro') + obj.lambda * trace_norm;
+        end
 
-    Problem.grad = @grad;
-    function g = grad(w, indices)
-        error('Not implemted yet.');
-    end
+        % calculate trace norm
+        function r = reg(obj, w)
+            L = reshape(w, [obj.m obj.n]);
+            [~,S,~] = svd(L,'econ');
+            s = diag(S);
+            r = sum(s);
+        end
 
-    Problem.hess = @hess; 
-    function h = hess(w, indices)
-        error('Not implemted yet.');        
-    end
+        function f = cost_batch(obj, w, indices)
+            error('Not implemted yet.');        
+        end
 
-    Problem.full_hess = @full_hess; 
-    function h = full_hess(w)
-        error('Not implemted yet.');        
-    end
+        function g = full_grad(obj, w)
+            L = reshape(w, [obj.m obj.n]);
+            G = (L - obj.A.*obj.mask) .* (obj.A.*obj.mask ~= 0);
+            g = G(:);
+        end
 
-    Problem.hess_vec = @hess_vec; 
-    function hv = hess_vec(w, v, indices)
-        error('Not implemted yet.');
+        function g = grad(obj, w, indices)
+            error('Not implemted yet.');
+        end
+
+        function h = hess(obj, w, indices)
+            error('Not implemted yet.');        
+        end
+
+        function h = full_hess(obj, w)
+            error('Not implemted yet.');        
+        end
+
+        function hv = hess_vec(obj, w, v, indices)
+            error('Not implemted yet.');
+        end
+        
     end
 
 

@@ -23,7 +23,7 @@ function [w, infos] = bfgs(problem, options)
 % This file is part of GDLibrary.
 %
 % Created by H.Kasai on Feb. 15, 2016
-% Modified by H.Kasai on Oct. 25, 2016
+% Modified by H.Kasai on Mar. 25, 2018
 
 
     % set dimensions and samples
@@ -120,7 +120,7 @@ function [w, infos] = bfgs(problem, options)
     grad = problem.full_grad(w);
     gnorm = norm(grad);
     infos.gnorm = gnorm;
-    if isfield(problem, 'reg')
+    if ismethod(problem, 'reg')
         infos.reg = problem.reg(w);   
     end  
     if store_w
@@ -181,7 +181,7 @@ function [w, infos] = bfgs(problem, options)
         w = w + step * p;
         
         % proximal operator
-        if isfield(problem, 'prox')
+        if ismethod(problem, 'prox')
             w = problem.prox(w, step);
         end          
         
@@ -265,7 +265,7 @@ function [w, infos] = bfgs(problem, options)
             infos.optgap = [infos.optgap optgap];        
             infos.cost = [infos.cost f_val];
             infos.gnorm = [infos.gnorm gnorm]; 
-            if isfield(problem, 'reg')
+            if ismethod(problem, 'reg')
                 reg = problem.reg(w);
                 infos.reg = [infos.reg reg];
             end 

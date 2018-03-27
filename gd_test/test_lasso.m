@@ -10,6 +10,7 @@ function [] = test_lasso()
         algorithms = gd_solver_list('ALL');  
     else
         algorithms = {'PG-BKT', 'PG-TFOCS-BKT', 'APG-BKT', 'APG-TFOCS-BKT', 'CD-LASSO', 'FISTA', 'ADMM-LASSO'}; 
+%        algorithms = {'FISTA'};
     end    
     
     
@@ -62,25 +63,25 @@ function [] = test_lasso()
                 
                 options.step_alg = 'backtracking';
                 options.step_init_alg = 'bb_init';
-                [w_list{alg_idx}, info_list{alg_idx}] = gd(problem, options);
+                [w_list{alg_idx}, info_list{alg_idx}] = sd(problem, options);
                 
             case {'PG-TFOCS-BKT'}
                 
                 options.step_alg = 'tfocs_backtracking';
                 options.step_init_alg = 'bb_init';
-                [w_list{alg_idx}, info_list{alg_idx}] = gd(problem, options);     
+                [w_list{alg_idx}, info_list{alg_idx}] = sd(problem, options);     
                 
             case {'APG-BKT'}
                 
                 options.step_alg = 'backtracking';
                 options.step_init_alg = 'bb_init';
-                [w_list{alg_idx}, info_list{alg_idx}] = gd_nesterov(problem, options);
+                [w_list{alg_idx}, info_list{alg_idx}] = sd_nesterov(problem, options);
                 
             case {'APG-TFOCS-BKT'}
                 
                 options.step_alg = 'tfocs_backtracking';
                 options.step_init_alg = 'bb_init';
-                [w_list{alg_idx}, info_list{alg_idx}] = gd_nesterov(problem, options); 
+                [w_list{alg_idx}, info_list{alg_idx}] = sd_nesterov(problem, options); 
                 
             case {'FISTA'}
                 

@@ -26,6 +26,12 @@ function test_stepsize_alg_demo()
     problem = logistic_regression(data.x_train, data.y_train, data.x_test, data.y_test); 
     
     
+%     %% define user-defined stepsize algorithm
+%     function step = my_stepalg(iter, options)
+%         step = options.step_init / (10 + iter*0.5);
+%     end       
+%     
+    
     %% perform algorithms SGD and SVRG 
     options.w_init = data.w_init;    
     options.step_init = 0.01;  
@@ -50,10 +56,10 @@ function test_stepsize_alg_demo()
 
 end
 
+    %% define user-defined stepsize algorithm
+    function step = my_stepalg(iter, options)
+        step = options.step_init / (10 + iter*0.5);
+    end       
     
-%% define user-defined stepsize algorithm
-function step = my_stepalg(iter, options)
-    step = options.step_init / (10 + iter*0.5);
-end     
 
 

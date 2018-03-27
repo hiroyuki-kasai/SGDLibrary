@@ -26,7 +26,7 @@ function [w, infos] = slbfgs(problem, in_options)
 %
 %                   
 % Created by H.Kasai on Oct. 15, 2016
-% Modified by H.Kasai on Sep. 25, 2017
+% Modified by H.Kasai on Mar. 25, 2018
 
 
     % set dimensions and samples
@@ -155,7 +155,7 @@ function [w, infos] = slbfgs(problem, in_options)
             end
             
             % proximal operator
-            if isfield(problem, 'prox')
+            if ismethod(problem, 'prox')
                 w = problem.prox(w, step);
             end              
             
@@ -167,7 +167,12 @@ function [w, infos] = slbfgs(problem, in_options)
             if(mod(total_iter,options.L)==0 && total_iter)                 
                 
                 % calcluate Hessian-vector product using subsamples
-                sub_indices = datasample((1:n),options.batch_hess_size);
+                %sub_indices = datasample((1:n), options.batch_hess_size);
+                % "datasample" is supported only in statistics package in Octave. 
+                % To avoid the packege, the following is an alternative. Modified by H.K. on Mar. 27, 2018.
+                perm_sub_idx_hessian = randperm(n);
+                sub_indices = perm_sub_idx_hessian(1:options.batch_hess_size);
+                
                 % calculate hessian
                 %H = problem.hess(w, sub_indices);
                 %Hv = H*(u_new - u_old);

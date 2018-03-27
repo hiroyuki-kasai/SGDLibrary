@@ -1,18 +1,18 @@
-# SGDLibrary : Stochastic Gradient Descent Library in MATLAB
+# SGDLibrary : Stochastic Gradient Descent Library in MATLAB/Octave
 ----------
 
 Authors: [Hiroyuki Kasai](http://kasai.kasailab.com/)
 
-Last page update: Septermer 29, 2017
+Last page update: April 01, 2018
 
-Latest library version: 1.0.12 (see Release notes for more info)
+Latest library version: 1.0.13 (see Release notes for more info)
 
 <br />
 
 Introduction
 ----------
-The SGDLibrary is a **pure-Matlab** library of a collection of **stochastic optimization algorithms**. This solves an unconstrained minimization problem of the form, min f(x) = sum_i f_i(x).
-
+The SGDLibrary is a **pure-MATLAB** library of a collection of **stochastic optimization algorithms**. This solves an unconstrained minimization problem of the form, min f(x) = sum_i f_i(x).
+The SGDLibrary is also operable on [GNU Octave](https://www.gnu.org/software/octave/) (Free software compatible with many MATLAB scripts).
 Note that this SGDLibrary internally contains the [GDLibrary](https://github.com/hiroyuki-kasai/GDLibrary).
 
 <br />
@@ -368,7 +368,7 @@ Convergence behavior animation example (Linear regression problem)
 
 License
 -------
-- The SGDLibrary is **free**, **non-commercial** and **open** source.
+- The SGDLibrary is **free** and **open** source.
 - The code provided iin SGDLibrary should only be used for **academic/research purposes**.
 - The codes provided by original papers are included. (Big thanks !!!)
     - iqn.m: originally created by [A. Mokhtari](https://fling.seas.upenn.edu/~aryanm/wiki/index.php?n=Main.HomePage). 
@@ -393,7 +393,9 @@ If you have any problems or questions, please contact the author: [Hiroyuki Kasa
 
 Release Notes
 --------------
-
+* Version 1.0.13 (Apr. 01, 2018)
+    - GNU Octave is supported.
+    - Change the functions of problem into class-based definitions. 
 * Version 1.0.12 (Sep. 29, 2017)
     - SARAH is nely added.
 * Version 1.0.11 (Sep. 28, 2017)

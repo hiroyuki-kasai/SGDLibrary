@@ -28,7 +28,7 @@ function  demo_ext()
     
     
     %% calculate optimal solution for optimality gap
-    w_opt = problem.calc_solution(problem, 1000);
+    w_opt = problem.calc_solution(1000);
     options.f_opt = problem.cost(w_opt);
 
     

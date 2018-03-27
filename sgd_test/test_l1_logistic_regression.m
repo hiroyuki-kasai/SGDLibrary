@@ -8,10 +8,11 @@ function [] = test_l1_logistic_regression()
     
      
     %% Set algorithms
-    if 0
+    if 1
         algorithms = sgd_solver_list('ALL');  
     else
-        algorithms = {'SVRG', 'SAG', 'Adam', 'Reg-oBFGS-Lim','APG-BKT', 'APG-TFOCS-BKT'};
+%        algorithms = {'SVRG', 'SAG', 'Adam', 'Reg-oBFGS-Lim','APG-BKT', 'APG-TFOCS-BKT'};
+        algorithms = {'SVRG', 'SAG', 'APG-TFOCS-BKT'};
     end    
     
     
@@ -56,8 +57,8 @@ function [] = test_l1_logistic_regression()
     %else
         % calculate solution
         options.w_init = w_init;
-        options.max_iter = 1000;
-        w_opt = problem.calc_solution(problem, 'gd_nesterov', options);
+        options.max_iter = 100;
+        w_opt = problem.calc_solution(options, 'sd_nesterov');
     %end
     f_opt = problem.cost(w_opt); 
     fprintf('f_opt: %.24e\n', f_opt);  
@@ -77,8 +78,8 @@ function [] = test_l1_logistic_regression()
         % general options for optimization algorithms   
         options.w_init = w_init;
         options.tol_gnorm = 1e-10;
-        options.max_iter = 300;
-        options.max_epoch = 300;
+        options.max_iter = 100;
+        options.max_epoch = 100;
         options.verbose = true;  
         options.f_opt = f_opt;
         batch_size = 10;        
@@ -88,25 +89,25 @@ function [] = test_l1_logistic_regression()
                 
                 options.step_alg = 'backtracking';
                 options.step_init_alg = 'bb_init';
-                [w_list{alg_idx}, info_list{alg_idx}] = gd(problem, options);
+                [w_list{alg_idx}, info_list{alg_idx}] = sd(problem, options);
                 
             case {'PG-TFOCS-BKT'}
                 
                 options.step_alg = 'tfocs_backtracking';
                 options.step_init_alg = 'bb_init';
-                [w_list{alg_idx}, info_list{alg_idx}] = gd(problem, options);     
+                [w_list{alg_idx}, info_list{alg_idx}] = sd(problem, options);     
                 
             case {'APG-BKT'}
                 
                 options.step_alg = 'backtracking';
                 options.step_init_alg = 'bb_init';
-                [w_list{alg_idx}, info_list{alg_idx}] = gd_nesterov(problem, options);
+                [w_list{alg_idx}, info_list{alg_idx}] = sd_nesterov(problem, options);
                 
             case {'APG-TFOCS-BKT'}
                 
                 options.step_alg = 'tfocs_backtracking';
                 options.step_init_alg = 'bb_init';
-                [w_list{alg_idx}, info_list{alg_idx}] = gd_nesterov(problem, options);  
+                [w_list{alg_idx}, info_list{alg_idx}] = sd_nesterov(problem, options);  
                 
             case {'L-BFGS-BKT'}
                 
@@ -157,7 +158,7 @@ function [] = test_l1_logistic_regression()
             case {'SVRG'}
                 
                 options.batch_size = batch_size;
-                options.step_init = 0.01 * options.batch_size;
+                options.step_init = 0.0001 * options.batch_size;
                 options.step_alg = 'fix';
 
                 [w_list{alg_idx}, info_list{alg_idx}] = svrg(problem, options);      

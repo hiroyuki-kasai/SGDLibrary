@@ -1,4 +1,5 @@
-function [Problem] = lasso(A, b, lambda)
+classdef lasso
+%function [Problem] = lasso(A, b, lambda)
 % This file defines the lasso (least absolute shrinkage and selection operator) problem for L1 norm. 
 %
 % Inputs:
@@ -19,112 +20,123 @@ function [Problem] = lasso(A, b, lambda)
 % This file is part of GDLibrary and SGDLibrary.
 %
 % Created by H.Kasai on Apr. 17, 2017
-% Modified by H.Kasai on Sep. 25, 2017
+% Modified by H.Kasai on Mar. 25, 2018
 
-
-    d = size(A, 2);
-    n = size(A, 2);
+    properties
+        name;    
+        dim;
+        samples;
+        lambda;
+        d;
+        n;
+        A;
+        b;
+        AtA;
+        Atb;
+        L;
+    end
     
-    Problem.name = @() 'lasso';    
-    Problem.dim = @() d;
-    Problem.samples = @() n;
-    Problem.lambda = @() lambda;
-    Problem.A = @() A;    
-    Problem.b = @() b; 
+    methods
+        function obj = lasso(A, b, varargin) 
+            
+            obj.A = A;
+            obj.b = b;
+            
+            if nargin < 3
+                obj.lambda = 0.1;
+            else
+                obj.lambda = varargin{1};
+            end               
+
+            obj.d = size(obj.A, 2);
+            obj.n = size(obj.A, 2);
+
+            obj.name = 'lasso';    
+            obj.dim = obj.d;
+            obj.samples = obj.n;
+
+            obj.AtA = obj.A'*obj.A;
+            obj.Atb = obj.A'*obj.b;
+            %L = max(eig(AtA));
+            fprintf('Calculated Lipschitz constant (L), i.e., max(eig(AtA)), .... ')
+            obj.L = eigs(obj.AtA, 1);
+            fprintf('is L=%f.\n', obj.L);
+        end
     
-    AtA = A'*A;
-    Problem.AtA = @() AtA;
-    Atb = A'*b;
-    %L = max(eig(AtA));
-    fprintf('Calculated Lipschitz constant (L), i.e., max(eig(AtA)), .... ')
-    L = eigs(A'*A,1);
-    fprintf('is L=%f.\n', L);
-    Problem.L = @() L;
-    
-    Problem.prox = @l1_soft_thresh;
-    function v = l1_soft_thresh(w, t)
-        v = soft_thresh(w, t * lambda);
-    end    
+        function v = prox(obj, w, t)
+            v = soft_thresh(w, t * obj.lambda);
+        end    
 
-    Problem.cost = @cost;
-    function f = cost(w)
-        reg = reg(w);
-        f = 1/2 * sum((A * w - b).^2) + lambda * reg;
-    end
+        function f = cost(obj,w)
+            reg = obj.reg(w);
+            f = 1/2 * sum((obj.A * w - obj.b).^2) + obj.lambda * reg;
+        end
 
-    % calculate l1 norm
-    Problem.reg = @reg;
-    function r = reg(w)
-        r = norm(w,1);
-    end
+        % calculate l1 norm
+        function r = reg(obj,w)
+            r = norm(w,1);
+        end
 
-    Problem.residual = @residual;
-    function r = residual(w)
-        r = - A * w + b;
-    end
+        function r = residual(obj,w)
+            r = - obj.A * w + obj.b;
+        end
 
-    Problem.cost_batch = @cost_batch;
-    function f = cost_batch(w, indices)
-        error('Not implemted yet.');        
-    end
+        function f = cost_batch(obj,w, indices)
+            error('Not implemted yet.');        
+        end
 
-    Problem.full_grad = @full_grad;
-    function g = full_grad(w)
-        %g = A' * (A * w - b);
-        g = AtA * w - Atb;
-    end
+        function g = full_grad(obj,w)
+            %g = obj.A' * (obj.A * w - obj.obj.b);
+            g = obj.AtA * w - obj.Atb;
+        end
 
-    Problem.grad = @grad;
-    function g = grad(w, indices)
-        A_partial = A(:,indices);
-        g = A_partial' * (A_partial * w - b);        
-    end
+        function g = grad(obj,w, indices)
+            A_partial = obj.A(:,indices);
+            g = A_partial' * (A_partial * w - obj.b);        
+        end
 
-    Problem.hess = @hess; 
-    function h = hess(w, indices)
-        error('Not implemted yet.');        
-    end
+        function h = hess(obj,w, indices)
+            error('Not implemted yet.');        
+        end
 
-    Problem.full_hess = @full_hess; 
-    function h = full_hess(w)
-        h = AtA;       
-    end
+        function h = full_hess(obj,w)
+            h = obj.AtA;       
+        end
 
-    Problem.hess_vec = @hess_vec; 
-    function hv = hess_vec(w, v, indices)
-        error('Not implemted yet.');
-    end
+        function hv = hess_vec(obj,w, v, indices)
+            error('Not implemted yet.');
+        end
 
-    Problem.calc_solution = @calc_solution;
-    function w_opt = calc_solution(problem, method, options_in)
-        
-        if nargin < 2
-            method = 'gd_nesterov';
-        end        
-        
-        options.max_iter = options_in.max_iter;
-        options.w_init = options_in.w_init;
-        options.verbose = true;
-        options.tol_optgap = 1.0e-24;
-        options.tol_gnorm = 1.0e-16;
-        options.step_alg = 'backtracking';
-        
-        if strcmp(method, 'sg')
-            [w_opt,~] = gd(problem, options);
-        elseif strcmp(method, 'cg')
-            [w_opt,~] = ncg(problem, options);
-        elseif strcmp(method, 'newton')
-            options.sub_mode = 'INEXACT';    
-            options.step_alg = 'non-backtracking'; 
-            [w_opt,~] = newton(problem, options);
-        elseif strcmp(method, 'gd_nesterov')
+        function w_opt = calc_solution(obj, options_in, method)
+
+            if nargin < 3
+                method = 'sd_nesterov';
+            end        
+
+            options.max_iter = options_in.max_iter;
+            options.w_init = options_in.w_init;
+            options.verbose = true;
+            options.tol_optgap = 1.0e-24;
+            options.tol_gnorm = 1.0e-16;
             options.step_alg = 'backtracking';
-            options.step_init_alg = 'bb_init';
-            [w_opt,~] = gd_nesterov(problem, options);            
-        else 
-            options.step_alg = 'backtracking';  
-            options.mem_size = 5;
-            [w_opt,~] = lbfgs(problem, options);              
+
+            if strcmp(method, 'sd')
+                [w_opt,~] = sd(obj, options);
+            elseif strcmp(method, 'cg')
+                [w_opt,~] = ncg(obj, options);
+            elseif strcmp(method, 'newton')
+                options.sub_mode = 'INEXACT';    
+                options.step_alg = 'non-backtracking'; 
+                [w_opt,~] = newton(obj, options);
+            elseif strcmp(method, 'sd_nesterov')
+                options.step_alg = 'backtracking';
+                options.step_init_alg = 'bb_init';
+                [w_opt,~] = sd_nesterov(obj, options);            
+            else 
+                options.step_alg = 'backtracking';  
+                options.mem_size = 5;
+                [w_opt,~] = lbfgs(obj, options);              
+            end
         end
     end
 end

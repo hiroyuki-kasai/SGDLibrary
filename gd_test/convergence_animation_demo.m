@@ -60,7 +60,7 @@ function  convergence_animation_demo()
     w_history{2} = info_list_ncd.w;  
     w_history{3} = info_list_lbfgs.w;      
     speed = 0.5;
-    draw_convergence_animation(problem, {'GD-BKT', 'NCG-BKT', 'LBFGS-WOLFE'}, w_history, options.max_iter, speed);    
+    draw_convergence_animation(problem, {'SD-BKT', 'NCG-BKT', 'LBFGS-WOLFE'}, w_history, options.max_iter, speed);    
     
 end
 

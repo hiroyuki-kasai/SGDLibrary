@@ -11,7 +11,7 @@ function [w, infos] = sgd(problem, in_options)
 % This file is part of SGDLibrary.
 %
 % Created by H.Kasai on Feb. 15, 2016
-% Modified by H.Kasai on Sep. 25, 2017
+% Modified by H.Kasai on Mar. 25, 2018
 
 
     % set dimensions and samples
@@ -68,7 +68,7 @@ function [w, infos] = sgd(problem, in_options)
             w = w - step * grad;
             
             % proximal operator
-            if isfield(problem, 'prox')
+            if ismethod(problem, 'prox')
                 w = problem.prox(w, step);
             end  
             

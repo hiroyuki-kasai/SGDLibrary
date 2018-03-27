@@ -29,7 +29,7 @@ function [infos, f_val, optgap] = store_infos(problem, w, options, infos, epoch,
         infos.optgap = optgap;
         infos.gnorm = norm(problem.full_grad(w));    
         infos.cost = f_val;
-        if isfield(problem, 'reg')
+        if ismethod(problem, 'reg')
             infos.reg = problem.reg(w);   
         end     
         if options.store_w
@@ -51,7 +51,7 @@ function [infos, f_val, optgap] = store_infos(problem, w, options, infos, epoch,
         infos.optgap = [infos.optgap optgap];
         infos.cost = [infos.cost f_val];
         infos.gnorm = [infos.gnorm gnorm]; 
-        if isfield(problem, 'reg')
+        if ismethod(problem, 'reg')            
             reg = problem.reg(w);
             infos.reg = [infos.reg reg];
         end          

@@ -99,32 +99,32 @@ function  test_logistic_regression()
         options.store_w = true;
 
         switch algorithms{alg_idx}
-            case {'GD-STD'}
+            case {'SD-STD'}
                 
                 options.step_alg = 'fix';
                 options.step_init = 1;
-                [w_list{alg_idx}, info_list{alg_idx}] = gd(problem, options);
+                [w_list{alg_idx}, info_list{alg_idx}] = sd(problem, options);
 
-            case {'GD-BKT'}
+            case {'SD-BKT'}
                 
                 options.step_alg = 'backtracking';
-                [w_list{alg_idx}, info_list{alg_idx}] = gd(problem, options);
+                [w_list{alg_idx}, info_list{alg_idx}] = sd(problem, options);
 
-            case {'GD-EXACT'}
+            case {'SD-EXACT'}
                 
                 options.step_alg = 'exact';                
-                [w_list{alg_idx}, info_list{alg_idx}] = gd(problem, options);
+                [w_list{alg_idx}, info_list{alg_idx}] = sd(problem, options);
                 
-            case {'GD-WOLFE'}
+            case {'SD-WOLFE'}
                 
                 options.step_alg = 'strong_wolfe';
-                [w_list{alg_idx}, info_list{alg_idx}] = gd(problem, options);                
+                [w_list{alg_idx}, info_list{alg_idx}] = sd(problem, options);                
                 
-            case {'GD-SCALE-EXACT'}
+            case {'SD-SCALE-EXACT'}
                 
                 options.sub_mode = 'SCALING';
                 options.step_alg = 'exact';                
-                [w_list{alg_idx}, info_list{alg_idx}] = gd(problem, options);
+                [w_list{alg_idx}, info_list{alg_idx}] = sd(problem, options);
                 
             case {'Newton-STD'}
                 

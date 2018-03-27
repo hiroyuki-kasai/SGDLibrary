@@ -10,14 +10,18 @@ function [  ] = draw_convergence_animation(problem, algorithms_list, w_history, 
 % This file is part of SGDLibrary.
 %
 % Created by H.Kasai on Oct. 28, 2016
-% Modified by H.Kasai on Mov. 02, 2016
+% Modified by H.Kasai on Mar. 27, 2018
 
+
+    octave_flag = is_octave();
 
     if nargin < 5
         speed = 0.5;
     else
         speed = varargin{1};
     end
+    
+
 
     % check the nunber of dimensions
     if problem.dim() > 2
@@ -31,8 +35,14 @@ function [  ] = draw_convergence_animation(problem, algorithms_list, w_history, 
     
     % calculate necessary # of algorithms
     alg_num = length(algorithms_list);  
+    % set the number of graphs per row
+    if octave_flag
+        max_row_num = alg_num;
+    else
+    max_row_num = 3;        
+    end
     % calculate necessary # of rows
-    row_num = ceil(length(algorithms_list)/3);
+    row_num = ceil(length(algorithms_list)/max_row_num);
     % calculate plot ranges
     x_range_max = -Inf;
     x_range_min = Inf;
@@ -64,8 +74,7 @@ function [  ] = draw_convergence_animation(problem, algorithms_list, w_history, 
     
     %% plot
     figure('units','normalized','outerposition',[0 0 1 1]);
-    suptitle('Convergence behabvior');
-
+    
     % initialize
     N = 50;
     W_prev = cell(alg_num,1);
@@ -73,9 +82,9 @@ function [  ] = draw_convergence_animation(problem, algorithms_list, w_history, 
     converge_flag_array = zeros(alg_num,1);    
     for alg_idx=1:alg_num
         
-        subplot(row_num,3,alg_idx);
-        [w_min, f_min, f_max] = draw_3D_surface(problem.cost, N, ...
-            x_range_min, x_range_max, y_range_min, y_range_max); hold on
+        subplot(row_num,max_row_num,alg_idx);
+        [w_min, f_min, f_max] = draw_3D_surface(problem, N, ...
+            x_range_min, x_range_max, y_range_min, y_range_max, octave_flag); hold on
         view(150,50);           
         %title_str = sprintf('%s ', algorithms_list{alg_idx});            
         %title(title_str);        
@@ -95,7 +104,7 @@ function [  ] = draw_convergence_animation(problem, algorithms_list, w_history, 
                 w = w_history{alg_idx};
                 w_prev = W_prev{alg_idx};
                 
-                subplot(row_num,3,alg_idx);                
+                subplot(row_num,max_row_num,alg_idx);                
                 
                 if iter <= len_array(alg_idx)
                     % when not converged
@@ -119,7 +128,7 @@ function [  ] = draw_convergence_animation(problem, algorithms_list, w_history, 
                     % when converged
                     if ~converge_flag_array(alg_idx)                        
                         converge_flag_array(alg_idx) = 1;
-                        subplot(row_num,3,alg_idx); 
+                        subplot(row_num,max_row_num,alg_idx); 
                         converge_str = sprintf('Converged at %d epoch !\nf=%.2e at (%.2f, %.2f)', ...
                                                 iter, W_prev{alg_idx}(3), W_prev{alg_idx}(1), W_prev{alg_idx}(2));
                         hText = text(x_range_min, y_range_min, f_max - (f_max-f_min)/3, converge_str, ...
@@ -131,7 +140,9 @@ function [  ] = draw_convergence_animation(problem, algorithms_list, w_history, 
                                                     'FontWeight', 'bold', ...
                                                     'FontSize', 14); hold on
                         % put text front
-                        set(hText, 'Layer', 'front');
+                        if ~octave_flag
+                            set(hText, 'Layer', 'front');
+                        end
                         fprintf('[%d] Converged\t\t', alg_idx);  
                         title_str = sprintf('%s [ iter: %03d ]', algorithms_list{alg_idx}, iter);            
                         title(title_str);                          
@@ -156,7 +167,7 @@ function [  ] = draw_convergence_animation(problem, algorithms_list, w_history, 
     % when reached maximum iteration
     for alg_idx=1:alg_num
         if ~converge_flag_array(alg_idx)
-            subplot(row_num,3,alg_idx);   
+            subplot(row_num,max_row_num,alg_idx);   
             if iter == max_epoch+1
                 converge_str = sprintf('Reached max %d epoch\nf=%.2e at (%.2f, %.2f)', ...
                                     iter-1, W_prev{alg_idx}(3), W_prev{alg_idx}(1), W_prev{alg_idx}(2));
@@ -172,12 +183,24 @@ function [  ] = draw_convergence_animation(problem, algorithms_list, w_history, 
                                         'LineWidth', 1.0, ...                                        
                                         'FontWeight', 'bold', ...
                                         'FontSize', 14); hold on  
-            % put text front                                    
-            set(hText, 'Layer', 'front');                                        
+            % put text front
+            if ~octave_flag            
+                set(hText, 'Layer', 'front');                                        
+            end
         end
     end
 
     hold off         
 
 end
+
+
+ %% subfunction that checks if we are in octave
+ function r = is_octave()
+   persistent x;
+   if (isempty(x))
+     x = exist('OCTAVE_VERSION', 'builtin');
+   end
+   r = x;
+ end
 

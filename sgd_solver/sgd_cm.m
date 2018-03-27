@@ -16,6 +16,7 @@ function [w, infos] = sgd_cm(problem, in_options)
 % This file is part of SGDLibrary.
 %
 % Created by H.Kasai on Sep. 28, 2017
+% Modified by H.Kasai on Mar. 25, 2017
 
 
     % set dimensions and samples
@@ -85,7 +86,7 @@ function [w, infos] = sgd_cm(problem, in_options)
             w = w + v;
             
             % proximal operator
-            if isfield(problem, 'prox')
+            if ismethod(problem, 'prox')
                 w = problem.prox(w, 1);
             end  
             
