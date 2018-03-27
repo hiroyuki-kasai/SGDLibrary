@@ -62,7 +62,8 @@ function  test_quadratic_sample()
         options.tol_gnorm = 1e-10;
         options.max_iter = 100;
         options.verbose = true;   
-        options.f_sol = f_sol;        
+        options.f_sol = f_sol; 
+        options.f_opt = f_sol;
         options.store_w = true;
 
         switch algorithms{alg_idx}

@@ -56,7 +56,9 @@ function [] = test_lasso()
         options.w_init = w_init;
         options.tol_gnorm = 1e-10;
         options.max_iter = 100;
-        options.verbose = true;  
+        options.verbose = true; 
+        options.f_opt = 0;
+        options.store_w = false;
 
         switch algorithms{alg_idx}
             case {'PG-BKT'}

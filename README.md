@@ -262,7 +262,7 @@ More plots
 For the calculation of "optimality gap", you need optimal solution `w_opt` beforehand by calling `calc_solution()` function of the problem definition function. 
 ```Matlab
 %% calculate optimal solution for optimality gap
-w_opt = problem.calc_solution(problem, 1000);
+w_opt = problem.calc_solution(1000);
 options.f_opt = problem.cost(w_opt);
 ```
 

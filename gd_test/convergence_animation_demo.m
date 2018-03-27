@@ -40,7 +40,7 @@ function  convergence_animation_demo()
     
     %% perform GD with backtracking line search 
     options.step_alg = 'backtracking';
-    [~, info_list_gd] = gd(problem, options); 
+    [~, info_list_gd] = sd(problem, options); 
     
     %% perform GD with backtracking line search 
     options.step_alg = 'backtracking';

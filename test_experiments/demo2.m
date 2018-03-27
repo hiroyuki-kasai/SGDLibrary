@@ -51,7 +51,7 @@ function  demo2()
     
     
     %% calculate solution 
-    %w_opt = problem.calc_solution(problem, 1000);
+    %w_opt = problem.calc_solution(1000);
      
 
     %% general options for optimization algorithms   

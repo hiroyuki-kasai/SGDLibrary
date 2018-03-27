@@ -100,7 +100,7 @@ function  test_convergence_animation_demo()
     if norm(w_opt)
     else
         % calculate solution
-        w_opt = problem.calc_solution(problem, 1000);
+        w_opt = problem.calc_solution(1000);
     end
     f_opt = problem.cost(w_opt); 
     fprintf('f_opt: %.24e\n', f_opt);       

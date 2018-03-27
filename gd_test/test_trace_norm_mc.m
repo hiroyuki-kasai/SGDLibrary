@@ -50,6 +50,8 @@ function [] = test_trace_norm_mc()
         options.tol_gnorm = 1e-10;
         options.max_iter = 100;
         options.verbose = true;  
+        options.f_opt = 0;
+        options.store_w = false;
 
         switch algorithms{alg_idx}
             case {'PG-BKT'}

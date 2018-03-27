@@ -67,7 +67,7 @@ function  test_softmax_classifier()
 
     
     %% define problem definitions
-    problem = softmax_regression(x_train, y_train, x_test, y_test, lambda, l);
+    problem = softmax_regression(x_train, y_train, x_test, y_test, l, lambda);
 
    
     % initialize
@@ -81,7 +81,7 @@ function  test_softmax_classifier()
     if norm(w_opt)
     else
         % calculate solution
-        w_opt = problem.calc_solution(problem, 1000);
+        w_opt = problem.calc_solution(1000);
     end
     f_opt = problem.cost(w_opt); 
     fprintf('f_opt: %.24e\n', f_opt);   

@@ -36,10 +36,10 @@ classdef rosenbrock
             obj.d = d;
             obj.n = obj.d;
 
-            Problem.name = 'rosenbrock';    
-            Problem.dim = obj.d;
-            Problem.samples = obj.n; 
-            Problem.hessain_w_independent = false;
+            obj.name = 'rosenbrock';    
+            obj.dim = obj.d;
+            obj.samples = obj.n; 
+            obj.hessain_w_independent = false;
         end
 
         function f = cost(obj, x)

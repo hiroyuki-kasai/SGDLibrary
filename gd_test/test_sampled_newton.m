@@ -42,7 +42,7 @@ function test_sampled_newton()
         f_opt1 = problem.cost(w_opt);
         fprintf('f_opt: %.16e\n', f_opt1);
         
-        w_opt = problem.calc_solution(problem, 100, 'lbfgs');
+        w_opt = problem.calc_solution(100, 'lbfgs');
         f_opt2 = problem.cost(w_opt); 
         fprintf('f_opt1: %.16e, f_opt2: %.16e, diff: %.16e\n', f_opt1, f_opt2, f_opt2 - f_opt1);    
         
@@ -70,7 +70,7 @@ function test_sampled_newton()
         problem = logistic_regression(x_train, y_train, [], [], lambda);
 
         % calculate f_opt
-        w_opt = problem.calc_solution(problem, 100, 'lbfgs');
+        w_opt = problem.calc_solution(100, 'lbfgs');
         f_opt = problem.cost(w_opt); 
         fprintf('f_opt: %.24e\n', f_opt); 
         

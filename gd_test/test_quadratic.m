@@ -9,8 +9,7 @@ function  test_quadratic()
     if 0
         algorithms = gd_solver_list('ALL');  
     else
-        algorithms = gd_solver_list
-        ('EXACT');           
+        algorithms = {'SD-NESTEROV'};           
     end
 
      
@@ -232,7 +231,7 @@ function  test_quadratic()
         w_history{alg_idx} = info_list{alg_idx}.w;
         cost_history{alg_idx} = info_list{alg_idx}.cost;
     end    
-    draw_convergence_sequence(problem, w_opt, algorithms, w_history, cost_history);       
+    %draw_convergence_sequence(problem, w_opt, algorithms, w_history, cost_history);       
 
 end
 

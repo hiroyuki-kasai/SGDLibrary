@@ -18,7 +18,7 @@ function  test_linear_regression()
         % generate synthtic data
         % sample data generating for training: y = w1*x1 + w2*x2 + ... * wd*1
         n = 10000;
-        d = 10;
+        d = 100;
         std = 0.25;
         data = linear_regression_data_generator(n, d, std);
         

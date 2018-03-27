@@ -25,7 +25,7 @@ function [] = test_lasso_cv()
 
 
     %% set algorithms and solver
-    % select from {'ADMM-LASSO','FISTA','PG-TFOCS-BKT','APG-TFOCS-BKT','CD-LASSO'}
+    % select ONE algorithm from {'ADMM-LASSO','FISTA','PG-TFOCS-BKT','APG-TFOCS-BKT','CD-LASSO'}
     algorithm = {'FISTA'};
 
     switch algorithm{1}
@@ -94,11 +94,11 @@ function [] = test_lasso_cv()
 
     %% plot all
     % display l1-norm vs coefficient
-    display_graph('l1','coeff', algorithm, l1_norm, {W}, 'plot');
+    display_graph('l1-norm','coeffs', algorithm, l1_norm, {W}, 'linear');
     % display lambda vs coefficient
-    display_graph('lambda','coeff', algorithm, lamnda_array, {W}, 'plot');
+    display_graph('lambda','coeffs', algorithm, lamnda_array, {W}, 'linear');
     % display l1-norm vs approximation error
-    display_graph('l1','aprox_err', algorithm, l1_norm, {aprox_err}, 'plot');    
+    display_graph('l1-norm','aprox_err', algorithm, l1_norm, {aprox_err}, 'linear');    
     
 end
 

@@ -129,7 +129,7 @@ rng(1234);
     
     
     %% calculate solution 
-    %w_opt = problem.calc_solution(problem, 2000);    
+    %w_opt = problem.calc_solution(2000);    
 
     
     %% initialize

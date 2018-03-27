@@ -92,6 +92,7 @@ function [w, infos] = sd(problem, options)
    
     % initialise
     iter = 0;
+    grad_calc_count = 0;
     if ~isfield(options, 'S')
         if strcmp(step_alg, 'exact')
             S = eye(d);
@@ -121,7 +122,7 @@ function [w, infos] = sd(problem, options)
     
     % store first infos
     clear infos;    
-    [infos, f_val, optgap] = store_infos(problem, w, options, [], epoch, grad_calc_count, 0);
+    [infos, f_val, optgap, grad, gnorm] = store_infos(problem, w, options, [], iter, grad_calc_count, 0);
     
     
     % set start time
@@ -183,10 +184,8 @@ function [w, infos] = sd(problem, options)
             w = problem.prox(w, step);
         end
         
-        % calculate gradient
-        %grad_old = grad;
-        %grad = problem.full_grad(w);
-
+        % store gradient
+        grad_old = grad;
 
         % measure elapsed time
         elapsed_time = toc(start_time);  
@@ -198,7 +197,7 @@ function [w, infos] = sd(problem, options)
         iter = iter + 1;        
         
         % store infos
-        [infos, f_val, optgap] = store_infos(problem, w, options, infos, iter, grad_calc_count, elapsed_time);        
+        [infos, f_val, optgap, grad, gnorm] = store_infos(problem, w, options, infos, iter, grad_calc_count, elapsed_time);        
 
         
 %         % calculate error

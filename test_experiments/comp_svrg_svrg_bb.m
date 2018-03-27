@@ -110,7 +110,7 @@ function  comp_svrg_svrg_bb()
     
     
     %% calculate solution 
-    w_star = problem.calc_solution(problem, 500);    
+    w_star = problem.calc_solution(500);    
 
     
     %% initialize
@@ -124,7 +124,7 @@ function  comp_svrg_svrg_bb()
     if norm(w_star)
     else
         % calculate solution
-        w_star = problem.calc_solution(problem, 1000);
+        w_star = problem.calc_solution(1000);
     end
     f_opt = problem.cost(w_star); 
     fprintf('f_opt: %.24e\n', f_opt);    

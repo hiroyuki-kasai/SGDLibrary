@@ -91,7 +91,7 @@ function  iqn_test()
         % define problem definitions
         problem = logistic_regression(x_train, y_train, x_test, y_test, lambda);
 
-        w_opt = problem.calc_solution(problem, 200);
+        w_opt = problem.calc_solution(200);
         f_opt = problem.cost(w_opt); 
         fprintf('f_opt: %.24e\n', f_opt); 
         

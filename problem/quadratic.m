@@ -52,7 +52,7 @@ classdef quadratic
             f = 1/2 * x' * obj.A * x - obj.b' * x;
         end
 
-        function g = grad(x)
+        function g = grad(obj, x)
 
             g = obj.A * x - obj.b;
 

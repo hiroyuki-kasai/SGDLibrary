@@ -79,7 +79,7 @@ function  test_logistic_regression()
     if norm(w_opt)
     else
         % calculate solution
-        w_opt = problem.calc_solution(problem, 1000, 0.05);
+        w_opt = problem.calc_solution(1000, 0.05);
     end
     f_opt = problem.cost(w_opt); 
     fprintf('f_opt: %.24e\n', f_opt);    
