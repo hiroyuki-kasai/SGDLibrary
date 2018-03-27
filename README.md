@@ -1,4 +1,4 @@
-# SGDLibrary : Stochastic Gradient Descent Library in MATLAB/Octave
+# SGDLibrary : Stochastic Optimization Algorithm Library in MATLAB/Octave
 ----------
 
 Authors: [Hiroyuki Kasai](http://kasai.kasailab.com/)
