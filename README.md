@@ -19,7 +19,7 @@ Note that this SGDLibrary internally contains the [GDLibrary](https://github.com
 
 Document
 ----------
-The document of SGDLibrary can be otaibed from below;
+The document of SGDLibrary can be obtained from below;
 
 - H. Kasai, "[SGDLibrary: A MATLAB library for stochastic gradient descent algorithms](http://arxiv.org/abs/1710.10951)," arXiv preprint arXiv:1710.10951, 2017.
 
