@@ -393,7 +393,7 @@ If you have any problems or questions, please contact the author: [Hiroyuki Kasa
 
 Release Notes
 --------------
-* Version 1.0.13 (Apr. 01, 2018)
+* Version 1.0.16 (Apr. 01, 2018)
     - GNU Octave is supported.
     - Change the functions of problem into class-based definitions. 
 * Version 1.0.12 (Sep. 29, 2017)
