@@ -8,11 +8,10 @@ function [] = test_l1_logistic_regression()
     
      
     %% Set algorithms
-    if 1
+    if 0
         algorithms = sgd_solver_list('ALL');  
     else
-%        algorithms = {'SVRG', 'SAG', 'Adam', 'Reg-oBFGS-Lim','APG-BKT', 'APG-TFOCS-BKT'};
-        algorithms = {'SVRG', 'SAG', 'APG-TFOCS-BKT'};
+        algorithms = {'SVRG', 'SAG', 'Adam', 'Reg-oBFGS-Lim','APG-BKT', 'APG-TFOCS-BKT'};
     end    
     
     
