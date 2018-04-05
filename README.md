@@ -21,7 +21,7 @@ Document
 ----------
 The document of SGDLibrary can be obtained from below;
 
-- H. Kasai, "[SGDLibrary: A MATLAB library for stochastic gradient descent algorithms](http://arxiv.org/abs/1710.10951)," arXiv preprint arXiv:1710.10951, 2017.
+- H. Kasai, "[SGDLibrary: A MATLAB library for stochastic optimization algorithms](http://arxiv.org/abs/1710.10951)," Journal of Machine Learning Research, vol.19, 2018 (arXiv preprint arXiv:1710.10951).
 
 
 <br />
