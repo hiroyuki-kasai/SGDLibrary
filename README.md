@@ -380,7 +380,7 @@ License
 - The codes provided by original papers are included. (Big thanks !!!)
     - iqn.m: originally created by [A. Mokhtari](https://fling.seas.upenn.edu/~aryanm/wiki/index.php?n=Main.HomePage). 
 - The codes ported from original python codes are included. (Big thanks !!!)
-    - scr.m, cr_subsolver.m, subsamp_tr.m, tr_subsolver.m: Ppython codes are originally created by [J. M. Kohler and A. Lucchi](https://github.com/dalab/subsampled_cubic_regularization). These MATLAB codes are ported with the original authors' big helps.
+    - scr.m, cr_subsolver.m, subsamp_tr.m, tr_subsolver.m: Ppython codes are originally created by [J. M. Kohler and A. Lucchi](https://github.com/dalab/subsampled_cubic_regularization). These MATLAB codes are ported with original authors' big helps.
 - Third party files are included.
     - subsamp_newton.m: originally created by Peng Xu and Jiyan Yang  in [Subsampled-Newton](https://github.com/git-xp/Subsampled-Newton). This is modifided to handle other problems like linear regression.  
 
