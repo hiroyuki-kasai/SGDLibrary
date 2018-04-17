@@ -121,8 +121,8 @@ optimization](https://arxiv.org/pdf/1607.01231v3.pdf)," arXiv preprint arXiv:160
 |Reg-oBFGS-Inf|`obfgs`|`'Inf-mem'`|`regularized=true`|
 |Damp-oBFGS-Inf|`obfgs`|`'Inf-mem'`|`regularized=true` & `damped=true`|
 |IQN|`iqn`|||
-|SCR|`scr`|| `gradient_sampling=1`|
-|Subsampled-TR|`subsamp_tr`|| `gradient_sampling=1`|
+|SCR|`scr`|| `gradient_sampling=1` & `Hessian_sampling=1`|
+|Subsampled-TR|`subsamp_tr`|| `gradient_sampling=1` & `Hessian_sampling=1`|
 |SVRG-BB|`svrg_bb`|||
 
 
