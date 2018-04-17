@@ -94,7 +94,7 @@ classdef logistic_regression
         function g = grad(obj, w, indices)
 
             % org code
-            %g = -sum(((ones(d,1) * (sigmoid(-y_train(indices).*(w'*x_train(:,indices))) .* y_train(indices))) .* x_train(:,indices))/length(indices),2) + lambda * w;
+            %g = -sum(((ones(obj.d,1) * (sigmoid(-obj.y_train(indices).*(w'*obj.x_train(:,indices))) .* obj.y_train(indices))) .* obj.x_train(:,indices))/length(indices),2) + obj.lambda * w;
             %
             % (log(1+exp(-y_train.*(w'*x_train)))' = -y_train.*x_train * (exp(-y_train.*(w'*x_train))/(1+exp(-y_train.*(w'*x_train))))
             %   = -y_train.*x_train * (1 - sigmoid(y_train.*(w'*x_train)))
@@ -107,10 +107,10 @@ classdef logistic_regression
             g = -sum(ones(obj.d,1) * obj.y_train(indices).*obj.x_train(:,indices) * (ones(1,length(indices))-sigmoid(obj.y_train(indices).*(w'*obj.x_train(:,indices))))',2)/length(indices)+ obj.lambda * w;
 
     %         Commented out below due to avoid 'NAN' values of g by HK on 2017/12/5
-    %         e = exp(-1*y_train(indices)'.*(x_train(:,indices)'*w));
-    %         s = e./(1+e);
-    %         g = -(1/length(indices))*((s.*y_train(indices)')'*x_train(:,indices)')';
-    %         g = full(g) + lambda * w;
+%             e = exp(-1*obj.y_train(indices)'.*(obj.x_train(:,indices)'*w));
+%             s = e./(1+e);
+%             g = -(1/length(indices))*((s.*obj.y_train(indices)')'*obj.x_train(:,indices)')';
+%             g = full(g) + obj.lambda * w;
 
         end
 

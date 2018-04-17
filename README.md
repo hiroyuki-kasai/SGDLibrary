@@ -3,9 +3,9 @@
 
 Authors: [Hiroyuki Kasai](http://kasai.kasailab.com/)
 
-Last page update: April 01, 2018
+Last page update: April 17, 2018
 
-Latest library version: 1.0.16 (see Release notes for more info)
+Latest library version: 1.0.17 (see Release notes for more info)
 
 <br />
 
@@ -83,6 +83,11 @@ International Conference on Artificial Intelligence and Statistics (AISTATS), pp
 optimization](https://arxiv.org/pdf/1607.01231v3.pdf)," arXiv preprint arXiv:1607.01231, 2016.
     - IQN (incremental Quasi-Newton method)
         - A. Mokhtari, M. Eisen, and A. Ribeiro, "[An Incremental Quasi-Newton Method with a Local Superlinear Convergence Rate](https://arxiv.org/abs/1702.00709)," ICASSP2017, 2017.
+- **Inexact Hessian variants**
+    - SCR (Sub-sampled Cubic Regularization)
+        - J. M. Kohler and A. Lucchi, "[Sub-sampled Cubic Regularization for non-convex optimization](http://proceedings.mlr.press/v70/kohler17a.html)," ICML, 2017.
+    - Sub-sampled TR (trust region)
+        - A. R. Conn, N. I. Gould, P. L. Toint, "[Trust region methods](https://epubs.siam.org/doi/book/10.1137/1.9780898719857)," MOS-SIAM Series on Optimization, 2000.
 - **Else**
     - SVRG-BB (stochastic variance reduced gradient with Barzilai-Borwein)
         - C. Tan, S. Ma, Y. Dai, Y. Qian, "[Barzilai-Borwein step size for stochastic gradient descent](https://arxiv.org/pdf/1605.04131v2.pdf)," NIPS, 2016.
@@ -116,6 +121,8 @@ optimization](https://arxiv.org/pdf/1607.01231v3.pdf)," arXiv preprint arXiv:160
 |Reg-oBFGS-Inf|`obfgs`|`'Inf-mem'`|`regularized=true`|
 |Damp-oBFGS-Inf|`obfgs`|`'Inf-mem'`|`regularized=true` & `damped=true`|
 |IQN|`iqn`|||
+|SCR|`scr`|| `gradient_sampling=1`|
+|Subsampled-TR|`subsamp_tr`|| `gradient_sampling=1`|
 |SVRG-BB|`svrg_bb`|||
 
 
@@ -372,6 +379,8 @@ License
 - The code provided iin SGDLibrary should only be used for **academic/research purposes**.
 - The codes provided by original papers are included. (Big thanks !!!)
     - iqn.m: originally created by [A. Mokhtari](https://fling.seas.upenn.edu/~aryanm/wiki/index.php?n=Main.HomePage). 
+- The codes ported from original python codes are included. (Big thanks !!!)
+    - scr.m, cr_subsolver.m, subsamp_tr.m, tr_subsolver.m: originally created by [J. M. Kohler and A. Lucchi](https://github.com/dalab/subsampled_cubic_regularization). 
 - Third party files are included.
     - subsamp_newton.m: originally created by Peng Xu and Jiyan Yang  in [Subsampled-Newton](https://github.com/git-xp/Subsampled-Newton). This is modifided to handle other problems like linear regression.  
 
@@ -393,6 +402,8 @@ If you have any problems or questions, please contact the author: [Hiroyuki Kasa
 
 Release Notes
 --------------
+* Version 1.0.17 (Apr. 17, 2018)
+    - Sub-sampled CR (including ARC) and Sub-sampled TR are nely added.
 * Version 1.0.16 (Apr. 01, 2018)
     - GNU Octave is supported.
     - Change the functions of problem into class-based definitions. 

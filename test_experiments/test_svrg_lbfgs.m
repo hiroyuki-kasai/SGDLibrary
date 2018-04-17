@@ -9,7 +9,8 @@ function  test_svrg_lbfgs()
     if 0
         algorithms = sgd_solver_list('ALL');  
     else
-        algorithms = {'SVRG','SVRG-SQN','SVRG-LBFGS'};     
+        %algorithms = {'SVRG','SVRG-SQN','SVRG-LBFGS'};    
+        algorithms = {'SVRG-SQN','SVRG-LBFGS'};   
     end       
     
     
@@ -81,7 +82,7 @@ function  test_svrg_lbfgs()
     if norm(w_opt)
     else
         % calculate solution
-        w_opt = problem.calc_solution(problem, 1000);
+        w_opt = problem.calc_solution(1000);
     end
     %f_opt = problem.cost(w_opt); 
     f_opt = 7.0528403016600641e-02;
@@ -104,11 +105,11 @@ function  test_svrg_lbfgs()
         
         
         switch algorithms{alg_idx}
-            case {'GD'}
+            case {'SD'}
                 
                 options.step_init = 0.05;
                 options.max_epoch = options.max_epoch;
-                [w_list{alg_idx}, info_list{alg_idx}] = gd(problem, options);
+                [w_list{alg_idx}, info_list{alg_idx}] = sd(problem, options);
 
             case {'SGD'} 
 

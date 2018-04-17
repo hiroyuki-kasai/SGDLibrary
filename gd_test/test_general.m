@@ -9,8 +9,10 @@ function  test_general()
     if 0
         algorithms = gd_solver_list('ALL');  
     else
-        %algorithms = gd_solver_list('BFGS'); 
+        algorithms = gd_solver_list('BFGS'); 
         algorithms = {'L-BFGS-WOLFE','SD-STD','SD-BKT','Newton-STD','Newton-DAMP','Newton-CHOLESKY','NCG-BTK'};
+        %algorithms = {'TR-NEWTON','TR-QUASI-NEWTON','L-BFGS-WOLFE'};
+        algorithms = {'TR-DOGLEG-QUASI-NEWTON','TR-CAUCHY-QUASI-NEWTON','TR-TRUSTONE-QUASI-NEWTON','TR-CG-QUASI-NEWTON','L-BFGS-WOLFE'};    
     end
 
      
@@ -32,13 +34,22 @@ function  test_general()
         h = @(x) [1200 * x(1)^2, 0; 0 0.12 * x(2)^2];  
         w_init = [1; 1];     
         
-    elseif 1
+    elseif 0
         % f = sqrt(1+(1).^2) + sqrt(1+x(2).^2)
         d = 2;
         f = @(x) sqrt(1+x(1).^2) + sqrt(1+x(2).^2);
         g = @(x) [x(1)/sqrt(x(1).^2+1); x(2)/sqrt(x(2).^2+1)];   
         h = @(x) [1/(x(1).^2+1).^1.5,0; 0, 1/(x(2).^2+1).^1.5];  
         w_init = [10; 10]; 
+        
+    elseif 1
+        d = 2;
+        f = @(x)7/5+(x(1)+2*x(2)+2*x(1)*x(2)-5*x(1)^2-5*x(2)^2)/(5* exp(x(1)^2+x(2)^2));
+        g = @(x)[(1+2*x(2)-10*x(1)-2*x(1)*(x(1)+ 2*x(2)+2*x(1)*x(2)-5*x(1)^2 -5*x(2)^2))/(5* exp(x(1)^2+x(2)^2)); 
+                (2+2*x(1)-10*x(2)-2*x(2)*(x(1)+2*x(2)+ 2*x(1)*x(2)-5*x(1)^2 -5*x(2)^2))/(5* exp(x(1)^2+x(2)^2))];
+        h = @(x) [];
+                
+        w_init = [0;0.5];
         
     end
     
@@ -72,6 +83,42 @@ function  test_general()
         options.store_w = true;
 
         switch algorithms{alg_idx}
+            case {'TR-DOGLEG-NEWTON'}
+                
+                options.H_mode = 'NEWTON';
+                [w_list{alg_idx}, info_list{alg_idx}] = tr(problem, options);  
+                
+            case {'TR-DOGLEG-QUASI-NEWTON'}
+                
+                options.H_mode = 'QUASI-NEWTON';
+                options.subprob_solver = 'DOGLEG';
+                [w_list{alg_idx}, info_list{alg_idx}] = tr(problem, options);   
+                
+            case {'TR-CAUCHY-QUASI-NEWTON'}
+                
+                options.H_mode = 'QUASI-NEWTON';
+                options.subprob_solver = 'CAUCHY';
+                [w_list{alg_idx}, info_list{alg_idx}] = tr(problem, options);  
+                
+            case {'TR-TRUSTONE-QUASI-NEWTON'}
+                
+                options.H_mode = 'QUASI-NEWTON';
+                options.subprob_solver = 'TRUSTONE';
+                [w_list{alg_idx}, info_list{alg_idx}] = tr(problem, options); 
+                
+            case {'TR-CG-QUASI-NEWTON'}
+                
+                options.H_mode = 'QUASI-NEWTON';
+                options.subprob_solver = 'CG';
+                [w_list{alg_idx}, info_list{alg_idx}] = tr(problem, options);       
+                
+%             case {'TR-Lanczos-QUASI-NEWTON'}
+%                 
+%                 options.H_mode = 'QUASI-NEWTON';
+%                 options.subprob_solver = 'Lanczos';
+%                 [w_list{alg_idx}, info_list{alg_idx}] = tr(problem, options);                 
+
+                
             case {'SD-STD'}
                 
                 options.step_alg = 'fix';
@@ -237,8 +284,9 @@ function  test_general()
     close all;
     
     % display iter vs cost/gnorm
-    display_graph('iter','cost', algorithms, w_list, info_list);
-    display_graph('iter','gnorm', algorithms, w_list, info_list);  
+    display_graph('iter','optimality_gap', algorithms, w_list, info_list);
+    display_graph('time','optimality_gap', algorithms, w_list, info_list);
+    %display_graph('iter','gnorm', algorithms, w_list, info_list);  
     
     % draw convergence sequence
     w_history = cell(1);

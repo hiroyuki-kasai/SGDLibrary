@@ -33,6 +33,12 @@ function [w, infos] = subsamp_newton(problem, options)
     end
     step = step_init;
     
+    if ~isfield(options, 'step_alg')
+        step_alg = 'backtracking';
+    else
+        step_alg  = options.step_alg;
+    end      
+    
     if ~isfield(options, 'tol_optgap')
         tol_optgap = 1.0e-12;
     else
@@ -75,14 +81,14 @@ function [w, infos] = subsamp_newton(problem, options)
         store_w = options.store_w;
     end
     
-    if ~isfield(options, 'step_init_alg')
-        % Do nothing
-    else
-        if strcmp(options.step_init_alg, 'bb_init')
-            % initialize by BB step-size
-            step_init = bb_init(problem, w);
-        end
-    end 
+%     if ~isfield(options, 'step_init_alg')
+%         % Do nothing
+%     else
+%         if strcmp(options.step_init_alg, 'bb_init')
+%             % initialize by BB step-size
+%             step_init = bb_init(problem, w);
+%         end
+%     end 
     
     if ~isfield(options, 'sub_mode')
         sub_mode = 'Uniform';
@@ -140,7 +146,7 @@ function [w, infos] = subsamp_newton(problem, options)
     start_time = tic();
 
     if verbose
-        fprintf('Sub-sampled Newton (%s): Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', sub_mode, iter, f_val, gnorm, optgap);
+        fprintf('Subsampled Newton (%s): Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', sub_mode, iter, f_val, gnorm, optgap);
     end       
 
     % main loop
@@ -182,7 +188,23 @@ function [w, infos] = subsamp_newton(problem, options)
         % calculate -Hv 
         [d,~] = pcg(H, -grad, 1e-6, 1000); 
         
+        % linesearch
+        if strcmp(step_alg, 'backtracking')
+            rho = 1/2;
+            c = 1e-4;
+            step = backtracking_line_search(problem, d, w, rho, c);
+        elseif strcmp(step_alg, 'tfocs_backtracking') 
+            if iter > 0
+                alpha = 1.05;
+                beta = 0.5; 
+                step = tfocs_backtracking_search(step, w, w_old, grad, grad_old, alpha, beta);
+            else
+                %step = step_init;
+            end            
+        end          
+        
         % update
+        w_old = w; 
         w = w + step * d;
         
         % proximal operator
@@ -196,6 +218,7 @@ function [w, infos] = subsamp_newton(problem, options)
         f_val = problem.cost(w);
         optgap = f_val - f_opt; 
         % calculate gradient
+        grad_old = -d;
         grad = problem.full_grad(w);           
         % calculate norm of gradient
         gnorm = norm(grad);
@@ -220,7 +243,7 @@ function [w, infos] = subsamp_newton(problem, options)
        
         % print info
         if verbose
-            fprintf('Sub-sampled Newton (%s): Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', sub_mode, iter, f_val, gnorm, optgap);
+            fprintf('Subsampled Newton (%s): Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', sub_mode, iter, f_val, gnorm, optgap);
         end        
     end
     
