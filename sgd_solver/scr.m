@@ -168,7 +168,7 @@ function [w, infos] = scr(problem, in_options)
         
         %% II: Step computation
         % (Step.3) (a) recompute gradient either because of accepted step or because of re-sampling
-        if options.gradient_sampling == true || successful_flag == true
+        if options.gradient_sampling == 1 || successful_flag == 1
             %grad = gradient_f(w, new_X2, new_Y2, alpha);
             grad = problem.grad(w, sub_grad_indices');
             grad_norm = norm(grad);
@@ -195,7 +195,9 @@ function [w, infos] = scr(problem, in_options)
        
         rho = function_decrease / model_decrease;
         if model_decrease >=0
-            %fprintf('negative model decrease (%e). This should not have happened\n', model_decrease);
+            if options.verbose > 2
+                fprintf('\tNegative model decrease (%e). This should not have happened\n', model_decrease);
+            end
         end
         
         % (Step.6) update w if step s is successful in Eq.(7)

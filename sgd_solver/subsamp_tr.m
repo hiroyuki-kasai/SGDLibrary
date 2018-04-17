@@ -120,24 +120,35 @@ function [w, infos] = subsamp_tr(problem, in_options)
         
         % b) draw batches
         if sample_size_Hessian < n
-            int_idx_Hessian = 1:sample_size_Hessian; % KY
+            int_idx_Hessian = randi([1, n], sample_size_Hessian,1); % KY
             bool_idx_Hessian = false(n,1);
             bool_idx_Hessian(int_idx_Hessian) = true;
-            sub_hess_indices = find(bool_idx_Hessian);
+            sub_hess_indices = find(bool_idx_Hessian);            
         else
             sub_hess_indices = 1:n;
         end
         
         if sample_size_gradient < n
-            int_idx_gradient = 1:sample_size_gradient; % KY
+            int_idx_gradient = randi([1, n], sample_size_gradient,1);
             bool_idx_gradient = false(n,1);
             bool_idx_gradient(int_idx_gradient) = true;
-            sub_grad_indices = find(bool_idx_gradient);
+            sub_grad_indices = find(bool_idx_gradient);            
         else
             sub_grad_indices = 1:n;
         end
         
         n_samples_per_step = sample_size_Hessian+sample_size_gradient;
+        
+        
+        % recompute gradient either because of accepted step or because of re-sampling
+        if options.gradient_sampling == 1 || successful_flag == 1
+            %grad = gradient_f(w, new_X2, new_Y2, alpha);
+            grad = problem.grad(w, sub_grad_indices');
+            grad_norm = norm(grad);
+            if grad_norm < options.grad_tol
+                break;
+            end
+        end        
         
         %% II: Step computation
         % b) call subproblem solver
@@ -184,15 +195,15 @@ function [w, infos] = subsamp_tr(problem, in_options)
             trstr = '   ';
         end
         
-        % recompute gradient either because of accepted step or because of re-sampling
-        if options.gradient_sampling == true || successful_flag == true
-            %grad = gradient_f(w, new_X2, new_Y2, alpha);
-            grad = problem.grad(w, sub_grad_indices');
-            grad_norm = norm(grad);
-            if grad_norm < options.grad_tol
-                break;
-            end
-        end
+%         % recompute gradient either because of accepted step or because of re-sampling
+%         if options.gradient_sampling == 1 || successful_flag == 1
+%             %grad = gradient_f(w, new_X2, new_Y2, alpha);
+%             grad = problem.grad(w, sub_grad_indices');
+%             grad_norm = norm(grad);
+%             if grad_norm < options.grad_tol
+%                 break;
+%             end
+%         end
 
         
         % measure elapsed time
