@@ -1,4 +1,4 @@
-function test_inexact_hessian()
+function comp_inexact_hessian()
 % demonstration file for SGDLibrary.
 %
 % This file illustrates test comparisons between various inexact
