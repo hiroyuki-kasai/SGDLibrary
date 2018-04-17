@@ -18,7 +18,7 @@ function [w, infos] = scr(problem, in_options)
 % This file is part of SGDLibrary.
 %
 % Ported to MATLAB code by K.Yoshikawa and H.Kasai on March, 2018.
-% Modified by H.Kasai on Apri. 05, 2018
+% Modified by H.Kasai on Apr. 17, 2018
 
     % set dimensions and samples
     d = problem.dim();
@@ -218,7 +218,7 @@ function [w, infos] = scr(problem, in_options)
             trstr = 'CR+';
         elseif rho < options.successful_threshold
             sigma = options.penalty_increase_multiplier * sigma;
-            successful_flag = false  ; 
+            successful_flag = false; 
             %fprintf('unscuccesful iteration\n');
             trstr = 'CR-';
         else

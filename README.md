@@ -82,12 +82,12 @@ International Conference on Artificial Intelligence and Statistics (AISTATS), pp
         - X. Wang, S. Ma, D. Goldfarb and W. Liu, "[Stochastic quasi-Newton methods for nonconvex stochastic 
 optimization](https://arxiv.org/pdf/1607.01231v3.pdf)," arXiv preprint arXiv:1607.01231, 2016.
     - IQN (incremental Quasi-Newton method)
-        - A. Mokhtari, M. Eisen, and A. Ribeiro, "[An Incremental Quasi-Newton Method with a Local Superlinear Convergence Rate](https://arxiv.org/abs/1702.00709)," ICASSP2017, 2017.
+        - A. Mokhtari, M. Eisen and A. Ribeiro, "[An Incremental Quasi-Newton Method with a Local Superlinear Convergence Rate](https://arxiv.org/abs/1702.00709)," ICASSP2017, 2017.
 - **Inexact Hessian variants**
     - SCR (Sub-sampled Cubic Regularization)
         - J. M. Kohler and A. Lucchi, "[Sub-sampled Cubic Regularization for non-convex optimization](http://proceedings.mlr.press/v70/kohler17a.html)," ICML, 2017.
     - Sub-sampled TR (trust region)
-        - A. R. Conn, N. I. Gould, P. L. Toint, "[Trust region methods](https://epubs.siam.org/doi/book/10.1137/1.9780898719857)," MOS-SIAM Series on Optimization, 2000.
+        - A. R. Conn, N. I. Gould and P. L. Toint, "[Trust region methods](https://epubs.siam.org/doi/book/10.1137/1.9780898719857)," MOS-SIAM Series on Optimization, 2000.
 - **Else**
     - SVRG-BB (stochastic variance reduced gradient with Barzilai-Borwein)
         - C. Tan, S. Ma, Y. Dai, Y. Qian, "[Barzilai-Borwein step size for stochastic gradient descent](https://arxiv.org/pdf/1605.04131v2.pdf)," NIPS, 2016.

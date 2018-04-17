@@ -16,7 +16,7 @@ function [w, infos] = subsamp_tr(problem, in_options)
 % This file is part of SGDLibrary.
 %
 % Ported to MATLAB code by K.Yoshikawa and H.Kasai on March, 2018.
-% Modified by H.Kasai on Apr. 05, 2018         
+% Modified by H.Kasai on Apr. 17, 2018         
 
 
     % set dimensions and samples
@@ -146,6 +146,7 @@ function [w, infos] = subsamp_tr(problem, in_options)
             grad = problem.grad(w, sub_grad_indices');
             grad_norm = norm(grad);
             if grad_norm < options.grad_tol
+                fprintf('Norm of gradient (%e) reached: grad_tol = %g\n', grad_norm, options.grad_tol);
                 break;
             end
         end        
@@ -166,11 +167,16 @@ function [w, infos] = subsamp_tr(problem, in_options)
         Hs = problem.hess_vec(w, s, sub_hess_indices);
         
         model_decrease = -((grad'*s) + 0.5 * (s'*Hs));
-        rho = function_decrease / model_decrease;
 
-        assert((model_decrease >=0), 'negative model decrease. This should not have happend');
+        rho = function_decrease / model_decrease;
         
-        % Update w if step s is successful
+        if model_decrease >=0
+            if options.verbose > 2
+                fprintf('\tNegative model decrease (%e). This should not have happened\n', model_decrease);
+            end
+        end        
+
+        % update w if step s is successful
         if rho >= options.successful_treshold
             w = w + s;
             loss = f_curr;
