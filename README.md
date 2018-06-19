@@ -21,7 +21,7 @@ Document
 ----------
 The document of SGDLibrary can be obtained from below;
 
-- H. Kasai, "[SGDLibrary: A MATLAB library for stochastic optimization algorithms](http://arxiv.org/abs/1710.10951)," Journal of Machine Learning Research (JMLR), vol.19, 2018 (arXiv preprint arXiv:1710.10951).
+- H. Kasai, "[SGDLibrary: A MATLAB library for stochastic optimization algorithms](http://www.jmlr.org/papers/v18/17-632.html)," Journal of Machine Learning Research (JMLR), vol.18, no.215, 2018 (arXiv preprint [arXiv:1710.10951](https://arxiv.org/abs/1710.10951)).
 
 
 <br />
