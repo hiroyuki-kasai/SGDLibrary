@@ -320,7 +320,7 @@ display_classification_result(problem, {'SGD', 'SVRG'}, {w_sgd, w_svrg}, {y_pred
 
 Output results:
 
-<img src="http://www.kasailab.com/Public/Github/SGDLibrary/images/log_reg_results.png" width="900">
+<img src="http://www.kasailab.com/public/github/SGDLibrary/images/log_reg_results.png" width="900">
 <br /><br />
 
 
@@ -348,15 +348,15 @@ Example results of other problems
 
 - Linear regression problem  
 
-<img src="http://www.kasailab.com/Public/Github/SGDLibrary/images/linear_reg_results.png" width="900">
+<img src="http://www.kasailab.com/public/github/SGDLibrary/images/linear_reg_results.png" width="900">
 
 - Softmax classifier problem
 
-<img src="http://www.kasailab.com/Public/Github/SGDLibrary/images/soft_class_results.png" width="900">
+<img src="http://www.kasailab.com/public/github/SGDLibrary/images/soft_class_results.png" width="900">
 
 - Linear SVM problem
 
-<img src="http://www.kasailab.com/Public/Github/SGDLibrary/images/linear_svm_results.png" width="900">
+<img src="http://www.kasailab.com/public/github/SGDLibrary/images/linear_svm_results.png" width="900">
 <br /><br />
 
 
@@ -367,7 +367,7 @@ Convergence behavior animation example (Linear regression problem)
 
 **"test_convergence_animation_demo.m"** provides you an animation of convergence behaviors of algorithms. Please click the image below to see its animation.
 
-[<img src="http://www.kasailab.com/Public/Github/SGDLibrary/images/convergence_anime_screenshot.png" width="900">](http://www.kasailab.com/Public/Github/SGDLibrary/gifs/convergence_anime_new.gif)
+[<img src="http://www.kasailab.com/public/github/SGDLibrary/images/convergence_anime_screenshot.png" width="900">](http://www.kasailab.com/public/github/SGDLibrary/gifs/convergence_anime_new.gif)
 <br /><br />
 
 
