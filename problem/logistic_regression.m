@@ -127,16 +127,17 @@ classdef logistic_regression
         end
 
         function h = hess(obj, w, indices)
-
             %org code
             %temp = exp(-1*(y_train(indices)').*(x_train(:,indices)'*w));
             %b = temp ./ (1+temp);
             %h = 1/length(indices)*x_train(:,indices)*(diag(b-b.^2)*(x_train(:,indices)'))+lambda*eye(d); 
 
             sigm_val = sigmoid(obj.y_train(indices).*(w'*obj.x_train(:,indices)));
-            c = sigm_val .* (ones(1,length(indices))-sigm_val); 
-            h = 1/length(indices)* obj.x_train(:,indices) * diag(obj.y_train(indices).^2 .* c) * obj.x_train(:,indices)'+obj.lambda*eye(obj.d);
-
+            c = sigm_val .* (ones(1,length(indices))-sigm_val);
+          
+            %h = 1/length(indices)* obj.x_train(:,indices) * diag(obj.y_train(indices).^2 .* c) * obj.x_train(:,indices)'+obj.lambda*eye(obj.d);
+            B = bsxfun(@times,obj.x_train(:,indices), obj.y_train(indices).*sqrt(c));
+            h = 1/length(indices) * (B*B') + obj.lambda*eye(obj.d);
         end
 
         function h = full_hess(obj, w)
@@ -197,7 +198,6 @@ classdef logistic_regression
             end
         end
 
-
         %% for NIM
         function [labels, samples] = get_partial_samples(obj, indices)
             samples = obj.x_train(:,indices);
@@ -215,14 +215,17 @@ classdef logistic_regression
             ss = s .* (1.0 - s);
         end
 
-
         %% for Sub-sampled Newton
-        function h = diag_based_hess(obj, w, indices, square_hess_diag)
-            X = obj.x_train(:,indices)';
-            h = X' * diag(square_hess_diag) * X / length(indices) + obj.lambda * eye(obj.d);
-        end  
-
+        function h = diag_based_hess(obj, ~, indices, square_hess_diag)
+            %X = obj.x_train(:,indices);
+            %h = X * diag(square_hess_diag) * X' / length(indices) + obj.lambda * eye(obj.d);
+            %fprintf("x_train size = %d, %d, sq_hess size = %d, %d", size(obj.x_train(:,indices)), size(square_hess_diag));      
+            B = bsxfun(@times, obj.x_train(:,indices), sqrt(square_hess_diag'));
+            h = 1/length(indices) * (B*B') + obj.lambda*eye(obj.d);
+        end
+        %% select diag Hessian of indices from n 
         function square_hess_diag = calc_square_hess_diag(obj, w, indices)
+            % H(x) = sigmoid(x).*(1-sigmoid(x));
             %hess_diag = 1./(1+exp(Y.*(X*w)))./(1+exp(-Y.*(X*w)));
             Xw = obj.x_train(:,indices)'*w;
             y = obj.y_train(indices)';
@@ -232,4 +235,3 @@ classdef logistic_regression
 
     end
 end
-
