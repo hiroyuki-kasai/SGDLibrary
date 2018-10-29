@@ -113,8 +113,7 @@ function [w, infos] = newton(problem, options)
             step_init = bb_init(problem, w);
         end
     end    
-    
-    
+        
     % initialise
     iter = 0;
     
@@ -225,7 +224,7 @@ function [w, infos] = newton(problem, options)
        
         % print info
         if verbose
-            fprintf('Newton (%s,%s): Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', sub_mode, step_alg, iter, f_val, gnorm, optgap);
+            fprintf('Newton (%s,%s): Iter = %03d, cost = %.6e, gnorm = %.4e, optgap = %.4e\n', sub_mode, step_alg, iter, f_val, gnorm, optgap);
         end        
     end
     

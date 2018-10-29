@@ -73,7 +73,7 @@ classdef lasso
         end
 
         % calculate l1 norm
-        function r = reg(obj,w)
+        function r = reg(obj, w)
             r = norm(w,1);
         end
 
@@ -81,7 +81,7 @@ classdef lasso
             r = - obj.A * w + obj.b;
         end
 
-        function f = cost_batch(obj,w, indices)
+        function f = cost_batch(obj, w, indices)
             error('Not implemted yet.');        
         end
 
@@ -95,11 +95,11 @@ classdef lasso
             g = A_partial' * (A_partial * w - obj.b);        
         end
 
-        function h = hess(obj,w, indices)
+        function h = hess(obj, w, indices)
             error('Not implemted yet.');        
         end
 
-        function h = full_hess(obj,w)
+        function h = full_hess(obj, w)
             h = obj.AtA;       
         end
 

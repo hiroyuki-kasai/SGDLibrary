@@ -76,7 +76,6 @@ function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, inf
             else
             end
             
-            
             if strcmp(y_category, 'cost')
                 y_plot_data = info_list{alg_idx}.cost;
             elseif strcmp(y_category, 'optimality_gap')

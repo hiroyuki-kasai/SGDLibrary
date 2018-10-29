@@ -9,10 +9,10 @@ function [] = test_lasso()
     if 0
         algorithms = gd_solver_list('ALL');  
     else
-        algorithms = {'PG-BKT', 'PG-TFOCS-BKT', 'APG-BKT', 'APG-TFOCS-BKT', 'CD-LASSO', 'FISTA', 'ADMM-LASSO'}; 
-%        algorithms = {'FISTA'};
+        %algorithms = {'PG-BKT', 'PG-TFOCS-BKT', 'APG-BKT', 'APG-TFOCS-BKT', 'CD-LASSO', 'FISTA', 'ADMM-LASSO'}; 
+%       algorithms = {'FISTA'};
+        algorithms = {'L-BFGS-BKT', 'ADMM-LASSO'};
     end    
-    
     
     %% prepare dataset
     if 1   

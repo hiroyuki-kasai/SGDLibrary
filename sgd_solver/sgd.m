@@ -16,7 +16,7 @@ function [w, infos] = sgd(problem, in_options)
 
     % set dimensions and samples
     d = problem.dim();
-    n = problem.samples();  
+    n = problem.samples();
 
     % set local options 
     local_options = [];

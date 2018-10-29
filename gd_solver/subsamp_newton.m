@@ -19,11 +19,9 @@ function [w, infos] = subsamp_newton(problem, options)
 % Originally modified by H.Kasai on Mar. 16, 2017
 % Modified by H.Kasai on Mar. 25, 2018
 
-
     % set dimensions and samples
     d = problem.dim();
     n = problem.samples();  
-
 
     % extract options
     if ~isfield(options, 'step_init')
@@ -115,8 +113,7 @@ function [w, infos] = subsamp_newton(problem, options)
     else
         r = options.r;
     end     
-    
-    
+   
     % initialise
     iter = 0;
     
@@ -141,36 +138,40 @@ function [w, infos] = subsamp_newton(problem, options)
         rnorms = problem.x_norm();
     end    
 
-    
     % set start time
     start_time = tic();
 
     if verbose
-        fprintf('Subsampled Newton (%s): Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', sub_mode, iter, f_val, gnorm, optgap);
+        fprintf('optgap = %5.3e, tol_optgap = %5.3e\n', optgap, tol_optgap);
+        fprintf('Subsampled Newton (%s): Iter = %03d, cost = %.4e, gnorm = %.4e, optgap = %.4e\n', sub_mode, iter, f_val, gnorm, optgap);
     end       
 
     % main loop
-    while (optgap > tol_optgap) && (gnorm > tol_gnorm) && (iter < max_iter)   
+    while (optgap > tol_optgap) && (gnorm > tol_gnorm) && (iter < max_iter)
         
         if strcmp(sub_mode, 'Uniform')
-
-            idx = randsample(n,subsamp_hess_size); % Sampling without replacement
+            if subsamp_hess_size < n
+                idx = randsample(n, subsamp_hess_size); % Sampling without replacement
+            elseif  subsamp_hess_size == n
+                idx = 1:n;
+            else
+                printf("ERROR");
+            end
             sub_square_hess_diag = problem.calc_square_hess_diag(w, idx);
             H = problem.diag_based_hess(w, idx, sub_square_hess_diag);
             
         elseif strcmp(sub_mode, 'RNS')
 
             square_hess_diag = problem.calc_square_hess_diag(w, 1:n);
-            p = square_hess_diag.*rnorms';
-            p = p/sum(p);              
+            p = square_hess_diag .* rnorms';
+            p = p/sum(p);
             q = min(1, p*subsamp_hess_size);
             
             idx = rand(n,1)<q;
             p_sub = q(idx);
             H = problem.diag_based_hess(w, idx, square_hess_diag(idx)./p_sub);
             
-        elseif strcmp(sub_mode, 'LS')
-            
+        elseif strcmp(sub_mode, 'LS') % leverage score
             % re-approximating scores every hess_update_freq iterations but never reweighting
             if mod(iter,hess_update_freq) == 0
                 square_hess_diag = problem.calc_square_hess_diag(w, 1:n);
@@ -178,15 +179,20 @@ function [w, infos] = subsamp_newton(problem, options)
                 p0 = lev/sum(lev);
                 q = min(1,p0*subsamp_hess_size);
             end
-            
-            idx = rand(n,1)<q; 
+            idx = rand(n,1)<q;
             p_sub = q(idx);
             sub_square_hess_diag = problem.calc_square_hess_diag(w, idx);
             H = problem.diag_based_hess(w, idx, sub_square_hess_diag./p_sub);
         end
 
-        % calculate -Hv 
-        [d,~] = pcg(H, -grad, 1e-6, 1000); 
+        % step 2: calculate H*(-g) 
+        %[d,~] = pcg(H, -grad, 1e-6, 1000); % Preconditioned Conjugate Gradients Method
+        [L, p] = chol(H, 'upper');
+        if p==0
+            d = -L' \ ( L \ grad);
+        else
+            d = grad;
+        end 
         
         % linesearch
         if strcmp(step_alg, 'backtracking')
@@ -201,7 +207,7 @@ function [w, infos] = subsamp_newton(problem, options)
             else
                 %step = step_init;
             end            
-        end          
+        end
         
         % update
         w_old = w; 
@@ -216,7 +222,7 @@ function [w, infos] = subsamp_newton(problem, options)
         iter = iter + 1;
         % calculate error
         f_val = problem.cost(w);
-        optgap = f_val - f_opt; 
+        optgap = f_val - f_opt;
         % calculate gradient
         grad_old = -d;
         grad = problem.full_grad(w);           
@@ -232,20 +238,20 @@ function [w, infos] = subsamp_newton(problem, options)
         infos.grad_calc_count = [infos.grad_calc_count iter*n];      
         infos.optgap = [infos.optgap optgap];        
         infos.cost = [infos.cost f_val];
-        infos.gnorm = [infos.gnorm gnorm]; 
+        infos.gnorm = [infos.gnorm gnorm];
         if ismethod(problem, 'reg')
             reg = problem.reg(w);
             infos.reg = [infos.reg reg];
-        end 
+        end
         if store_w
             infos.w = [infos.w w];         
         end        
        
         % print info
         if verbose
-            fprintf('Subsampled Newton (%s): Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', sub_mode, iter, f_val, gnorm, optgap);
+            fprintf('Subsampled Newton (%s): Iter = %03d, cost = %.4e, gnorm = %.4e, optgap = %.4e\n', sub_mode, iter, f_val, gnorm, optgap);
         end        
-    end
+    end %end of while
     
     if gnorm < tol_gnorm
         fprintf('Gradient norm tolerance reached: tol_gnorm = %g\n', tol_gnorm);
@@ -256,7 +262,6 @@ function [w, infos] = subsamp_newton(problem, options)
     end    
     
 end
-
 
 % Originally created by Peng Xu, Jiyan Yang on Feb. 20, 2016 (https://github.com/git-xp/Subsampled-Newton)
 % Modified by H.Kasai on Mar. 16, 2017

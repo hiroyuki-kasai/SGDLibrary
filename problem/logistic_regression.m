@@ -175,7 +175,7 @@ classdef logistic_regression
 
             if nargin < 3
                 method = 'lbfgs';
-            end        
+            end
 
             options.max_iter = maxiter;
             options.verbose = true;
@@ -219,7 +219,6 @@ classdef logistic_regression
         function h = diag_based_hess(obj, ~, indices, square_hess_diag)
             %X = obj.x_train(:,indices);
             %h = X * diag(square_hess_diag) * X' / length(indices) + obj.lambda * eye(obj.d);
-            %fprintf("x_train size = %d, %d, sq_hess size = %d, %d", size(obj.x_train(:,indices)), size(square_hess_diag));      
             B = bsxfun(@times, obj.x_train(:,indices), sqrt(square_hess_diag'));
             h = 1/length(indices) * (B*B') + obj.lambda*eye(obj.d);
         end

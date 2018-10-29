@@ -71,13 +71,14 @@ classdef l1_logistic_regression
             obj.x = obj.x_train;
         end
 
-
         function v = prox(obj, w, t) % l1 soft threshholding
             v = soft_thresh(w, t * obj.lambda);
         end     
 
-        function f = cost(obj, w)
-
+       function f = cost(obj, w)
+%             fprintf('y_train dim: (%d,%d) \n', size(obj.y_train));
+%             fprintf('x_train dim: (%d,%d) \n', size(obj.x_train));
+%             fprintf('w dim:       (%d,%d) \n', size(w));
             f = -sum(log(sigmoid(obj.y_train.*(w'*obj.x_train))),2)/obj.n_train + obj.lambda * norm(w,1);
 
         end
@@ -117,13 +118,13 @@ classdef l1_logistic_regression
 
             sigm_val = sigmoid(obj.y_train(indices).*(w'*obj.x_train(:,indices)));
             c = sigm_val .* (ones(1,length(indices))-sigm_val); 
-            h = 1/length(indices)* obj.x_train(:,indices) * diag(obj.y_train(indices).^2 .* c) * obj.x_train(:,indices)';
+            %h = 1/length(indices)* obj.x_train(:,indices) * diag(obj.y_train(indices).^2 .* c) * obj.x_train(:,indices)';
+            B = bsxfun(@times,obj.x_train(:,indices), obj.y_train(indices).*sqrt(c));
+            h = 1/length(indices) * (B*B');
         end
 
         function h = full_hess(obj, w)
-
             h = obj.hess(w, 1:obj.n_train);
-
         end
 
         function hv = hess_vec(obj, w, v, indices)

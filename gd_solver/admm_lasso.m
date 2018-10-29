@@ -167,7 +167,7 @@ function [w, infos] = admm_lasso(problem, options)
        
         % print info
         if verbose
-            fprintf('ADMM Lasso: Iter = %03d, cost = %.24e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
+            fprintf('ADMM Lasso: Iter = %03d, cost = %.6e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
         end        
     end
     

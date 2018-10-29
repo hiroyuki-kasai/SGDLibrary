@@ -17,9 +17,9 @@ function [data] = logistic_regression_data_generator(n, d)
 % Created H.Kasai on Oct. 25, 2016
 
     % true
-    w_opt = randn(d, 1);  
+    w_opt = randn(d, 1);
     %w_opt = 0.5 * ones(d, 1);
-    data.w_opt = w_opt;    
+    data.w_opt = w_opt;   
 
     % train data
     x1 = 20 * randn(d, n);

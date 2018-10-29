@@ -10,7 +10,10 @@ function [] = test_l1_logistic_regression()
         algorithms = gd_solver_list('ALL');  
     else
         %algorithms = {'PG-BKT', 'PG-TFOCS-BKT', 'APG-BKT', 'APG-TFOCS-BKT', 'Newton-CHOLESKY', 'NCG-BKT','L-BFGS-TFOCS'};
-        algorithms = {'APG-BKT', 'APG-TFOCS-BKT'};
+        %algorithms = {'APG-BKT', 'APG-TFOCS-BKT'};
+        algorithms = {'L-BFGS-TFOCS', 'Newton-CHOLESKY', 'ADMM-SUBNEWTON'};
+        
+        %algorithms = {'ADMM-SUBNEWTON'};
     end    
     
     
@@ -18,10 +21,12 @@ function [] = test_l1_logistic_regression()
     if 1
         % generate synthtic data        
         d = 100;
-        n = 1000;
+        n = 65535;
         data = logistic_regression_data_generator(n, d);
         x_train = data.x_train;
-        y_train = data.y_train;    
+        y_train = data.y_train;
+        fprintf('x_train size : (%d, %d)', size(x_train));
+        fprintf('y_train size : (%d, %d)\n', size(y_train));
         x_test = data.x_test;
         y_test = data.y_test;          
         d = size(x_train,1);
@@ -129,7 +134,11 @@ function [] = test_l1_logistic_regression()
                 options.step_alg = 'backtracking'; 
                 %options.step_alg = 'tfocs_backtracking';
                 %options.beta_alg = 'PR';                
-                [w_list{alg_idx}, info_list{alg_idx}] = ncg(problem, options);                
+                [w_list{alg_idx}, info_list{alg_idx}] = ncg(problem, options);
+                
+            case {'ADMM-SUBNEWTON'}
+                                        
+                [w_list{alg_idx}, info_list{alg_idx}] = admm_sub_newton(problem, options);
                 
             otherwise
                 warn_str = [algorithms{alg_idx}, ' is not supported.'];
@@ -139,7 +148,6 @@ function [] = test_l1_logistic_regression()
         end
         
     end
-    
     
     fprintf('\n\n');
     
