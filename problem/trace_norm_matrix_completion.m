@@ -62,7 +62,7 @@ classdef trace_norm_matrix_completion
             diff = (L - obj.A.*obj.mask) .* (obj.A.*obj.mask ~= 0);
             trace_norm = reg(obj, w);
 
-            f = 1/2 * norm(diff, 'fro') + obj.lambda * trace_norm;
+            f = 1/2 * norm(diff, 'fro')^2 + obj.lambda * trace_norm;
         end
 
         % calculate trace norm
