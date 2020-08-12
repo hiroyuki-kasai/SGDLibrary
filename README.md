@@ -11,7 +11,7 @@ Latest library version: 1.0.17 (see Release notes for more info)
 
 Introduction
 ----------
-The SGDLibrary is a **pure-MATLAB** library of a collection of **stochastic optimization algorithms**. This solves an unconstrained minimization problem of the form, min f(x) = sum_i f_i(x).
+The SGDLibrary is a **pure-MATLAB** library or toolbox of a collection of **stochastic optimization algorithms**. This solves an unconstrained minimization problem of the form, min f(x) = sum_i f_i(x).
 The SGDLibrary is also operable on [GNU Octave](https://www.gnu.org/software/octave/) (Free software compatible with many MATLAB scripts).
 Note that this SGDLibrary internally contains the [GDLibrary](https://github.com/hiroyuki-kasai/GDLibrary).
 
