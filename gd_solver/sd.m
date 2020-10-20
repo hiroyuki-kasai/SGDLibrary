@@ -1,9 +1,9 @@
-function [w, infos] = sd(problem, options)
+function [w, infos] = sd(problem, in_options)
 % Full steepest descent gradient algorithm.
 %
 % Inputs:
 %       problem     function (cost/grad/hess)
-%       options     options
+%       in_options  options
 % Output:
 %       w           solution of w
 %       infos       information
@@ -12,160 +12,84 @@ function [w, infos] = sd(problem, options)
 %
 % Created by H.Kasai on Feb. 15, 2016
 % Modified by H.Kasai on Mar. 23, 2018
+% Modified by H.Kasai on Oct. 20, 2020
 
 
     % set dimensions and samples
     d = problem.dim();
-    n = problem.samples();  
+    n = problem.samples(); 
+    
+    % set local options 
+    local_options = [];    
+    local_options.sub_mode = 'STANDARD';
 
+    % merge options
+    options = mergeOptions(get_default_options(d), local_options);   
+    options = mergeOptions(options, in_options);     
 
-    % extract options
-    if ~isfield(options, 'step_init')
-        step_init = 0.1;
-    else
-        step_init = options.step_init;
-    end
-    step = step_init;    
-    
-    if ~isfield(options, 'step_alg')
-        step_alg = 'backtracking';
-    else
-        step_alg  = options.step_alg;
-    end  
-   
-    if ~isfield(options, 'tol_optgap')
-        tol_optgap = 1.0e-12;
-    else
-        tol_optgap = options.tol_optgap;
-    end      
-    
-    if ~isfield(options, 'tol_gnorm')
-        tol_gnorm = 1.0e-12;
-    else
-        tol_gnorm = options.tol_gnorm;
-    end    
-    
-    if ~isfield(options, 'max_iter')
-        max_iter = 100;
-    else
-        max_iter = options.max_iter;
-    end 
-    
-    if ~isfield(options, 'verbose')
-        verbose = false;
-    else
-        verbose = options.verbose;
-    end   
-    
-    if ~isfield(options, 'w_init')
-        w = randn(d,1);
-    else
-        w = options.w_init;
-    end 
-    
-    if ~isfield(options, 'f_opt')
-        f_opt = -Inf;
-    else
-        f_opt = options.f_opt;
-    end    
-    
-    if ~isfield(options, 'store_w')
-        store_w = false;
-    else
-        store_w = options.store_w;
-    end    
-    
-    if ~isfield(options, 'sub_mode')
-        sub_mode = 'STANDARD';
-    else
-        sub_mode = options.sub_mode;
-    end 
-    
-    if ~isfield(options, 'step_init_alg')
-        % Do nothing
-    else
-        if strcmp(options.step_init_alg, 'bb_init')
-            % initialize by BB step-size
-            step_init = bb_init(problem, w);
-        end
-    end     
-   
     % initialise
     iter = 0;
     grad_calc_count = 0;
+    w = options.w_init;
     if ~isfield(options, 'S')
-        if strcmp(step_alg, 'exact')
+        if strcmp(options.step_alg, 'exact')
             S = eye(d);
         end        
     else    
         S = options.S;
     end
     
-%     % store first infos
-%     clear infos;
-%     infos.iter = iter;
-%     infos.time = 0;    
-%     infos.grad_calc_count = 0;    
-%     f_val = problem.cost(w);
-%     infos.cost = f_val;     
-%     optgap = f_val - f_opt;
-%     infos.optgap = optgap;
-%     grad = problem.full_grad(w);
-%     gnorm = norm(grad);
-%     infos.gnorm = gnorm;
-%     if ismethod(problem, 'reg')
-%         infos.reg = problem.reg(w);   
-%     end    
-%     if store_w
-%         infos.w = w;       
-%     end
+    % initialize by BB step-size 
+    if strcmp(options.step_init_alg, 'bb_init')
+        options.step_init = bb_init(problem, w);
+    end    
     
     % store first infos
     clear infos;    
     [infos, f_val, optgap, grad, gnorm] = store_infos(problem, w, options, [], iter, grad_calc_count, 0);
     
-    
-    % set start time
-    start_time = tic();  
-    
-    % print info
-    if verbose
+    % display info
+    if options.verbose
         if ~ismethod(problem, 'prox')
             fprintf('SD: Iter = %03d, cost = %.24e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
         else
             fprintf('PG: Iter = %03d, cost = %.24e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
         end
-    end      
+    end  
+    
+    % set start time
+    start_time = tic();      
 
     % main loop
-    while (optgap > tol_optgap) && (gnorm > tol_gnorm) && (iter < max_iter)        
+    while (optgap > options.tol_optgap) && (gnorm > options.tol_gnorm) && (iter < options.max_epoch)        
 
         % line search
-        if strcmp(step_alg, 'backtracking')
+        if strcmp(options.step_alg, 'backtracking')
             rho = 1/2;
             c = 1e-4;
             step = backtracking_line_search(problem, -grad, w, rho, c);
-        elseif strcmp(step_alg, 'exact')
+        elseif strcmp(options.step_alg, 'exact')
             ls_options.sub_mode = sub_mode;
             ls_options.S = S;
             step = exact_line_search(problem, 'SD', -grad, [], [], w, ls_options);
-        elseif strcmp(step_alg, 'strong_wolfe')
+        elseif strcmp(options.step_alg, 'strong_wolfe')
             c1 = 1e-4;
             c2 = 0.9;
             step = strong_wolfe_line_search(problem, -grad, w, c1, c2);
-        elseif strcmp(step_alg, 'tfocs_backtracking') 
+        elseif strcmp(options.step_alg, 'tfocs_backtracking') 
             if iter > 0
                 alpha = 1.05;
                 beta = 0.5; 
                 step = tfocs_backtracking_search(step, w, w_old, grad, grad_old, alpha, beta);
             else
-                step = step_init;
+                step = options.step_init;
             end
         else
+            step = options.step_init;
         end
         
         w_old = w;
-        if strcmp(sub_mode, 'SCALING')
+        if strcmp(options.sub_mode, 'SCALING')
             % diagonal scaling 
             if isempty(S)
                 h = problem.full_hess(w);
@@ -199,33 +123,8 @@ function [w, infos] = sd(problem, options)
         % store infos
         [infos, f_val, optgap, grad, gnorm] = store_infos(problem, w, options, infos, iter, grad_calc_count, elapsed_time);        
 
-        
-%         % calculate error
-%         f_val = problem.cost(w);
-%         optgap = f_val - f_opt;  
-%         % calculate norm of gradient
-%         gnorm = norm(grad);
-%         
-%         % measure elapsed time
-%         elapsed_time = toc(start_time);        
-% 
-%         % store infoa
-%         infos.iter = [infos.iter iter];
-%         infos.time = [infos.time elapsed_time];        
-%         infos.grad_calc_count = [infos.grad_calc_count iter*n];      
-%         infos.optgap = [infos.optgap optgap];        
-%         infos.cost = [infos.cost f_val];
-%         infos.gnorm = [infos.gnorm gnorm]; 
-%         if ismethod(problem, 'reg')
-%             reg = problem.reg(w);
-%             infos.reg = [infos.reg reg];
-%         end        
-%         if store_w
-%             infos.w = [infos.w w];         
-%         end        
-       
-        % print info
-        if verbose
+        % display infos
+        if options.verbose
             if ~isfield(problem, 'prox')
                 fprintf('SD: Iter = %03d, cost = %.24e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
             else
@@ -234,12 +133,12 @@ function [w, infos] = sd(problem, options)
         end        
     end
     
-    if gnorm < tol_gnorm
-        fprintf('Gradient norm tolerance reached: tol_gnorm = %g\n', tol_gnorm);
-    elseif optgap < tol_optgap
-        fprintf('Optimality gap tolerance reached: tol_optgap = %g\n', tol_optgap);        
-    elseif iter == max_iter
-        fprintf('Max iter reached: max_iter = %g\n', max_iter);
+    if gnorm < options.tol_gnorm
+        fprintf('Gradient norm tolerance reached: tol_gnorm = %g\n', options.tol_gnorm);
+    elseif optgap < options.tol_optgap
+        fprintf('Optimality gap tolerance reached: tol_optgap = %g\n', options.tol_optgap);        
+    elseif iter == options.max_epoch
+        fprintf('Max iter reached: max_epoch = %g\n', options.max_epoch);
     end    
     
 end
