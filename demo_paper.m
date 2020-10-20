@@ -2,7 +2,7 @@ function demo_paper()
 % demonstration file for SGDLibrary.
 %
 % This file illustrates how to use this library in case of linear
-% regression problem. This demonstrates SGD and SVRG algorithms.
+% regression problem. This demonstrates SGD, SVRG, SQN, and SVRG-LBFGS algorithms.
 %
 % This file is part of SGDLibrary.
 %

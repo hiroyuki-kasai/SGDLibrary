@@ -34,7 +34,7 @@ function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, inf
     
     % for plotting
     if strcmp(line_type, 'line')
-        linetype = {'r','b','c','g','m','y','r--','b--','c--','g--','m--','y--','r:','b:','c:','g:','m:','y:','r.','b.','c.','g.','m.','y.'};
+        linetype = {'r','b','m','g','c','y','r--','b--','c--','g--','m--','y--','r:','b:','c:','g:','m:','y:','r.','b.','c.','g.','m.','y.'};
     elseif strcmp(line_type, 'line-with-mark')
         linetype = {'ro-','bo-','mo-','go-','co-','yo-','r*-','b*-','m*-','g*-','c*-','y*-','r+--','b+--','m+--','g+--','c+--','y+--','rs:','bs:','ms:','gs:','cs:','ys:','r.','b.','c.','g.','m.','y.'};
     else

@@ -1,4 +1,4 @@
-function [  ] = draw_convergence_sequence(problem, opt_sol, algorithms_list, w_history, cost_history)
+function [  ] = draw_convergence_sequence(problem, opt_sol, algorithms_list, w_history, cost_history, varargin)
 % Draw convergence sequence.
 %
 % Inputs:
@@ -19,7 +19,8 @@ function [  ] = draw_convergence_sequence(problem, opt_sol, algorithms_list, w_h
     end         
 
     % for plotting
-    c_style =  {'r-*','b-*','c-*','y-*','m-*','g-*','r-*','b-*','c-*','y-*','m-*','g-*','r-*','b-*','c-*','y-*','m-*','g-*','r-*','b-*','c-*','y-*','m-*','g-*'};
+    c_style =  {'ro-','bo-','mo-','go-','co-','yo-','r*-','b*-','m*-','g*-','c*-','y*-','r+--','b+--','m+--','g+--','c+--','y+--','rs:','bs:','ms:','gs:','cs:','ys:','r.','b.','c.','g.','m.','y.'};
+  
     
     % calculate necessary # of algorithms
     alg_num = length(algorithms_list);  
@@ -29,30 +30,45 @@ function [  ] = draw_convergence_sequence(problem, opt_sol, algorithms_list, w_h
     x_range_max = -Inf;
     x_range_min = Inf;
     y_range_max = -Inf;
-    y_range_min = Inf;      
-    for alg_idx=1:alg_num
-        w = w_history{alg_idx};
-        
-        max_cost = max(cost_history{alg_idx});
-        
-        if ~(any(isinf(w(:))) || any(isnan(w(:)))) && (max_cost < 10e8)
-            if x_range_max <  max(w(1,:))
-                x_range_max = max(w(1,:));
-            end   
-            if x_range_min >  min(w(1,:))
-                x_range_min = min(w(1,:));
-            end  
+    y_range_min = Inf; 
+    
+    
+    if nargin < 6
+        for alg_idx=1:alg_num
+            w = w_history{alg_idx};
 
-             if y_range_max <  max(w(2,:))
-                y_range_max = max(w(2,:));
-            end   
-            if y_range_min >  min(w(2,:))
-                y_range_min = min(w(2,:));
-            end  
-        else
+            max_cost = max(cost_history{alg_idx});
+
+            if ~(any(isinf(w(:))) || any(isnan(w(:)))) && (max_cost < 10e8)
+                if x_range_max <  max(w(1,:))
+                    x_range_max = max(w(1,:));
+                end   
+                if x_range_min >  min(w(1,:))
+                    x_range_min = min(w(1,:));
+                end  
+
+                 if y_range_max <  max(w(2,:))
+                    y_range_max = max(w(2,:));
+                end   
+                if y_range_min >  min(w(2,:))
+                    y_range_min = min(w(2,:));
+                end  
+            else
+
+            end
+        end        
+    else
+        
+        range_input = varargin{1};
+
+        x_range_min = range_input.x_min;
+        x_range_max = range_input.x_max;
+        y_range_min = range_input.y_min;
+        y_range_max = range_input.y_max;        
+    end   
             
-        end
-    end
+    
+
     x_range = x_range_max - x_range_min;
     y_range = y_range_max - y_range_min;   
     x_range_max = x_range_max + x_range/4;
