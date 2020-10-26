@@ -121,19 +121,34 @@ function  test_rosenbrock()
                 
                 [w_list{alg_idx}, info_list{alg_idx}] = cg(problem, options); 
                 
-            case {'NCG-BTK'}
+            case {'NCG-PR-BTK'}
                 
                 options.sub_mode = 'STANDARD';                
                 options.step_alg = 'backtracking';      
                 options.beta_alg = 'PR';                
                 [w_list{alg_idx}, info_list{alg_idx}] = ncg(problem, options);    
                 
-            case {'NCG-WOLFE'}
+            case {'NCG-PR-WOLFE'}
                 
                 options.sub_mode = 'STANDARD';                
                 options.step_alg = 'strong_wolfe';      
                 options.beta_alg = 'PR';                
-                [w_list{alg_idx}, info_list{alg_idx}] = ncg(problem, options);                   
+                [w_list{alg_idx}, info_list{alg_idx}] = ncg(problem, options); 
+                
+                
+            case {'NCG-FR-BTK'}
+                
+                options.sub_mode = 'STANDARD';                
+                options.step_alg = 'backtracking';      
+                options.beta_alg = 'FR';                
+                [w_list{alg_idx}, info_list{alg_idx}] = ncg(problem, options);    
+                
+            case {'NCG-FR-WOLFE'}
+                
+                options.sub_mode = 'STANDARD';                
+                options.step_alg = 'strong_wolfe';      
+                options.beta_alg = 'FR';                
+                [w_list{alg_idx}, info_list{alg_idx}] = ncg(problem, options);                    
              
             case {'BFGS-H-BKT'}
                 

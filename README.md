@@ -3,9 +3,9 @@
 
 Authors: [Hiroyuki Kasai](http://kasai.comm.waseda.ac.jp/kasai/)
 
-Last page update: April 17, 2018
+Last page update: October 27, 2018
 
-Latest library version: 1.0.17 (see Release notes for more info)
+Latest library version: 1.0.19 (see Release notes for more info)
 
 <br />
 
@@ -402,6 +402,8 @@ If you have any problems or questions, please contact the author: [Hiroyuki Kasa
 
 Release Notes
 --------------
+* Version 1.0.19 (Oct. 27, 2020)
+    - Buf fixed, and some files are added.
 * Version 1.0.17 (Apr. 17, 2018)
     - Sub-sampled CR (including ARC) and Sub-sampled TR are nely added.
 * Version 1.0.16 (Apr. 01, 2018)

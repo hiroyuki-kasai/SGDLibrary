@@ -41,7 +41,8 @@ classdef l1_logistic_regression
         x_test;
         y_test;
         x_norm;
-        x;    
+        x; 
+        prox_flag;        
     end
     
     methods
@@ -56,7 +57,13 @@ classdef l1_logistic_regression
                 obj.lambda = 0.1;
             else
                 obj.lambda = varargin{1};
-            end            
+            end
+            
+            if obj.lambda > 0
+                obj.prox_flag = true;
+            else
+                obj.prox_flag = false;
+            end
 
             obj.d = size(obj.x_train, 1);
             obj.n_train = length(obj.y_train);
@@ -154,7 +161,7 @@ classdef l1_logistic_regression
         function w_opt = calc_solution(obj, options_in, method)
 
             if nargin < 3
-                method = 'sd_nesterov';
+                method = 'ag';
             end        
 
             options.max_iter = options_in.max_iter;
@@ -172,10 +179,10 @@ classdef l1_logistic_regression
                 options.sub_mode = 'INEXACT';    
                 options.step_alg = 'non-backtracking'; 
                 [w_opt,~] = newton(obj, options);
-            elseif strcmp(method, 'sd_nesterov')
+            elseif strcmp(method, 'ag')
                 options.step_alg = 'backtracking';
                 options.step_init_alg = 'bb_init';
-                [w_opt,~] = sd_nesterov(obj, options);            
+                [w_opt,~] = ag(obj, options);            
             else 
                 options.step_alg = 'backtracking';  
                 options.mem_size = 5;

@@ -63,6 +63,7 @@ function [w, infos] = ag(problem, in_options)
     iter = 0;
     grad_calc_count = 0;
     w = options.w_init;
+    y_old = w;
     w_old = w;
     prev_step = options.step_init;
     
@@ -81,6 +82,11 @@ function [w, infos] = ag(problem, in_options)
         options.step_init = 1 / problem.L();
     elseif strcmp(options.step_alg, 'fix')
     end
+    
+    if strcmp(options.step_init_alg, 'bb_init')
+        % initialize by BB step-size
+        options.step_init = bb_init(problem, w);
+    end    
 
     % for Rada-FISTA
     if options.use_rada
@@ -97,7 +103,7 @@ function [w, infos] = ag(problem, in_options)
     % store first infos
     clear infos;    
     [infos, f_val, optgap, grad, gnorm] = store_infos(problem, w, options, [], iter, grad_calc_count, 0);
-    grad_old = grad;
+    grad_old = [];
     fun_val_old = f_val;
     
     % display info
@@ -113,8 +119,9 @@ function [w, infos] = ag(problem, in_options)
         
         % calculate stepsize        
         options.iter = iter;
-        [step, ~] = linesearch_alg(options.step_alg, problem, w, w_old, grad, grad_old, prev_step, options);          
-        
+        [step, ~] = linesearch_alg(options.step_alg, problem, w, w_old, grad, grad_old, prev_step, options);  
+        %[step, ~] = linesearch_alg(options.step_alg, problem, y, y_old, grad, grad_old, prev_step, options); 
+         
         %params_old = params_in;
         w_old = w;
 
@@ -263,7 +270,7 @@ function [w, infos] = ag(problem, in_options)
         
 
         grad = problem.full_grad(y); 
-        prev_grad = grad; 
+        grad_old = grad; 
         theta = theta_new;         
     end
     

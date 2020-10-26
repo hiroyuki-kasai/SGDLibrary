@@ -36,6 +36,7 @@ classdef elastic_net
         Atb;
         AtA_l2;
         L;
+        prox_flag;        
     end
     
     
@@ -54,6 +55,12 @@ classdef elastic_net
                 obj.lambda1 = varargin{1};
                 obj.lambda2 = varargin{2};                  
             end 
+            
+            if obj.lambda1 > 0 || obj.lambda2 > 0
+                obj.prox_flag = true;
+            else
+                obj.prox_flag = false;
+            end
             
             obj.d = size(obj.A, 2);
             obj.n = size(obj.A, 2);

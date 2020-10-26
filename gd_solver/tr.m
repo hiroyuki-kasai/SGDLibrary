@@ -1,4 +1,4 @@
-function [w, infos]= tr(problem, options)
+function [w, infos]= tr(problem, in_options)
 % Trust region medhod algorithm.
 %
 % Inputs:
@@ -38,154 +38,80 @@ function [w, infos]= tr(problem, options)
 % TAdjusted by H.Kasai on Apr. 08, 2018
 % Modified by H.Kasai on Mar. 23, 2018
 
+
     % set dimensions and samples
-    d = problem.dim();
-    n = problem.samples();  
+    d = problem.dim;
+    n = problem.samples;     
+    
+    % set local options 
+    local_options = []; 
+    local_options.algorithm = 'TR'; 
+    local_options.subprob_solver = 'DOGLEG';
+    local_options.H_mode = 'QUASI-NEWTON';
+    local_options.delta = 0.5;
+    local_options.mu = 0.1;    
+    local_options.eta1= 0.25;  
+    local_options.eta2 = 0.75; 
+    local_options.gamma1 = 0.25; 
+    local_options.gamma2 = 2;    
+    local_options.delta_max = 5;     
 
+    % merge options
+    options = mergeOptions(get_default_options(d), local_options);   
+    options = mergeOptions(options, in_options);  
 
-    % extract options
-    if ~isfield(options, 'tol_optgap')
-        tol_optgap = 1.0e-12;
-    else
-        tol_optgap = options.tol_optgap;
-    end      
-    
-    if ~isfield(options, 'tol_gnorm')
-        tol_gnorm = 1.0e-12;
-    else
-        tol_gnorm = options.tol_gnorm;
-    end    
-    
-    if ~isfield(options, 'max_iter')
-        max_iter = 100;
-    else
-        max_iter = options.max_iter;
-    end 
-    
-    if ~isfield(options, 'verbose')
-        verbose = false;
-    else
-        verbose = options.verbose;
-    end   
-    
-    if ~isfield(options, 'w_init')
-        w = randn(d,1);
-    else
-        w = options.w_init;
-    end 
-    
-    if ~isfield(options, 'f_opt')
-        f_opt = -Inf;
-    else
-        f_opt = options.f_opt;
-    end    
-    
-    if ~isfield(options, 'store_w')
-        store_w = false;
-    else
-        store_w = options.store_w;
-    end    
-    
-    if ~isfield(options, 'subprob_solver')
-        subprob_solver = 'DOGLEG';
-    else
-        subprob_solver = options.subprob_solver;
-    end
-    
-    if ~isfield(options, 'H_mode')
-        H_mode = 'QUASI-NEWTON';
-    else
-        H_mode = options.H_mode;
-    end     
-    
-    
-    if ~isfield(options, 'delta')
-         delta = 0.5;
-    else
-         delta = options.delta;
-    end
-    
-    if ~isfield(options, 'mu')
-         mu = 0.1;
-    else
-         mu = options.mu;
-    end
-    
-    if ~isfield(options, 'eta1')
-        eta1= 0.25;
-    else
-        eta1= options.eta1;
-    end
-    
-    if ~isfield(options, 'eta2')
-        eta2 = 0.75;
-    else
-        eta2 = options.eta2;
-    end
-    
-    if ~isfield(options, 'gamma1')
-        gamma1 = 0.25;
-    else
-        gamma1 = options.gamma1;
-    end
-    
-    if ~isfield(options, 'gamma2')
-        gamma2 = 2;
-    else
-        gamma2 = options.gamma2;
-    end   
-    
-    if ~isfield(options, 'delta_max')
-        delta_max = 5;
-    else
-        delta_max = options.delta_max;
-    end      
-    
 
     % initialise
     iter = 0;
-    grad_calc_count = 0;    
+    grad_calc_count = 0;
+    w = options.w_init;    
     
+   % initialize by BB step-size 
+    if strcmp(options.step_init_alg, 'bb_init')
+        options.step_init = bb_init(problem, w);
+    end    
     
     % store first infos
     clear infos;    
     [infos, f_val, optgap, grad, gnorm] = store_infos(problem, w, options, [], iter, grad_calc_count, 0);
+    grad_old = [];   
     
     
     %gk = grad_func(w); 
     gk = problem.grad(w);
     eps2 = sqrt(eps);
 
-    if strcmp(H_mode, 'NEWTON')
+    if strcmp(options.H_mode, 'NEWTON')
         %Hk=hess(w);
         Hk = problem.hess(w);
     else
-        Hk=eye(length(w)); 
+        Hk = eye(length(w)); 
     end    
+    
+    % display infos
+    if options.verbose
+        fprintf('TR (%s,%s) %s %s : Iter = %03d, cost = %.24e, gnorm = %.4e, optgap = %.4e\n', options.subprob_solver, options.H_mode, '   ', '   ', iter, f_val, gnorm, optgap);
+    end      
     
     
     % set start time
     start_time = tic();  
     
-    % print info
-    if verbose
-        fprintf('TR (%s,%s) %s %s : Iter = %03d, cost = %.24e, gnorm = %.4e, optgap = %.4e\n', subprob_solver, H_mode, '   ', '   ', iter, f_val, gnorm, optgap);
-    end      
 
-    while (optgap > tol_optgap) && (gnorm > tol_gnorm) && (iter < max_iter)         
+    while (optgap > options.tol_optgap) && (gnorm > options.tol_gnorm) && (iter < options.max_epoch)         
         
         % sub-problem calculates the proposed step "s".
-        if strcmp(subprob_solver, 'TRUSTONE')
-            s = trustone(Hk, gk, delta);
-        elseif strcmp(subprob_solver, 'CAUCHY')
-            s = cauchy_point(Hk, gk, delta);
-        elseif strcmp(subprob_solver, 'DOGLEG')
-            s = dogleg(Hk, gk, delta);
-        elseif strcmp(subprob_solver, 'CG')
+        if strcmp(options.subprob_solver, 'TRUSTONE')
+            s = trustone(Hk, gk, options.delta);
+        elseif strcmp(options.subprob_solver, 'CAUCHY')
+            s = cauchy_point(Hk, gk, options.delta);
+        elseif strcmp(options.subprob_solver, 'DOGLEG')
+            s = dogleg(Hk, gk, options.delta);
+        elseif strcmp(options.subprob_solver, 'CG')
             params(1) = 1e-8;
             params(2) = 10;
             params(3) = 1;
-            [s, ~, ~] = cg_steihaug(Hk, gk, delta, params);
+            [s, ~, ~] = cg_steihaug(Hk, gk, options.delta, params);
 %         elseif strcmp(subprob_solver, 'Lanczos')
 %             s = lstrs(Hk, gk, delta);
         end
@@ -193,7 +119,7 @@ function [w, infos]= tr(problem, options)
         rho = (problem.cost(w+s)-problem.cost(w))/(s'*gk+0.5*s'*Hk*s);
         
         % judge whether accept or reject the proposed step "s" based on the model performance.
-        if rho > mu 
+        if rho > options.mu 
             w1 = w + s; 
             accstr = 'ACC';
         else 
@@ -202,15 +128,15 @@ function [w, infos]= tr(problem, options)
         end
 
         % update the trust region radius: delta
-        if rho < eta1
+        if rho < options.eta1
             % If the decrease is less than 1/4 of the predicted decrease,
             % we then reduce the trust region (TR) radius.            
-            delta = gamma1*delta;
+            options.delta = options.gamma1 * options.delta;
             trstr = 'TR-';
-        elseif rho > eta2 && abs(norm(s)-delta)<sqrt(eps)
+        elseif rho > options.eta2 && abs(norm(s)-options.delta)<sqrt(eps)
             % If the decrease is greter than 3/4 of the precicted decrease and
             % "s" is close to the trust region boundary, we increase the TR radius.
-            delta = min([gamma2*delta,delta_max]); 
+            options.delta = min([options.gamma2*options.delta,options.delta_max]); 
             trstr = 'TR+';
         else
             % Otherwise, we keep the trust region radius unchanged. 
@@ -221,7 +147,7 @@ function [w, infos]= tr(problem, options)
         %err = norm((gk1.*w1)/max([abs(fun(w1)),1]),inf);
         %err = norm((gk1.*w1)/max([abs(problem.cost(w1)),1]),inf);
 
-        if strcmp(H_mode, 'NEWTON')
+        if strcmp(options.H_mode, 'NEWTON')
             % Exact Newton
             w = w1;
             gk = gk1; 
@@ -239,7 +165,7 @@ function [w, infos]= tr(problem, options)
             w = w1; 
             gk = gk1;
         end
-        
+
         % measure elapsed time
         elapsed_time = toc(start_time);  
         
@@ -251,20 +177,20 @@ function [w, infos]= tr(problem, options)
         
         % store infos
         [infos, f_val, optgap, grad, gnorm] = store_infos(problem, w, options, infos, iter, grad_calc_count, elapsed_time);        
-        
-        % print info
-        if verbose
-            fprintf('TR (%s,%s) %s %s : Iter = %03d, cost = %.24e, gnorm = %.4e, optgap = %.4e\n', subprob_solver, H_mode, accstr, trstr, iter, f_val, gnorm, optgap);
-        end         
+
+        % display infos
+        if options.verbose
+            fprintf('TR (%s,%s) %s %s : Iter = %03d, cost = %.24e, gnorm = %.4e, optgap = %.4e\n', options.subprob_solver, options.H_mode, accstr, trstr, iter, f_val, gnorm, optgap);
+        end        
     end
 
-    if gnorm < tol_gnorm
-        fprintf('Gradient norm tolerance reached: tol_gnorm = %g\n', tol_gnorm);
-    elseif optgap < tol_optgap
-        fprintf('Optimality gap tolerance reached: tol_optgap = %g\n', tol_optgap);        
-    elseif iter == max_iter
-        fprintf('Max iter reached: max_iter = %g\n', max_iter);
-    end   
+    if gnorm < options.tol_gnorm
+        fprintf('Gradient norm tolerance reached: tol_gnorm = %g\n', options.tol_gnorm);
+    elseif optgap < options.tol_optgap
+        fprintf('Optimality gap tolerance reached: tol_optgap = %g\n', options.tol_optgap);        
+    elseif iter == options.max_epoch
+        fprintf('Max iter reached: max_epoch = %g\n', options.max_epoch);
+    end  
 end
 
 function s = trustone(Hk, gk, delta) 

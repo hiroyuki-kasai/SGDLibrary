@@ -31,6 +31,7 @@ classdef trace_norm_matrix_completion
         n;
         A;
         mask;
+        prox_flag;
     end
     
     methods
@@ -43,7 +44,13 @@ classdef trace_norm_matrix_completion
                 obj.lambda = 0.1;
             else
                 obj.lambda = varargin{1};
-            end              
+            end   
+            
+            if obj.lambda > 0
+                obj.prox_flag = true;
+            else
+                obj.prox_flag = false;
+            end
             
             obj.m = size(obj.A, 1);
             obj.n = size(obj.A, 2);
