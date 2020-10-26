@@ -16,11 +16,12 @@ function [w, infos] = sd(problem, in_options)
 
 
     % set dimensions and samples
-    d = problem.dim();
-    n = problem.samples(); 
+    d = problem.dim;
+    n = problem.samples;     
     
     % set local options 
-    local_options = [];    
+    local_options = []; 
+    local_options.algorithm = 'SD';    
     local_options.sub_mode = 'STANDARD';
 
     % merge options
@@ -31,12 +32,15 @@ function [w, infos] = sd(problem, in_options)
     iter = 0;
     grad_calc_count = 0;
     w = options.w_init;
+    w_old = w;
+    prev_step = options.step_init;
+    
     if ~isfield(options, 'S')
         if strcmp(options.step_alg, 'exact')
-            S = eye(d);
+            options.S = eye(d);
         end        
     else    
-        S = options.S;
+        %
     end
     
     % initialize by BB step-size 
@@ -47,6 +51,7 @@ function [w, infos] = sd(problem, in_options)
     % store first infos
     clear infos;    
     [infos, f_val, optgap, grad, gnorm] = store_infos(problem, w, options, [], iter, grad_calc_count, 0);
+    grad_old = grad;
     
     % display info
     if options.verbose
@@ -61,43 +66,22 @@ function [w, infos] = sd(problem, in_options)
     start_time = tic();      
 
     % main loop
-    while (optgap > options.tol_optgap) && (gnorm > options.tol_gnorm) && (iter < options.max_epoch)        
-
-        % line search
-        if strcmp(options.step_alg, 'backtracking')
-            rho = 1/2;
-            c = 1e-4;
-            step = backtracking_line_search(problem, -grad, w, rho, c);
-        elseif strcmp(options.step_alg, 'exact')
-            ls_options.sub_mode = sub_mode;
-            ls_options.S = S;
-            step = exact_line_search(problem, 'SD', -grad, [], [], w, ls_options);
-        elseif strcmp(options.step_alg, 'strong_wolfe')
-            c1 = 1e-4;
-            c2 = 0.9;
-            step = strong_wolfe_line_search(problem, -grad, w, c1, c2);
-        elseif strcmp(options.step_alg, 'tfocs_backtracking') 
-            if iter > 0
-                alpha = 1.05;
-                beta = 0.5; 
-                step = tfocs_backtracking_search(step, w, w_old, grad, grad_old, alpha, beta);
-            else
-                step = options.step_init;
-            end
-        else
-            step = options.step_init;
-        end
+    while (optgap > options.tol_optgap) && (gnorm > options.tol_gnorm) && (iter < options.max_epoch)  
         
+        options.iter = iter;
+        [step, ~] = linesearch_alg(options.step_alg, problem, w, w_old, grad, grad_old, prev_step, options);   
+
+        prev_step = step;
         w_old = w;
         if strcmp(options.sub_mode, 'SCALING')
             % diagonal scaling 
-            if isempty(S)
+            if isempty(options.S)
                 h = problem.full_hess(w);
-                S = diag(1./diag(h));
+                options.S = diag(1./diag(h));
             end
             
             % update w
-            w = w - step * S * grad;  
+            w = w - step * options.S * grad;  
         else
             % update w
             w = w - step * grad;            
@@ -125,7 +109,7 @@ function [w, infos] = sd(problem, in_options)
 
         % display infos
         if options.verbose
-            if ~isfield(problem, 'prox')
+            if ~ismethod(problem, 'prox')
                 fprintf('SD: Iter = %03d, cost = %.24e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
             else
                 fprintf('PG: Iter = %03d, cost = %.24e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);

@@ -1,6 +1,7 @@
 old/
 tmp_test/
 lecture/
+lecture_org/
 test_experiments/
 old/
 !.gitignore

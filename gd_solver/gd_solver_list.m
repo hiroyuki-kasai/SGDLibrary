@@ -15,7 +15,7 @@ function [ algs ] = gd_solver_list(category)
     gd_algs = {'SD-STD','SD-BKT','SD-EXACT','SD-WOLFE','SD-SCALE-EXACT'};
     newton_algs = {'Newton-STD','Newton-DAMP','Newton-CHOLESKY'};
     cg_algs = {'CG-PRELIM','CG-BKT','CG-EXACT','CG-PRECON-EXACT'};
-    ncg_algs = {'NCG-BTK','NCG-WOLFE'};
+    ncg_algs = {'NCG-FR-BTK','NCG-FR-WOLFE','NCG-PR-BTK','NCG-PR-WOLFE'};
     bfgs_algs = {'BFGS-B-EXACT', 'BFGS-B-BKT','BFGS-H-EXACT','BFGS-H-BKT', ...
                     'DAMPED-BFGS-BKT','DAMPED-BFGS-EXACT', ...
                     'L-BFGS-BKT','L-BFGS-EXACT','L-BFGS-WOLFE'}; 

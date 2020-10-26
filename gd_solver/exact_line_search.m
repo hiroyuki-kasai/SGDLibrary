@@ -46,7 +46,7 @@ function alpha = exact_line_search(problem, solver, p, r, y, x, options)
             switch problem.name()
                 case 'quadratic'
                     if strcmp(options.sub_mode, 'PRELIM')
-                         alpha = - r' * p /(p' * problem.A() * p);                          
+                        alpha = - r' * p /(p' * problem.A() * p);                          
                     elseif strcmp(options.sub_mode, 'STANDARD')
                         alpha = r' * r /(p' * problem.A() * p);                
                     elseif strcmp(options.sub_mode, 'PRECON')

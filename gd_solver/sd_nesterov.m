@@ -15,8 +15,8 @@ function [w, infos] = sd_nesterov(problem, options)
 
 
     % set dimensions and samples
-    d = problem.dim();
-    n = problem.samples();  
+    d = problem.dim;
+    n = problem.samples;  
 
 
     % extract options
@@ -190,7 +190,7 @@ function [w, infos] = sd_nesterov(problem, options)
        
         % print info
         if verbose
-            if ~isfield(problem, 'prox')
+            if ~ismethod(problem, 'prox') 
                 fprintf('AG: Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
             else
                 fprintf('APG: Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);

@@ -72,7 +72,7 @@ classdef quadratic
 
         function h = full_hess(obj, x)
 
-            h = hess(x);
+            h = obj.hess(x);
 
         end
     end

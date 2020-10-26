@@ -1,4 +1,4 @@
-function [w, infos] = cg(problem, options)
+function [w, infos] = cg(problem, in_options)
 % Linear conjugate gradient (CG) algorithm.
 %
 % The algorithm of interest is defined as
@@ -25,90 +25,29 @@ function [w, infos] = cg(problem, options)
 %       sub_mode    'STANDARD'  Algorithm 5.2
 %       sub_mode    'PRECON'    Algorithm 5.3
 %
-% This file is part of GDLibrary.
+% This file is part of GDLibrary and SGDLibrary.
 %
 % Created by H.Kasai on Oct. 30, 2016
 % Modified by H.Kasai on Mar. 25, 2018
+% Modified by H.Kasai on Oct. 22, 2020
 
 
     % set dimensions and samples
-    d = problem.dim();
-    n = problem.samples();  
+    d = problem.dim;
+    n = problem.samples;     
+    
+    % set local options 
+    local_options = []; 
+    local_options.algorithm = 'CG';    
+    local_options.sub_mode = 'STANDARD';
+
+    % merge options
+    options = mergeOptions(get_default_options(d), local_options);   
+    options = mergeOptions(options, in_options);  
 
 
-    % extract options
-    if ~isfield(options, 'step_init')
-        step_init = 0.1;
-    else
-        step_init = options.step_init;
-    end
-    step = step_init;
-    
-    if ~isfield(options, 'step_alg')
-        step_alg = 'backtracking';
-    else
-        step_alg  = options.step_alg;
-    end  
-   
-    if ~isfield(options, 'tol_optgap')
-        tol_optgap = 1.0e-12;
-    else
-        tol_optgap = options.tol_optgap;
-    end      
-    
-    if ~isfield(options, 'tol_gnorm')
-        tol_gnorm = 1.0e-12;
-    else
-        tol_gnorm = options.tol_gnorm;
-    end    
-    
-    if ~isfield(options, 'max_iter')
-        max_iter = 100;
-    else
-        max_iter = options.max_iter;
-    end 
-    
-    if ~isfield(options, 'verbose')
-        verbose = false;
-    else
-        verbose = options.verbose;
-    end   
-    
-    if ~isfield(options, 'w_init')
-        w = randn(d,1);
-    else
-        w = options.w_init;
-    end 
-    
-    if ~isfield(options, 'f_opt')
-        f_opt = -Inf;
-    else
-        f_opt = options.f_opt;
-    end    
-    
-    if ~isfield(options, 'store_w')
-        store_w = false;
-    else
-        store_w = options.store_w;
-    end
-    
-    if ~isfield(options, 'step_init_alg')
-        % Do nothing
-    else
-        if strcmp(options.step_init_alg, 'bb_init')
-            % initialize by BB step-size
-            step_init = bb_init(problem, w);
-        end
-    end 
-    
-    if ~isfield(options, 'sub_mode')
-        sub_mode = 'STANDARD';
-    else
-        sub_mode = options.sub_mode;
-    end      
-    
     if ~isfield(options, 'M')
-        if strcmp(sub_mode, 'PRECON')
+        if strcmp(options.sub_mode, 'PRECON')
             h = problem.full_hess(w);
             M = diag(diag(h));
         else
@@ -118,51 +57,52 @@ function [w, infos] = cg(problem, options)
         M = options.M;
     end  
     
-    ls_options.sub_mode = sub_mode;    
-    if strcmp(sub_mode, 'STANDARD')
-        %
-    elseif strcmp(sub_mode, 'PRECON')
-        ls_options.M = M;
-    else
-        %
-    end     
+%     ls_options.sub_mode = sub_mode;    
+%     if strcmp(sub_mode, 'STANDARD')
+%         %
+%     elseif strcmp(optionssub_mode, 'PRECON')
+%         ls_options.M = M;
+%     else
+%         %
+%     end     
     
 
     % initialise
     iter = 0;
+    grad_calc_count = 0;
+    w = options.w_init;    
+    
+   % initialize by BB step-size 
+    if strcmp(options.step_init_alg, 'bb_init')
+        options.step_init = bb_init(problem, w);
+    end    
     
     % store first infos
-    clear infos;
-    infos.iter = iter;
-    infos.time = 0;    
-    infos.grad_calc_count = 0;    
-    f_val = problem.cost(w);
-    infos.cost = f_val;     
-    optgap = f_val - f_opt;
-    infos.optgap = optgap;
-    grad = problem.full_grad(w);
-    gnorm = norm(grad);
-    infos.gnorm = gnorm;
-    if ismethod(problem, 'reg')
-        infos.reg = problem.reg(w);   
+    clear infos;    
+    [infos, f_val, optgap, grad, gnorm] = store_infos(problem, w, options, [], iter, grad_calc_count, 0);
+    grad_old = [];
+    
+    % display infos
+    if options.verbose
+        fprintf('CG (%s): Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', options.sub_mode, iter, f_val, gnorm, optgap);
     end  
-    if store_w
-        infos.w = w;       
-    end
     
     
     % set first residual, i.e., r = Ax - b;
     r_old = grad;
-    y_old = [];  
+    y_old = []; 
+    w_old = w;
+    grad_old = grad;
+    prev_step = options.step_init;    
     
     % initialise
-    if strcmp(sub_mode, 'PRELIM')
+    if strcmp(options.sub_mode, 'PRELIM')
         % set directoin
         p = -r_old;        
-    elseif strcmp(sub_mode, 'STANDARD')
+    elseif strcmp(options.sub_mode, 'STANDARD')
         % set directoin
         p = -r_old;           
-    elseif strcmp(sub_mode, 'PRECON')
+    elseif strcmp(options.sub_mode, 'PRECON')
         % solve y
         y_old = M \r_old;       
         % set directoin
@@ -170,18 +110,13 @@ function [w, infos] = cg(problem, options)
     else
         fprintf('sub_mode %s is not supported\n', sub_mode);
         return;
-    end    
+    end     
     
     % set start time
-    start_time = tic();  
-    
-    % print info
-    if verbose
-        fprintf('CG (%s): Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', sub_mode, iter, f_val, gnorm, optgap);
-    end       
+    start_time = tic();    
     
     % main loop
-    while (optgap > tol_optgap) && (gnorm > tol_gnorm) && (iter < max_iter)        
+    while (optgap > options.tol_optgap) && (gnorm > options.tol_gnorm) && (iter < options.max_epoch)       
         
         % Revert to steepest descent if is not direction of descent                
         if (p'*grad > 0)
@@ -189,27 +124,10 @@ function [w, infos] = cg(problem, options)
         end        
 
         % line search
-        if strcmp(step_alg, 'backtracking')
-            rho = 1/2;
-            c = 1e-4;
-            step = backtracking_line_search(problem, p, w, rho, c);
-        elseif strcmp(step_alg, 'exact')
-            ls_options.M = M;
-            step = exact_line_search(problem, 'CG', p, r_old, y_old, w, ls_options);
-        elseif strcmp(step_alg, 'strong_wolfe')
-            c1 = 1e-4;
-            c2 = 0.9;
-            step = strong_wolfe_line_search(problem, -grad, w, c1, c2);
-        elseif strcmp(step_alg, 'tfocs_backtracking') 
-            if iter > 0
-                alpha = 1.05;
-                beta = 0.5; 
-                step = tfocs_backtracking_search(step, w, w_old, grad, grad_old, alpha, beta);
-            else
-                step = step_init;
-            end
-        else
-        end
+        options.r_old = r_old;
+        options.y_old = y_old;        
+        [step, ~] = linesearch_alg(options.step_alg, problem, w, w_old, p, grad_old, prev_step, options);   
+        prev_step = step;
         
         % update w
         w_old = w;
@@ -225,7 +143,7 @@ function [w, infos] = cg(problem, options)
         grad = problem.full_grad(w);   
         
         
-        if strcmp(sub_mode, 'PRELIM')
+        if strcmp(options.sub_mode, 'PRELIM')
             % updata residual 
             r = grad;
             
@@ -235,7 +153,7 @@ function [w, infos] = cg(problem, options)
             % update direction  
             p = - grad + beta * p;         
         
-        elseif  strcmp(sub_mode, 'STANDARD')
+        elseif  strcmp(options.sub_mode, 'STANDARD')
             % updata residual             
             r = r_old + step * problem.A() * p;
                         
@@ -265,44 +183,30 @@ function [w, infos] = cg(problem, options)
             y_old = y;
         end
         
-        % update iter        
-        iter = iter + 1;
-        % calculate error
-        f_val = problem.cost(w);
-        optgap = f_val - f_opt;  
-        % calculate norm of gradient
-        gnorm = norm(grad);
-        
         % measure elapsed time
-        elapsed_time = toc(start_time);        
+        elapsed_time = toc(start_time);  
+        
+        % count gradient evaluations
+        grad_calc_count = grad_calc_count + n;  
+        
+        % update iter        
+        iter = iter + 1;        
+        
+        % store infos
+        [infos, f_val, optgap, grad, gnorm] = store_infos(problem, w, options, infos, iter, grad_calc_count, elapsed_time);        
 
-        % store infoa
-        infos.iter = [infos.iter iter];
-        infos.time = [infos.time elapsed_time];        
-        infos.grad_calc_count = [infos.grad_calc_count iter*n];      
-        infos.optgap = [infos.optgap optgap];        
-        infos.cost = [infos.cost f_val];
-        infos.gnorm = [infos.gnorm gnorm]; 
-        if ismethod(problem, 'reg')
-            reg = problem.reg(w);
-            infos.reg = [infos.reg reg];
-        end 
-        if store_w
-            infos.w = [infos.w w];         
-        end        
-       
-        % print info
-        if verbose
-            fprintf('CG (%s): Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', sub_mode, iter, f_val, gnorm, optgap);
-        end        
+        % display infos
+        if options.verbose
+            fprintf('CG (%s): Iter = %03d, cost = %.16e, gnorm = %.4e, optgap = %.4e\n', options.sub_mode, iter, f_val, gnorm, optgap);
+        end
     end
     
-    if gnorm < tol_gnorm
-        fprintf('Gradient norm tolerance reached: tol_gnorm = %g\n', tol_gnorm);
-    elseif optgap < tol_optgap
-        fprintf('Optimality gap tolerance reached: tol_optgap = %g\n', tol_optgap);        
-    elseif iter == max_iter
-        fprintf('Max iter reached: max_iter = %g\n', max_iter);
-    end    
+    if gnorm < options.tol_gnorm
+        fprintf('Gradient norm tolerance reached: tol_gnorm = %g\n', options.tol_gnorm);
+    elseif optgap < options.tol_optgap
+        fprintf('Optimality gap tolerance reached: tol_optgap = %g\n', options.tol_optgap);        
+    elseif iter == options.max_epoch
+        fprintf('Max iter reached: max_epoch = %g\n', options.max_epoch);
+    end     
     
 end
