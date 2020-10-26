@@ -3,7 +3,7 @@
 
 Authors: [Hiroyuki Kasai](http://kasai.comm.waseda.ac.jp/kasai/)
 
-Last page update: October 27, 2018
+Last page update: October 27, 2020
 
 Latest library version: 1.0.19 (see Release notes for more info)
 
