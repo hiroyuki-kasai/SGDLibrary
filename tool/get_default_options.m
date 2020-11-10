@@ -1,6 +1,7 @@
 function options = get_default_options(d)
 
     options.stepsizefun     = @stepsize_alg;
+    options.linesearchfun   = @linesearch_alg;    
     options.step_init_alg   = '';
     options.step_alg        = 'fix';
     options.step_init       = 0.01;
@@ -14,6 +15,7 @@ function options = get_default_options(d)
     options.permute_on      = 1;
     options.verbose         = 0;
     options.store_w         = false;
+    options.store_grad      = false;    
     options.store_subinfo   = false;
 
 end

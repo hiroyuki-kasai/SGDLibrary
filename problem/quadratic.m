@@ -32,19 +32,29 @@ classdef quadratic
         A;
         b;
         hessain_w_independent;
+        L;
+        mu;
+        cn;
+        prox_flag;
     end
     
     methods
         function obj = quadratic(A, b)
             obj.d = length(b);
             obj.n = obj.d;
+            obj.prox_flag = false;
 
             obj.name = 'quadratic';    
             obj.dim = obj.d;
             obj.samples = obj.n;    
             obj.A = A;     
             obj.b = b;  
-            obj.hessain_w_independent = true;            
+            obj.hessain_w_independent = true;
+            eigvalues = eigs(obj.A);
+            obj.L = max(eigvalues);
+            obj.mu = min(eigvalues);
+            obj.cn = obj.L/obj.mu; % = cond(onj.A)
+            fprintf('L = %f, mu = %f, cn = %f\n', obj.L, obj.mu, obj.cn);
         end
 
         function f = cost(obj, x)

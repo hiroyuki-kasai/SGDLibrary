@@ -1,17 +1,18 @@
 function [] = test_lasso()
 
-    clc;
+    %clc;
     clear;
     close all;
     
+    rng('default')
+    
      
     %% Set algorithms
-    if 0
-        algorithms = gd_solver_list('ALL');  
-    else
-        algorithms = {'PG-BKT', 'PG-TFOCS-BKT', 'APG-BKT', 'APG-TFOCS-BKT', 'CD-LASSO', 'FISTA', 'ADMM-LASSO'}; 
-%        algorithms = {'FISTA'};
-    end    
+    %algorithms = {'PG-BKT', 'PG-TFOCS-BKT', 'PG-FIX', 'SUBG-DEC', 'SUBG-BKT', 'APG-TFOCS-BKT', 'FISTA', 'CD-LASSO', 'ADMM-LASSO'};
+    algorithms = {'SMOOTH-FIX', 'SMOOTH-BKT', 'PG-WOLFE', 'PG-TFOCS-BKT', 'PG-FIX', 'SUBG-DEC', 'SUBG-BKT', 'APG-BKT', 'APG-TFOCS-BKT', 'FISTA', 'ADMM-LASSO'};
+    %algorithms = {'SUBG-DEC', 'SUBG-BKT', 'SUBG-TFOCS-BKT'};
+    %algorithms = {'SUBG-DEC', 'SUBG-BKT', 'SUBG-TFOCS-BKT', 'SMOOTH-FIX', 'FISTA', 'ADMM-LASSO'};
+    algorithms = {'SUBG-DEC', 'SUBG-BKT'};
     
     
     %% prepare dataset
@@ -37,9 +38,6 @@ function [] = test_lasso()
     end
     
     
-    %% define problem definitions
-    problem = lasso(A, b, lambda);
-
     
     %% initialize
     w_init = rand(n,1); 
@@ -49,23 +47,78 @@ function [] = test_lasso()
 
     %% perform algorithms
     for alg_idx=1:length(algorithms)
+        
+        %% define problem definitions
+        clear problem;
+        problem = lasso(A, b, lambda, 'reg');
+    
         fprintf('\n\n### [%02d] %s ###\n\n', alg_idx, algorithms{alg_idx});
         
         clear options;
         % general options for optimization algorithms   
         options.w_init = w_init;
         options.tol_gnorm = 1e-10;
-        options.max_iter = 100;
+        options.max_epoch = 100;
+        options.max_iter = options.max_epoch;
         options.verbose = true; 
         options.f_opt = 0;
         options.store_w = false;
 
         switch algorithms{alg_idx}
+            case {'SMOOTH-FIX'}
+                smooth_mu = 0.1;
+                clear problem;
+                problem = lasso(A, b, lambda, 'smooth', smooth_mu);
+                
+                options.step_alg = 'fix';
+                options.step_init = 1/(problem.L+lambda/smooth_mu); 
+                [w_list{alg_idx}, info_list{alg_idx}] = smoothing_gd(problem, options);
+                
+            case {'SMOOTH-BKT'}
+                smooth_mu = 0.1;
+                clear problem;
+                problem = lasso(A, b, lambda, 'smooth', smooth_mu);
+                
+                options.step_alg = 'backtracking';
+                [w_list{alg_idx}, info_list{alg_idx}] = smoothing_gd(problem, options);                
+                
+            case {'SUBG-DEC'}
+                
+                options.step_alg = 'decay-7';
+                options.step_init = 1/problem.L; 
+                [w_list{alg_idx}, info_list{alg_idx}] = subgrad(problem, options);
+                
+            case {'SUBG-BKT'}
+                
+                options.step_alg = 'backtracking';
+                [w_list{alg_idx}, info_list{alg_idx}] = subgrad(problem, options);  
+                
+                
+            case {'SUBG-TFOCS-BKT'}
+                
+                options.step_alg = 'tfocs_backtracking';
+                [w_list{alg_idx}, info_list{alg_idx}] = subgrad(problem, options);                  
+                
             case {'PG-BKT'}
                 
                 options.step_alg = 'backtracking';
-                options.step_init_alg = 'bb_init';
+                %options.step_init_alg = 'bb_init';
                 [w_list{alg_idx}, info_list{alg_idx}] = sd(problem, options);
+                
+            case {'PG-FIX'}
+                
+                options.step_alg = 'fix';
+                options.step_alg = 'fix';
+                options.step_init = 1/problem.L;                  
+                %options.step_init_alg = 'bb_init';
+                [w_list{alg_idx}, info_list{alg_idx}] = sd(problem, options);                
+                
+                
+            case {'PG-WOLFE'}
+                
+                options.step_alg = 'strong_wolfe';
+                options.step_init_alg = 'bb_init';
+                [w_list{alg_idx}, info_list{alg_idx}] = sd(problem, options);   
                 
             case {'PG-TFOCS-BKT'}
                 
@@ -77,13 +130,15 @@ function [] = test_lasso()
                 
                 options.step_alg = 'backtracking';
                 options.step_init_alg = 'bb_init';
-                [w_list{alg_idx}, info_list{alg_idx}] = sd_nesterov(problem, options);
+                %[w_list{alg_idx}, info_list{alg_idx}] = sd_nesterov(problem, options);
+                [w_list{alg_idx}, info_list{alg_idx}] = ag(problem, options);
                 
             case {'APG-TFOCS-BKT'}
                 
                 options.step_alg = 'tfocs_backtracking';
                 options.step_init_alg = 'bb_init';
-                [w_list{alg_idx}, info_list{alg_idx}] = sd_nesterov(problem, options); 
+                %[w_list{alg_idx}, info_list{alg_idx}] = sd_nesterov(problem, options); 
+                [w_list{alg_idx}, info_list{alg_idx}] = ag(problem, options);
                 
             case {'FISTA'}
                 
@@ -131,10 +186,11 @@ function [] = test_lasso()
     
     
     %% plot all
-    close all;
-    
-    % display iter vs cost/gnorm
+   
+    % display iter vs cost
     display_graph('iter','cost', algorithms, w_list, info_list);
+    % display time vs cost
+    display_graph('time','cost', algorithms, w_list, info_list);    
     % display iter vs. l1 norm, i.e. the toral number of non-zero elements 
     display_graph('iter','reg', algorithms, w_list, info_list); 
     

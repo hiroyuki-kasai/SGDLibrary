@@ -69,7 +69,7 @@ function [w, infos] = sd(problem, in_options)
     while (optgap > options.tol_optgap) && (gnorm > options.tol_gnorm) && (iter < options.max_epoch)  
         
         options.iter = iter;
-        [step, ~] = linesearch_alg(options.step_alg, problem, w, w_old, grad, grad_old, prev_step, options);   
+        [step, ~] = options.linesearchfun(options.step_alg, problem, w, w_old, grad, grad_old, prev_step, options);   
 
         prev_step = step;
         w_old = w;

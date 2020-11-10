@@ -65,7 +65,7 @@ function [w, infos] = ncg(problem, in_options)
         end        
 
         %line search
-        [step, ~] = linesearch_alg(options.step_alg, problem, w, w_old, -d_old, grad_old, prev_step, options);   
+        [step, ~] = options.linesearchfun(options.step_alg, problem, w, w_old, -d_old, grad_old, prev_step, options);   
         prev_step = step;        
         
         % update w

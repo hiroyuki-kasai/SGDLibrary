@@ -12,7 +12,8 @@ function  test_general()
         algorithms = gd_solver_list('BFGS'); 
         algorithms = {'L-BFGS-WOLFE','SD-STD','SD-BKT','Newton-STD','Newton-DAMP','Newton-CHOLESKY','NCG-BTK'};
         %algorithms = {'TR-NEWTON','TR-QUASI-NEWTON','L-BFGS-WOLFE'};
-        algorithms = {'TR-DOGLEG-QUASI-NEWTON','TR-CAUCHY-QUASI-NEWTON','TR-TRUSTONE-QUASI-NEWTON','TR-CG-QUASI-NEWTON','L-BFGS-WOLFE'};    
+        algorithms = {'TR-DOGLEG-QUASI-NEWTON','TR-CAUCHY-QUASI-NEWTON','TR-TRUSTONE-QUASI-NEWTON','TR-CG-QUASI-NEWTON','L-BFGS-WOLFE'}; 
+        algorithms = {'SD-BKT', 'NCG-BTK','TR-DOGLEG-QUASI-NEWTON','L-BFGS-BKT', 'BFGS-H-BKT','BB'};  
     end
 
      
@@ -55,7 +56,7 @@ function  test_general()
     
     
     %% define problem definitions
-    problem = general(f, g, h, [], d);
+    problem = general(f, g, h, [], d, [], [], [], [], [], [], []);
     
     
     % Calculate the solution

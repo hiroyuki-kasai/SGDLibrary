@@ -11,6 +11,8 @@ function [w, infos] = ag(problem, in_options)
 % This file is part of GDLibrary and SGDLibrary.
 %
 % Created by H.Kasai on Oct. 23, 2020
+% Modified by H.Kasai on Oct. 28, 2020 (add optimal step (alpha) and beta)
+
 
     
     % set dimensions and samples
@@ -19,16 +21,19 @@ function [w, infos] = ag(problem, in_options)
     
     % set local options 
     local_options = []; 
-    local_options.algorithm     = 'AG';    
-    local_options.sub_mode      = 'AG';
-    local_options.use_restart   = 0;
-    local_options.monotonic     = 0;
-    local_options.use_rada      = 0;
-    local_options.use_greedy    = 0;
-    local_options.p             = 1;
-    local_options.q             = 1;
-    local_options.r             = 4;     
-   
+    local_options.algorithm                 = 'AG';    
+    local_options.sub_mode                  = 'AG';
+    local_options.use_fix_beta              = false;    
+    local_options.use_optimal_alpha_beta    = false; 
+    local_options.use_variable_beta         = false;
+    local_options.use_restart               = 0;
+    local_options.monotonic                 = 0;
+    local_options.use_rada                  = 0;
+    local_options.use_greedy                = 0;
+    local_options.p                         = 1;
+    local_options.q                         = 1;
+    local_options.r                         = 4;
+    local_options.beta                      = 0.01;
 
     % merge options
     options = mergeOptions(get_default_options(d), local_options);   
@@ -63,7 +68,6 @@ function [w, infos] = ag(problem, in_options)
     iter = 0;
     grad_calc_count = 0;
     w = options.w_init;
-    y_old = w;
     w_old = w;
     prev_step = options.step_init;
     
@@ -75,13 +79,53 @@ function [w, infos] = ag(problem, in_options)
         options.step_alg = 'no_change';
     end    
     
+%     if strcmp(options.step_alg, 'ista_prox_backtracking')
+%         prev_step = 1;
+%     %elseif strcmp(options.step_alg, 'fix') && ~isempty(problem.prox) && isprop(problem, 'L')
+%     elseif strcmp(options.step_alg, 'fix') && isprop(problem, 'L')
+%         options.step_init = 1 / problem.L();
+%     elseif strcmp(options.step_alg, 'fix')
+%     end
+    
+    
+    % for stepsize
     if strcmp(options.step_alg, 'ista_prox_backtracking')
-        prev_step = 1;
-    %elseif strcmp(options.step_alg, 'fix') && ~isempty(problem.prox) && isprop(problem, 'L')
-    elseif strcmp(options.step_alg, 'fix') && isprop(problem, 'L')
-        options.step_init = 1 / problem.L();
-    elseif strcmp(options.step_alg, 'fix')
-    end
+        prev_step = 1;    
+    elseif strcmp(options.step_alg, 'fix') || strcmp(options.step_alg, 'no_change')
+        if isprop(problem, 'L')
+            if problem.L > 0
+                if isprop(problem, 'mu')
+                    if problem.mu > 0 && options.use_fix_beta
+                        % This casse is L-smooth and mu-strongly convex.
+                        cn = problem.L/problem.mu;
+                        if options.use_optimal_alpha_beta
+                            options.step_init = 4/(3*problem.L + problem.mu);
+                            if options.beta == 0.01
+                                options.beta = (sqrt(3*cn+1)-2)/(sqrt(3*cn+1)+2); 
+                            else % value by user
+                                % use options.beta by user
+                            end
+                        else
+                            options.step_init = 1/problem.L;
+                            if options.beta == 0.01
+                                options.beta = (sqrt(cn)-1)/(sqrt(cn)+1);   
+                            else % value by user
+                                % use options.beta by user
+                            end                            
+                        end                      
+                    else
+                        % This casse is L-smooth
+                        options.step_init = 1/problem.L; 
+                    end
+                else
+                    % This casse is L-smooth
+                    options.step_init = 1/problem.L; 
+                end
+            else
+                options.step_alg = 'backtracking';
+            end
+        end
+    end    
     
     if strcmp(options.step_init_alg, 'bb_init')
         % initialize by BB step-size
@@ -119,8 +163,8 @@ function [w, infos] = ag(problem, in_options)
         
         % calculate stepsize        
         options.iter = iter;
-        [step, ~] = linesearch_alg(options.step_alg, problem, w, w_old, grad, grad_old, prev_step, options);  
-        %[step, ~] = linesearch_alg(options.step_alg, problem, y, y_old, grad, grad_old, prev_step, options); 
+        [step, ~] = options.linesearchfun(options.step_alg, problem, w, w_old, grad, grad_old, prev_step, options);  
+        %[step, ~] = options.linesearchfun(options.step_alg, problem, y, y_old, grad, grad_old, prev_step, options); 
          
         %params_old = params_in;
         w_old = w;
@@ -138,8 +182,9 @@ function [w, infos] = ag(problem, in_options)
         end          
 
         % calculate nesterov step
-        theta_new = 0.5 * (options.p + sqrt(options.q + options.r * theta^2));
-
+        theta_new = 0.5 * (options.p + sqrt(options.q + options.r * theta^2)); % FISTA parameter
+        beta = (theta - 1)/theta_new;
+        
         % calculate 
         w_w_old_diff = w - w_old;
         if options.use_restart  % Restart, Rada, Greedy
@@ -147,7 +192,7 @@ function [w, infos] = ag(problem, in_options)
             % calculate (y-w)
             y_w_diff = y-w;
             % calculate (y-w)'*(w-w_old)
-            y_w_diff_w_w_old_diff_ip = y_w_diff'*(w-w_old);
+            y_w_diff_w_w_old_diff_ip = y_w_diff' * w_w_old_diff;
 
             if y_w_diff_w_w_old_diff_ip > 0
                 w = w_old;
@@ -160,7 +205,7 @@ function [w, infos] = ag(problem, in_options)
                     if ag_cnt >= 4 % increase the value here if the condition number is big
 
                         if ag_flag
-                            a = min(1, (theta - 1) / theta_new);
+                            a = min(1, beta);
                             a_half = (4 + 1*a) / 5;
                             ag_xi = a_half^(1/30);
 
@@ -191,14 +236,22 @@ function [w, infos] = ag(problem, in_options)
             else
                 % calculate y = w + (theta - 1)/theta_new * (w-w_old);
                 %y = problem.lincomb_vecvec(1, w, (theta - 1)/theta_new, w_w_old_diff);
-                a = min(1, (theta-1)/theta_new);
+                a = min(1, beta);
                 %y = problem.lincomb_vecvec(1, w, a, w_w_old_diff);
                 y = w + a * w_w_old_diff;
             end
         else  % Baseline, Monotonic
             if ~options.monotonic
-                % calculate y = w + (theta - 1)/theta_new * (w-w_old);
-                y = w + (theta - 1)/theta_new * (w-w_old);
+                if options.use_fix_beta
+                    % Fix step (alpha) and beta
+                    y = w + options.beta * w_w_old_diff; 
+                elseif options.use_variable_beta
+                    y = w + iter/(iter+3) * w_w_old_diff;                     
+                else
+                    % FISTA update!
+                    % calculate y = w + (theta - 1)/theta_new * (w-w_old);
+                    y = w + beta * w_w_old_diff; 
+                end
             else
                 fun_val = problem.cost(w);
                 if iter > 1
@@ -215,7 +268,7 @@ function [w, infos] = ag(problem, in_options)
                 params_diff = w - w_old;
                 %params_diff = problem.lincomb_vecvec(1, w, -1, params_old);
                 %tmp = problem.lincomb_vecvec(theta/theta_new, params_diff, (theta - 1)/theta_new, w_w_old_diff);
-                a = min(1, (theta-1)/theta_new);
+                a = min(1, beta);
                 %tmp = problem.lincomb_vecvec(theta/theta_new, params_diff, a, w_w_old_diff);
                 tmp = theta/theta_new * params_diff + a * w_w_old_diff;
                 %y = problem.lincomb_vecvec(1, w, 1, tmp);

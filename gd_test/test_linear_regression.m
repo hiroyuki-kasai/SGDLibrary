@@ -3,13 +3,16 @@ function  test_linear_regression()
     clc;
     clear;
     close all;
+    
+    %rng('default')
 
     
     %% Set algorithms
     if 0
         algorithms = gd_solver_list('ALL');  
     else           
-        algorithms = gd_solver_list('BFGS'); 
+        algorithms = gd_solver_list('NCG'); 
+        %algorithms = {'NCG-FR-BTK','NCG-FR-WOLFE','NCG-PR-BTK','NCG-PR-WOLFE'};
     end
 
      
@@ -184,14 +187,28 @@ function  test_linear_regression()
                 
                 [w_list{alg_idx}, info_list{alg_idx}] = cg(problem, options); 
                 
-            case {'NCG-BTK'}
+            case {'NCG-FR-BTK'}
+                
+                options.sub_mode = 'STANDARD';                
+                options.step_alg = 'backtracking';      
+                options.beta_alg = 'FR';                
+                [w_list{alg_idx}, info_list{alg_idx}] = ncg(problem, options);    
+                
+            case {'NCG-FR-WOLFE'}
+                
+                options.sub_mode = 'STANDARD';                
+                options.step_alg = 'strong_wolfe';      
+                options.beta_alg = 'FR';                
+                [w_list{alg_idx}, info_list{alg_idx}] = ncg(problem, options);                  
+                
+            case {'NCG-PR-BTK'}
                 
                 options.sub_mode = 'STANDARD';                
                 options.step_alg = 'backtracking';      
                 options.beta_alg = 'PR';                
                 [w_list{alg_idx}, info_list{alg_idx}] = ncg(problem, options);    
                 
-            case {'NCG-WOLFE'}
+            case {'NCG-PR-WOLFE'}
                 
                 options.sub_mode = 'STANDARD';                
                 options.step_alg = 'strong_wolfe';      

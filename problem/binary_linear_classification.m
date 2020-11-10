@@ -1,11 +1,11 @@
-classdef logistic_regression
-% This file defines logistic regression (binary classifier) problem class
+classdef binary_linear_classification
+% This file defines binary linear classification problem (with least squares) class
 %
 % Inputs:
 %       x_train     train data matrix of x of size dxn.
 %       y_train     train data vector of y of size 1xn.
 %       x_test      test data matrix of x of size dxn.
-%       y_test      test data vector of y of size 1xn.
+%       y_test      test data vector of y of size 1xn, y_i = {0,1}.
 %       lambda      l2-regularized parameter. 
 % Output:
 %       Problem     problem instance. 
@@ -16,14 +16,15 @@ classdef logistic_regression
 %           min f(w) = 1/n * sum_i^n f_i(w),           
 %           where 
 %           f_i(w) = log(1 + exp(-y_i' .* (w'*x_i))) + lambda/2 * w^2.
+%           f_i(w) = (y_i - phi(<w, x_i>) )^2, 
+%           where phi(z) = 1 / (1+exp(-z)).
 %
 % "w" is the model parameter of size d vector.
 %
 %
 % This file is part of GDLibrary and SGDLibrary.
 %
-% Created by H.Kasai on Feb. 17, 2016
-% Modified by H.Kasai on March 23, 2018
+% Created by H.Kasai on Apr. 19, 2018
 
 
     properties
@@ -45,7 +46,7 @@ classdef logistic_regression
     end
     
     methods
-        function obj = logistic_regression(x_train, y_train, x_test, y_test, varargin)    
+        function obj = binary_linear_classification(x_train, y_train, x_test, y_test, varargin)    
             
             obj.x_train = x_train;
             obj.y_train = y_train;
@@ -61,7 +62,7 @@ classdef logistic_regression
             obj.d = size(obj.x_train, 1);
             obj.n_train = length(y_train);
             obj.n_test = length(y_test);      
-            obj.name = 'logistic_regression';    
+            obj.name = 'binary_linear_classification';    
             obj.dim = obj.d;
             obj.samples = obj.n_train;
             obj.lambda = obj.lambda;
@@ -72,17 +73,12 @@ classdef logistic_regression
         end
 
         function f = cost(obj, w)
-            %f_old = sum(log(1+exp(-y_train.*(w'*x_train)))/n_train,2)+ lambda * (w'*w) / 2; %is replaced below 
-            % becasuse log(sigmoid(a)) = log(1/(1+exp(-a))) = log1 - log(1+exp(-a)) = -log(1+exp(-a)).
-            %f = -sum(log(sigmoid(y_train.*(w'*x_train)))/n_train,2) + lambda * (w'*w) / 2;
-
-    %         Commented out below due to avoid '-Inf' values of g by HK on 2017/12/5
-    %         f = -sum(log(sigmoid(y_train.*(w'*x_train))),2)/n_train + lambda * (w'*w) / 2;
-
     %         The above is replaced with below by HK on 2017/12/5
-            sigmod_result = sigmoid(obj.y_train.*(w'*obj.x_train));
-            sigmod_result = sigmod_result + (sigmod_result<eps).*eps;
-            f = -sum(log(sigmod_result),2)/obj.n_train + obj.lambda * (w'*w) / 2;
+            %sigmod_result = sigmoid(obj.y_train.*(w'*obj.x_train));
+            %sigmod_result = sigmod_result + (sigmod_result<eps).*eps;
+            %f = -sum(log(sigmod_result),2)/obj.n_train + obj.lambda * (w'*w) / 2;
+            
+            f = mean((obj.y_train' - sigmoid(obj.x_train' * w)).^2) + 0.5 * obj.lambda * norm(w)^2;        
         end
         
         function f = cost_batch(obj, w, indices)
@@ -92,32 +88,21 @@ classdef logistic_regression
         end
 
         function g = grad(obj, w, indices)
+            
+            n = length(indices);
+            X_sub = obj.x_train(:,indices);
+            y_sub = obj.y_train(indices);
 
-            % org code
-            %g = -sum(((ones(obj.d,1) * (sigmoid(-obj.y_train(indices).*(w'*obj.x_train(:,indices))) .* obj.y_train(indices))) .* obj.x_train(:,indices))/length(indices),2) + obj.lambda * w;
-            %
-            % (log(1+exp(-y_train.*(w'*x_train)))' = -y_train.*x_train * (exp(-y_train.*(w'*x_train))/(1+exp(-y_train.*(w'*x_train))))
-            %   = -y_train.*x_train * (1 - sigmoid(y_train.*(w'*x_train)))
-            % or
-            % (log(sigmoid(y_train.*(w'*x_train)))' = y_train.*x_train * 1/sigmoid(y_train.*(w'*x_train)) * (sigmoid(y_train.*(w'*x_train)))'
-            %   = y_train.*x_train * 1/sigmoid(y_train.*(w'*x_train)) * (- sigmoid(y_train.*(w'*x_train)) * (1 - sigmoid(y_train.*(w'*x_train))))
-            %   = -y_train.*x_train * (1 - sigmoid(y_train.*(w'*x_train)))
-
-    %         Replace the commented-out lines with below (although it is a bit slower) due to avoid 'NAN' values of g by HK on 2017/12/5
-            g = -sum(ones(obj.d,1) * obj.y_train(indices).*obj.x_train(:,indices) * (ones(1,length(indices))-sigmoid(obj.y_train(indices).*(w'*obj.x_train(:,indices))))',2)/length(indices)+ obj.lambda * w;
-
-    %         Commented out below due to avoid 'NAN' values of g by HK on 2017/12/5
-%             e = exp(-1*obj.y_train(indices)'.*(obj.x_train(:,indices)'*w));
-%             s = e./(1+e);
-%             g = -(1/length(indices))*((s.*obj.y_train(indices)')'*obj.x_train(:,indices)')';
-%             g = full(g) + obj.lambda * w;
-
+            a = sigmoid(X_sub' * w);
+            g = 2 * X_sub *((a - y_sub').*a.*(1-a)) + obj.lambda * w;
+            g = g / n;
         end
 
         function g = full_grad(obj, w)
 
-            %g = -sum(ones(d,1) * y_train.*x_train * (ones(1,n_train)-sigmoid(y_train.*(w'*x_train)))',2)/n_train+ lambda * w;
-            g = grad(obj, w, 1:obj.n_train);
+            a = sigmoid(obj.x_train' * w);
+            g = 2 * obj.x_train * ((a - obj.y_train').*a.*(1-a)) + obj.lambda * w;
+            g = g / obj.n_train;
         end
 
         function g = ind_grad(obj, w, indices)
@@ -126,49 +111,105 @@ classdef logistic_regression
 
         end
 
+%         function h = hess(obj, w, subsamp_size)
+%             
+%             XY = datasample([obj.x_train', obj.y_train'], subsamp_size, 1, 'Replace', false);
+%             X_sub = XY(:,1:end-1);
+%             y_sub = XY(:,end);
+% 
+%             n = length(y_sub);
+%             a = sigmoid(X_sub * w);
+%             c = 2/n * ((a - y_sub).*a.*(1-a).*(1 - 2*a) + a.^2 .*(1 - a).^2);  
+%             
+%             h = X_sub'*bsxfun(@times,c,X_sub)+ obj.lambda * eye(obj.d);
+%             h = (h + h')/2;            
+% 
+%         end
+        
         function h = hess(obj, w, indices)
+            
+            n = length(indices);
+            
+            X_sub = obj.x_train(:,indices)';
+            y_sub = obj.y_train(indices)';
+            
+            a = sigmoid(X_sub * w);
+            c = 2/n * ((a - y_sub).*a.*(1-a).*(1 - 2*a) + a.^2 .*(1 - a).^2);  
+            
+            h = X_sub'*bsxfun(@times,c, X_sub)+ obj.lambda * eye(obj.d);
+            h = (h + h')/2;            
 
-            %org code
-            %temp = exp(-1*(y_train(indices)').*(x_train(:,indices)'*w));
-            %b = temp ./ (1+temp);
-            %h = 1/length(indices)*x_train(:,indices)*(diag(b-b.^2)*(x_train(:,indices)'))+lambda*eye(d); 
-
-            sigm_val = sigmoid(obj.y_train(indices).*(w'*obj.x_train(:,indices)));
-            c = sigm_val .* (ones(1,length(indices))-sigm_val); 
-            h = 1/length(indices)* obj.x_train(:,indices) * diag(obj.y_train(indices).^2 .* c) * obj.x_train(:,indices)'+obj.lambda*eye(obj.d);
-
-        end
+        end        
 
         function h = full_hess(obj, w)
 
-            h = hess(obj, w, 1:obj.n_train);
+            h = hess(obj, w, obj.n_train);
 
         end
 
         function hv = hess_vec(obj, w, v, indices)
 
-            sigm_val = sigmoid(obj.y_train(indices).*(w'*obj.x_train(:,indices)));
-            c = sigm_val .* (ones(1,length(indices))-sigm_val); 
-            hv = 1/length(indices)* obj.x_train(:,indices) * diag(obj.y_train(indices).^2 .* c) * (obj.x_train(:,indices)' * v) +obj.lambda*v;
+            n = length(indices);
+            
+            X_sub = obj.x_train(:,indices)';
+            y_sub = obj.y_train(indices)';
+            
+            a = sigmoid(X_sub * w);
+            c = 2/n * ((a - y_sub).*a.*(1-a).*(1 - 2*a) + a.^2 .*(1 - a).^2);  
+            
+            h = X_sub'*bsxfun(@times,c, X_sub)+ obj.lambda * eye(obj.d);
+            h = (h + h')/2;   
+            
+            hv = h * v;
 
         end
 
-        function p = prediction(obj, w)
-
-            p = sigmoid(w' * obj.x_test);
-
-            class1_idx = p>0.5;
-            class2_idx = p<=0.5;         
-            p(class1_idx) = 1;
-            p(class2_idx) = -1;         
-
+        function p = prediction(obj, w, mode)
+            if strcmp(mode, 'train')
+                p = sigmoid(obj.x_train*(w)) > 0.5;
+            else
+                p = sigmoid(obj.x_test*(w)) > 0.5;
+            end
         end
+        
+        function p_all = prediction_all(obj, w_array, mode)
+            len = size(w_array, 2);
+            if strcmp(mode, 'train')            
+                p_all = zeros(obj.n_train, len);
+            else
+                p_all = zeros(obj.n_test, len);
+            end
+            
+            for i = 1 : len
+                if strcmp(mode, 'train')
+                    p_all(:, i) = sigmoid(obj.x_train'*(w_array(:,i))) > 0.5;
+                else
+                    p_all(:, i) = sigmoid(obj.x_test'*(w_array(:,i))) > 0.5;
+                end
+            end
+        end        
 
-        function a = accuracy(obj, y_pred)
-
-            a = sum(y_pred == obj.y_test) / obj.n_test; 
-
+        function a = accuracy(obj, y_pred, mode)
+            if strcmp(mode, 'train')
+                a = bsxfun(@(x,y)x==y, y_pred, obj.y_train);
+            else
+                a = bsxfun(@(x,y)x==y, y_pred, obj.y_test);               
+            end
         end
+        
+        function a_all = accuracy_all(obj, y_pred_array, mode)
+            len = size(y_pred_array, 2);
+            a_all = zeros(len, 1);
+            
+            for i = 1 : len 
+                if strcmp(mode, 'train')
+                    corrects = bsxfun(@(x,y)x==y, y_pred_array(:, i), obj.y_train');
+                else
+                    corrects = bsxfun(@(x,y)x==y, y_pred_array(:, i), obj.y_test');
+                end
+                a_all(i) = mean(corrects);
+            end
+        end        
 
         function w_opt = calc_solution(obj, maxiter, method)
 

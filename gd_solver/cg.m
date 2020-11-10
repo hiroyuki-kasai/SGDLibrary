@@ -126,7 +126,7 @@ function [w, infos] = cg(problem, in_options)
         % line search
         options.r_old = r_old;
         options.y_old = y_old;        
-        [step, ~] = linesearch_alg(options.step_alg, problem, w, w_old, p, grad_old, prev_step, options);   
+        [step, ~] = options.linesearchfun(options.step_alg, problem, w, w_old, p, grad_old, prev_step, options);   
         prev_step = step;
         
         % update w

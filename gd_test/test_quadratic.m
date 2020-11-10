@@ -6,10 +6,11 @@ function  test_quadratic()
 
     
     %% Set algorithms
-    if 0
+    if 1
         algorithms = gd_solver_list('ALL');  
     else
-        algorithms = {'SD-NESTEROV'};           
+        algorithms = {'SD-NESTEROV'};     
+        algorithms = {'CG-PRECON-EXACT','CG-EXACT'}; 
     end
 
      
@@ -66,7 +67,7 @@ function  test_quadratic()
             case {'SD-NESTEROV'}
                 
                 options.step_alg = 'backtracking';
-                [w_list{alg_idx}, info_list{alg_idx}] = sd_nesterov(problem, options);
+                [w_list{alg_idx}, info_list{alg_idx}] = ag(problem, options);
                 
             case {'SD-STD'}
                 

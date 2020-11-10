@@ -57,7 +57,7 @@ function [] = test_l1_logistic_regression()
         % calculate solution
         options.w_init = w_init;
         options.max_iter = 100;
-        w_opt = problem.calc_solution(options, 'sd_nesterov');
+        w_opt = problem.calc_solution(options, 'ag');
     %end
     f_opt = problem.cost(w_opt); 
     fprintf('f_opt: %.24e\n', f_opt);  
@@ -100,13 +100,13 @@ function [] = test_l1_logistic_regression()
                 
                 options.step_alg = 'backtracking';
                 options.step_init_alg = 'bb_init';
-                [w_list{alg_idx}, info_list{alg_idx}] = sd_nesterov(problem, options);
+                [w_list{alg_idx}, info_list{alg_idx}] = ag(problem, options);
                 
             case {'APG-TFOCS-BKT'}
                 
                 options.step_alg = 'tfocs_backtracking';
                 options.step_init_alg = 'bb_init';
-                [w_list{alg_idx}, info_list{alg_idx}] = sd_nesterov(problem, options);  
+                [w_list{alg_idx}, info_list{alg_idx}] = ag(problem, options);  
                 
             case {'L-BFGS-BKT'}
                 

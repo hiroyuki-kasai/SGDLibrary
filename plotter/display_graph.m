@@ -79,10 +79,32 @@ function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, inf
             
             if strcmp(y_category, 'cost')
                 y_plot_data = info_list{alg_idx}.cost;
+            elseif strcmp(y_category, 'best_cost')
+                y_plot_data = info_list{alg_idx}.best_cost; 
+            elseif strcmp(y_category, 'cost_lag')
+                y_plot_data = info_list{alg_idx}.cost_lag;                   
             elseif strcmp(y_category, 'optimality_gap')
                 y_plot_data = info_list{alg_idx}.optgap;
+            elseif strcmp(y_category, 'abs_optimality_gap')
+                y_plot_data = info_list{alg_idx}.absoptgap;                
+            elseif strcmp(y_category, 'best_optimality_gap')
+                y_plot_data = info_list{alg_idx}.best_optgap;                
             elseif strcmp(y_category, 'sol_optimality_gap')
-                y_plot_data = info_list{alg_idx}.sol_optgap;                
+                y_plot_data = info_list{alg_idx}.sol_optgap; 
+            elseif strcmp(y_category, 'dual_gap')
+                y_plot_data = info_list{alg_idx}.dual_gap;   
+            elseif strcmp(y_category, 'const_norm')
+                y_plot_data = info_list{alg_idx}.const_norm;  
+            elseif strcmp(y_category, 'econst_norm')
+                y_plot_data = info_list{alg_idx}.econst_norm;                  
+            elseif strcmp(y_category, 'ineconst_norm')
+                y_plot_data = info_list{alg_idx}.ineconst_norm;  
+            elseif strcmp(y_category, 'inv_rho')
+                y_plot_data = info_list{alg_idx}.inv_rho;  
+            elseif strcmp(y_category, 'eta')
+                y_plot_data = info_list{alg_idx}.eta;                  
+            elseif strcmp(y_category, 'gradL_norm')
+                y_plot_data = info_list{alg_idx}.gradL_norm;                  
             elseif strcmp(y_category, 'gnorm')
                 y_plot_data = info_list{alg_idx}.gnorm;    
             elseif strcmp(y_category, 'subgnorm')
@@ -147,10 +169,32 @@ function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, inf
     % Y label    
     if strcmp(y_category, 'cost')    
         ylabel('Cost', 'FontSize', fontsize);
+    elseif strcmp(y_category, 'best_cost')    
+        ylabel('Best cost', 'FontSize', fontsize);    
+    elseif strcmp(y_category, 'cost_lag')    
+        ylabel('Lagrangian cost', 'FontSize', fontsize);         
     elseif strcmp(y_category, 'optimality_gap')
         ylabel('Optimality gap', 'FontSize', fontsize);
+    elseif strcmp(y_category, 'abs_optimality_gap')
+        ylabel('Absolute optimality gap', 'FontSize', fontsize);        
+    elseif strcmp(y_category, 'best_optimality_gap')
+        ylabel('Best optimality gap', 'FontSize', fontsize);        
     elseif strcmp(y_category, 'sol_optimality_gap')
-        ylabel('Solution optimality gap', 'FontSize', fontsize);        
+        ylabel('Solution optimality gap', 'FontSize', fontsize);  
+    elseif strcmp(y_category, 'dual_gap')
+        ylabel('Dual gap', 'FontSize', fontsize); 
+    elseif strcmp(y_category, 'const_norm')
+        ylabel('Norm of constraints', 'FontSize', fontsize); 
+    elseif strcmp(y_category, 'econst_norm')
+        ylabel('Norm of equality constraints', 'FontSize', fontsize);          
+    elseif strcmp(y_category, 'ineconst_norm')
+        ylabel('Norm of inequality constraints', 'FontSize', fontsize);          
+    elseif strcmp(y_category, 'gradL_norm')
+        ylabel('Norm of gradient of Lagrangian', 'FontSize', fontsize);    
+    elseif strcmp(y_category, 'inv_rho')
+        ylabel('Inverse of \rho', 'FontSize', fontsize);  
+    elseif strcmp(y_category, 'eta')
+        ylabel('\eta', 'FontSize', fontsize);           
     elseif strcmp(y_category, 'gnorm')
         ylabel('Norm of gradient', 'FontSize', fontsize);   
     elseif strcmp(y_category, 'subgnorm')
