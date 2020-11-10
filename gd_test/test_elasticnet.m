@@ -9,7 +9,7 @@ function [] = test_elasticnet()
     if 0
         algorithms = gd_solver_list('ALL');  
     else
-        algorithms = {'PG-BKT', 'PG-TFOCS-BKT', 'APG-BKT', 'APG-TFOCS-BKT', 'CD-EasticNet', 'FISTA'}; 
+        algorithms = {'PG-BKT', 'PG-TFOCS-BKT', 'APG-BKT', 'CD-EasticNet', 'FISTA'}; 
     end    
     
     
@@ -76,7 +76,8 @@ function [] = test_elasticnet()
                 
             case {'FISTA'}
                 
-                [w_list{alg_idx}, info_list{alg_idx}] = fista(problem, options); 
+                options.sub_mode  = 'FISTA';
+                [w_list{alg_idx}, info_list{alg_idx}] = ista(problem, options); 
                 
             case {'ADMM-LASSO'}
                 
