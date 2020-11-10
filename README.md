@@ -3,9 +3,9 @@
 
 Authors: [Hiroyuki Kasai](http://kasai.comm.waseda.ac.jp/kasai/)
 
-Last page update: October 27, 2020
+Last page update: October 20, 2020
 
-Latest library version: 1.0.19 (see Release notes for more info)
+Latest library version: 1.0.20 (see Release notes for more info)
 
 <br />
 
@@ -383,6 +383,7 @@ License
     - scr.m, cr_subsolver.m, subsamp_tr.m, tr_subsolver.m: Python codes are originally created by [J. M. Kohler and A. Lucchi](https://github.com/dalab/subsampled_cubic_regularization). These MATLAB codes are ported with original authors' big helps.
 - Third party files are included.
     - subsamp_newton.m: originally created by Peng Xu and Jiyan Yang  in [Subsampled-Newton](https://github.com/git-xp/Subsampled-Newton). This is modifided to handle other problems like linear regression.  
+    - Proximal Solver from [FOM](https://sites.google.com/site/fomsolver/)
 
 <br />
 
@@ -402,6 +403,8 @@ If you have any problems or questions, please contact the author: [Hiroyuki Kasa
 
 Release Notes
 --------------
+* Version 1.0.20 (Nov. 10, 2020)
+    - Buf fixed, and some files are added.
 * Version 1.0.19 (Oct. 27, 2020)
     - Buf fixed, and some files are added.
 * Version 1.0.17 (Apr. 17, 2018)
