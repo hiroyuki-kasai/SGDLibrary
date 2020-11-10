@@ -50,7 +50,7 @@ function [] = test_lasso()
         
         %% define problem definitions
         clear problem;
-        problem = lasso(A, b, lambda, 'reg');
+        problem = lasso(A, b, lambda, 'prox_reg');
     
         fprintf('\n\n### [%02d] %s ###\n\n', alg_idx, algorithms{alg_idx});
         
