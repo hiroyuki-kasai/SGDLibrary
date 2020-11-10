@@ -8,7 +8,7 @@ function [] = test_lasso_cv()
     %% prepare dataset
     n = 1280; 
     d = 100;         
-    k = 5;                                     % cardinality of nonzero elements
+    k = 5;                                      % cardinality of nonzero elements
     if n >= d
         [A,~] = qr(randn(n,d),0);                   
         A = A'; 
@@ -43,7 +43,8 @@ function [] = test_lasso_cv()
 
         case {'FISTA'}
 
-            solver = @fista;
+            options.sub_mode  = 'FISTA';
+            solver = @ista;
 
         case {'ADMM-LASSO'}
 
@@ -84,7 +85,7 @@ function [] = test_lasso_cv()
     %% perform cross-validations
     for i=1:len
         lambda = lamnda_array(i);
-        problem = lasso(A, b, lambda);
+        problem = lasso(A, b, lambda, 'prox_reg');
         
         [W(:,i), infos] = solver(problem, options);
         l1_norm(i) = infos.reg(end);
