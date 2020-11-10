@@ -142,7 +142,8 @@ function [] = test_lasso()
                 
             case {'FISTA'}
                 
-                [w_list{alg_idx}, info_list{alg_idx}] = fista(problem, options); 
+                options.sub_mode  = 'FISTA';                
+                [w_list{alg_idx}, info_list{alg_idx}] = ista(problem, options); 
                 
             case {'ADMM-LASSO'}
                 
