@@ -10,7 +10,8 @@ classdef matrix_completion
 %
 % The problem of interest is defined as
 %
-%           min f(w) =  1/2 ||P_omega(W) - P_omega(A)||_2^2,
+%           min     f(w) =  1/2 ||P_omega(W) - P_omega(A)||_2^2,
+%           s.t.    || W ||_* <= 1,
 %
 % "w" is the model parameter of size mxn vector, which is transformed to matrix W of size [m, n]. 
 %
@@ -28,7 +29,8 @@ classdef matrix_completion
         n;
         A;
         mask;
-        r
+        r;
+        prox_flag;
     end
     
     methods
@@ -44,6 +46,8 @@ classdef matrix_completion
             obj.name = 'matrix completion';  
             obj.dim = obj.m * obj.n;
             obj.samples = obj.n;
+            
+            obj.prox_flag = true;
         end
         
         function v = prox(obj, w, t)
@@ -56,7 +60,7 @@ classdef matrix_completion
             
             grad_mat = reshape(grad, [obj.m obj.n]);
 
-            [u,s,v] = svds(-grad_mat,1); % LMO is solved by top singular vector pair
+            [u,s,v] = svds(-grad_mat, 1); % LMO is solved by top singular vector pair
             uvt = obj.r * u*v';
             uvt = uvt(:);
             idx = 1;
@@ -103,6 +107,47 @@ classdef matrix_completion
         function hv = hess_vec(obj, w, v, indices)
             error('Not implemted yet.');
         end
+        
+        
+        function w_opt = calc_solution(obj, method, options_in)
+
+            if nargin < 2
+                method = 'ag';
+            end        
+
+            options.max_epoch = options_in.max_iter;
+            options.w_init = options_in.w_init;
+            options.verbose = options_in.verbose;
+            options.tol_optgap = 1.0e-24;
+            options.tol_gnorm = 1.0e-16;
+            options.step_alg = 'backtracking';
+            
+            if ~options.verbose
+                fprintf('Calclation of solution started ... ');
+            end            
+
+            if strcmp(method, 'sd')
+                [w_opt,~] = sd(obj, options);
+            elseif strcmp(method, 'cg')
+                [w_opt,~] = ncg(obj, options);
+            elseif strcmp(method, 'newton')
+                options.sub_mode = 'INEXACT';    
+                options.step_alg = 'non-backtracking'; 
+                [w_opt,~] = newton(obj, options);
+            elseif strcmp(method, 'ag')
+                options.step_alg = 'backtracking';
+                options.step_init_alg = 'bb_init';
+                [w_opt,~] = ag(obj, options);            
+            else 
+                options.step_alg = 'backtracking';  
+                options.mem_size = 5;
+                [w_opt,~] = lbfgs(obj, options);              
+            end
+            
+            if ~options.verbose
+                fprintf('done\n');
+            end             
+        end          
         
     end
 

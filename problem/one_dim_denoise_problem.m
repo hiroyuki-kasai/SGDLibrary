@@ -11,6 +11,7 @@ classdef one_dim_denoise_problem
         b;
         n;
         d;
+        prox_flag;
     end
     
     methods
@@ -33,7 +34,7 @@ classdef one_dim_denoise_problem
             end 
             obj.LaptLap = obj.Lap' * obj.Lap;
             
-
+            obj.prox_flag = false;
         end
 
 %         function v = prox_denoise(w, t)

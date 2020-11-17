@@ -1,4 +1,4 @@
-function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, info_list, scale, line, width)
+function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, info_list, scale, line, width, xlim_range_in, ylim_range_in)
 % SHow graphs of optimizations
 %
 % Inputs:
@@ -30,7 +30,19 @@ function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, inf
         linewidth = 2;
     else
         linewidth = width;
-    end      
+    end 
+    
+    if nargin < 9
+        xlim_range = [];
+    else
+        xlim_range = xlim_range_in;
+    end 
+    
+    if nargin < 10
+        ylim_range = [];
+    else
+        ylim_range = ylim_range_in;
+    end     
     
     % for plotting
     if strcmp(line_type, 'line')
@@ -164,8 +176,9 @@ function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, inf
     elseif strcmp(x_category, 'inner_iter')
         xlabel('Inner Iteration', 'FontSize', fontsize);         
     else
-    end    
+    end  
     
+   
     % Y label    
     if strcmp(y_category, 'cost')    
         ylabel('Cost', 'FontSize', fontsize);
@@ -217,9 +230,21 @@ function [ ] = display_graph(x_category, y_category, algorithm_list, w_list, inf
         ylabel('Norm of direction', 'FontSize', fontsize);         
     end
     
+    
+    % range
+    if ~isempty(xlim_range)
+        xlim([xlim_range])
+    end  
+    
+    if ~isempty(ylim_range)
+        ylim([ylim_range])
+    end
+    
+    % legend
     if ~strcmp(y_category, 'coeffs')
         legend(legend_str);
     end
+    
     set(gca, 'FontSize', fontsize);      
 end
 

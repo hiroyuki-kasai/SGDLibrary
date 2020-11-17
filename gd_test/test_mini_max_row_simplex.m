@@ -35,11 +35,11 @@ function [] = test_mini_max_row_simplex()
     
     options.step_init = 1;    
     algorithms{1} = 'Proximal Subgradient (step: 1)';      
-    [w_list{1}, info_list{1}] = subgrad(problem, options); 
+    [w_list{1}, info_list{1}] = subg(problem, options); 
 
     options.step_init = 0.2;
     algorithms{2} = 'Proximal Subgradient (step: 0.2)';     
-    [w_list{2}, info_list{2}] = subgrad(problem, options); 
+    [w_list{2}, info_list{2}] = subg(problem, options); 
 
 
     %% plot all
