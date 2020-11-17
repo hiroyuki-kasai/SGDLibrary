@@ -177,7 +177,7 @@ function [w, infos] = ag(problem, in_options)
 
 
         % proximal operator for APG
-        if ismethod(problem, 'prox')            
+        if problem.prox_flag            
             w = problem.prox(w, step);
         end          
 

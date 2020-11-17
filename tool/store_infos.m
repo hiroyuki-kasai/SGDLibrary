@@ -94,7 +94,7 @@ function [infos, f_val, optgap, grad, gnorm, subgrad, subgnorm, smooth_grad, smo
         infos.optgap = [infos.optgap optgap];
         infos.absoptgap = [infos.absoptgap abs(optgap)];
         if optgap < infos.best_optgap(end)
-            infos.best_optgap = [infos.best_optgap f_val];
+            infos.best_optgap = [infos.best_optgap optgap];
         else
             infos.best_optgap = [infos.best_optgap infos.best_optgap(end)];
         end        

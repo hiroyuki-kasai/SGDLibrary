@@ -86,18 +86,18 @@ function [] = test_lasso()
                 
                 options.step_alg = 'decay-7';
                 options.step_init = 1/problem.L; 
-                [w_list{alg_idx}, info_list{alg_idx}] = subgrad(problem, options);
+                [w_list{alg_idx}, info_list{alg_idx}] = subg(problem, options);
                 
             case {'SUBG-BKT'}
                 
                 options.step_alg = 'backtracking';
-                [w_list{alg_idx}, info_list{alg_idx}] = subgrad(problem, options);  
+                [w_list{alg_idx}, info_list{alg_idx}] = subg(problem, options);  
                 
                 
             case {'SUBG-TFOCS-BKT'}
                 
                 options.step_alg = 'tfocs_backtracking';
-                [w_list{alg_idx}, info_list{alg_idx}] = subgrad(problem, options);                  
+                [w_list{alg_idx}, info_list{alg_idx}] = subg(problem, options);                  
                 
             case {'PG-BKT'}
                 

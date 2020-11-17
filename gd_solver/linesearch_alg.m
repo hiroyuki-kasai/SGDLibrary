@@ -89,9 +89,39 @@ function [step, out_options] = linesearch_alg(step_alg, problem, w, w_old, grad,
         elseif strcmp(step_alg, 'decay-6')
             step = step_init / sqrt(options.lambda + iter);  
         elseif strcmp(step_alg, 'decay-7')
-            step = step_init / sqrt(2 + iter);            
+            step = step_init / sqrt(2 + iter); 
+        elseif strcmp(step_alg, 'decay-8')
+            step = step_init / (3 + iter);            
         else
         end
+        
+    elseif contains(step_alg, 'gnorm') 
+        
+        iter = options.iter;        
+        step_init = options.step_init;
+
+        if strcmp(step_alg, 'gnorm-sub-1')  
+            subgrad = problem.full_subgrad(w);
+            gnorm = norm(subgrad);            
+            step = step_init / gnorm;   
+        elseif strcmp(step_alg, 'gnorm-sub-opt')  
+            subgrad = problem.full_subgrad(w);
+            gnorm = norm(subgrad);            
+            step = (options.f_val - options.f_opt) / gnorm^2; 
+        elseif strcmp(step_alg, 'gnorm-sub-est_opt')  
+            subgrad = problem.full_subgrad(w);
+            gnorm = norm(subgrad);            
+            gamma = 10/(10+iter+1);
+            step = (options.f_val - options.f_best + gamma) / gnorm^2;             
+        elseif strcmp(step_alg, 'gnorm-dual-1')
+            grad = problem.full_grad_dual(w);
+            gnorm = norm(grad);            
+            step = step_init / gnorm;        
+        end 
+        
+    elseif contains(step_alg, 'exact_lasso') 
+        
+        step = problem.exact_line_search(w, -grad, options.idx, options.sign_flag);
         
     elseif strcmp(step_alg, 'no_change')
 

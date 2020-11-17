@@ -114,7 +114,8 @@ classdef lasso
             if strcmp(obj.sub_mode, 'prox_reg')
                 v = soft_thresh(w, t * obj.lambda);
             elseif strcmp(obj.sub_mode, 'const')
-                v = sign(w) .* proj_simplex(abs(w), obj.lambda, 'ineq');
+                %v = sign(w) .* proj_simplex(abs(w), obj.lambda, 'ineq');
+                v = proj_l1_ball(w, obj.lambda);
             else
                 error('Not correctly specified for sub_mode');
             end
@@ -213,9 +214,9 @@ classdef lasso
             step = max(0, min(1, As_minus_Ax' * (obj.b-obj.A*w) / (As_minus_Ax' * As_minus_Ax)));
         end          
 
-        function w_opt = calc_solution(obj, options_in, method)
+        function w_opt = calc_solution(obj, method, options_in)
 
-            if nargin < 3
+            if nargin < 1
                 method = 'ista';
             end        
 
@@ -250,7 +251,7 @@ classdef lasso
             end
             
             if ~options.verbose
-                fprintf('dobe\n');
+                fprintf('done\n');
             end            
         end
     end

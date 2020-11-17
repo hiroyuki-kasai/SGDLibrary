@@ -1,5 +1,5 @@
-function [w, infos] = sd(problem, in_options)
-% Full steepest descent gradient algorithm.
+function [w, infos] = hb(problem, in_options)
+% Heavy Ball algorithm.
 %
 % Inputs:
 %       problem     function (cost/grad/hess)
@@ -10,9 +10,7 @@ function [w, infos] = sd(problem, in_options)
 %
 % This file is part of GDLibrary and SGDLibrary.
 %
-% Created by H.Kasai on Feb. 15, 2016
-% Modified by H.Kasai on Mar. 23, 2018
-% Modified by H.Kasai on Oct. 20, 2020
+% Created by H.Kasai on Oct. 28, 2020
 
 
     % set dimensions and samples
@@ -20,9 +18,9 @@ function [w, infos] = sd(problem, in_options)
     n = problem.samples;     
     
     % set local options 
-    local_options = []; 
-    local_options.algorithm = 'SD';    
-    local_options.sub_mode = 'STANDARD';
+    local_options = [];
+    local_options.step_alg = 'backtracking';
+    local_options.beta = 0.01;    
 
     % merge options
     options = mergeOptions(get_default_options(d), local_options);   
@@ -35,14 +33,30 @@ function [w, infos] = sd(problem, in_options)
     w_old = w;
     prev_step = options.step_init;
     
-    if ~isfield(options, 'S')
-        if strcmp(options.step_alg, 'exact')
-            options.S = eye(d);
-        end        
-    else    
-        %
+    % for stepsize
+    if strcmp(options.step_alg, 'fix') || strcmp(options.step_alg, 'no_change')
+        if isprop(problem, 'L')
+            if problem.L > 0
+                if isprop(problem, 'mu')
+                    if problem.mu > 0
+                        % This casse is L-smooth and mu-strongly convex.
+                        cn = problem.L/problem.mu;
+                        options.step_init = 4/(sqrt(problem.L)+sqrt(problem.mu))^2;
+                        options.beta = ( (sqrt(cn)-1)/(sqrt(cn)+1) )^2;                        
+                    else
+                        % This casse is L-smooth
+                        options.step_init = 1/problem.L; 
+                    end
+                else
+                    % This casse is L-smooth
+                    options.step_init = 1/problem.L; 
+                end
+            else
+                options.step_alg = 'backtracking';
+            end
+        end
     end
-    
+
     % initialize by BB step-size 
     if strcmp(options.step_init_alg, 'bb_init')
         options.step_init = bb_init(problem, w);
@@ -55,11 +69,7 @@ function [w, infos] = sd(problem, in_options)
     
     % display info
     if options.verbose
-        if ~problem.prox_flag
-            fprintf('SD: Iter = %03d, cost = %.24e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
-        else
-            fprintf('PG: Iter = %03d, cost = %.24e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
-        end
+        fprintf('HB: Iter = %03d, cost = %.24e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
     end  
     
     % set start time
@@ -72,23 +82,14 @@ function [w, infos] = sd(problem, in_options)
         [step, ~] = options.linesearchfun(options.step_alg, problem, w, w_old, grad, grad_old, prev_step, options);   
 
         prev_step = step;
+        w_w_old_diff = w - w_old;
         w_old = w;
-        if strcmp(options.sub_mode, 'SCALING')
-            % diagonal scaling 
-            if isempty(options.S)
-                h = problem.full_hess(w);
-                options.S = diag(1./diag(h));
-            end
-            
-            % update w
-            w = w - step * options.S * grad;  
-        else
-            % update w
-            w = w - step * grad;            
-        end
-        
+  
+        % update w
+        w = w - step * grad + options.beta * w_w_old_diff;            
+
         % proximal operator
-        if problem.prox_flag            
+        if ismethod(problem, 'prox')            
             w = problem.prox(w, step);
         end
         
@@ -109,11 +110,7 @@ function [w, infos] = sd(problem, in_options)
 
         % display infos
         if options.verbose
-            if ~problem.prox_flag
-                fprintf('SD: Iter = %03d, cost = %.24e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
-            else
-                fprintf('PG: Iter = %03d, cost = %.24e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
-            end
+            fprintf('HB: Iter = %03d, cost = %.24e, gnorm = %.4e, optgap = %.4e\n', iter, f_val, gnorm, optgap);
         end        
     end
     
