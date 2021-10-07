@@ -40,7 +40,8 @@ classdef l1_linear_regression
         x_test;
         y_test;
         x_norm;
-        x;          
+        x;   
+        prox_flag;
     end
 
         
@@ -56,6 +57,12 @@ classdef l1_linear_regression
                 obj.lambda = 0.1;
             else
                 obj.lambda = varargin{1};
+            end 
+            
+            if obj.lambda > 0
+                obj.prox_flag = true;
+            else
+                obj.prox_flag = false;
             end            
             
             obj.d = size(obj.x_train, 1);
@@ -70,6 +77,11 @@ classdef l1_linear_regression
             obj.x = x_train;            
         end
 
+        
+        function v = prox(obj, w, t) % l1 soft threshholding
+            v = obj.l1_soft_thresh(w, t);
+        end   
+        
         function v = l1_soft_thresh(obj, w, t)
             v = soft_thresh(w, t * obj.lambda);
         end       
