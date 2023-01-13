@@ -9,6 +9,14 @@ Latest library version: 1.0.20 (see Release notes for more info)
 
 <br />
 
+Announcement
+----------
+We are very welcome to your contribution. Please tell us 
+- Stochastic optimization solvers written by MATLAB, and 
+- your comments and suggestions.
+
+<br />
+
 Introduction
 ----------
 The SGDLibrary is a **pure-MATLAB** library or toolbox of a collection of **stochastic optimization algorithms**. This solves an unconstrained minimization problem of the form, min f(x) = sum_i f_i(x).
