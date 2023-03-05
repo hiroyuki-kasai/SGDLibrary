@@ -450,7 +450,3 @@ Release Notes
     - Convergence behavior animation function is added.
 * Version 1.0.0 (Oct. 27, 2016)
     - Initial version.
-
-
-
-
