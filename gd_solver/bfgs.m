@@ -24,6 +24,7 @@ function [w, infos] = bfgs(problem, options)
 %
 % Created by H.Kasai on Feb. 15, 2016
 % Modified by H.Kasai on Mar. 25, 2018
+% Modified by H.Kasai on May 11, 2023
 
 
     % set dimensions and samples
@@ -128,13 +129,12 @@ function [w, infos] = bfgs(problem, options)
     end
     
     % set direction
-    % Set the identity matrix to the initial inverse-Hessian-matrix
-    % The first step is in the steepest descent direction
     if strcmp(update_mode, 'H')    
         InvHess = eye(d);
         p = - InvHess * grad;    
     else
         B = eye(d);
+        B_old = B;        
         p = - B \ grad;        
     end
     
@@ -149,10 +149,15 @@ function [w, infos] = bfgs(problem, options)
     % main loop
     while (optgap > tol_optgap) && (gnorm > tol_gnorm) && (iter < max_iter) && ~stopping       
         
-        % Revert to steepest descent if is not direction of descent                
+        % revert to steepest descent if not descent direction                 
         if (p'*grad > 0)
-            p = -p;
-        end  
+            p = -grad;
+            if strcmp(bfgs_update_mode, 'H') 
+                InvHess = eye(n);
+            else
+                B = B_old;
+            end
+        end         
         
         % line search
         if strcmp(step_alg, 'backtracking')
@@ -207,9 +212,10 @@ function [w, infos] = bfgs(problem, options)
             p = - InvHess * grad;     
         
         elseif  strcmp(update_mode, 'B')
+            B_old = B;
             
             % update hessian by Eq. (6.19)
-            B = B - (B*s*s'*B)/(s'*B*s) + (y*y')/(s'*y) + 1e-6 * eye(d);
+            B = B - (B*(s*s')*B)/(s'*B*s) + (y*y')/(s'*y) + 1e-6 * eye(d);
 
             if ~(any(isnan(B(:))))
                 p = - B \ grad; 
@@ -228,10 +234,10 @@ function [w, infos] = bfgs(problem, options)
                 theta = 0.8 * stBs / (stBs - sty);
             end
             % form r, convex combination of y and Bs
-            r = theta * y + (1-theta)*B*s;                
+            r = theta * y + (1 - theta) * B * s;                
 
             % update hessian by Eq. (18.16)
-            B = B - (B*s*s'*B)/stBs + (r*r')/(s'*r) + 1e-6 * eye(d);
+            B = B - (B*(s*s')*B)/stBs + (r*r')/(s'*r) + 1e-6 * eye(d);
             
             if ~(any(isnan(B(:))))
                 p = - B \ grad; 

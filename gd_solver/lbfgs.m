@@ -23,6 +23,7 @@ function [w, infos] = lbfgs(problem, options)
 %
 % Created by H.Kasai on Feb. 15, 2016
 % Modified by H.Kasai on Mar. 25, 2018
+% Modified by H.Kasai on May 11, 2023
 
 
     % set dimensions and samples
@@ -147,15 +148,15 @@ function [w, infos] = lbfgs(problem, options)
     % main loop
     while (optgap > tol_optgap) && (gnorm > tol_gnorm) && (iter < max_iter) && ~stopping     
         
-        % Revert to steepest descent if is not direction of descent                
-        if (p'*grad > 0)
-            p = -p;
-        end 
-        
         if iter > 0              
             % perform LBFGS two loop recursion
             p = lbfgs_two_loop_recursion(grad, s_array, y_array);
-        end        
+        end 
+
+        % Revert to steepest descent if not descent direction                
+        if (p'*grad > 0)
+            p = -grad;
+        end         
         
         % line search
         if strcmp(step_alg, 'backtracking')
