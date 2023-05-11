@@ -40,6 +40,7 @@ classdef general
         inedim;     % dimension of inequality constraints
         samples;
         hessain_w_independent;
+        prox_flag;
     end
     
     methods
@@ -62,6 +63,7 @@ classdef general
             obj.dim = obj.d;
             obj.samples = 0; 
             obj.hessain_w_independent = false;
+            obj.prox_flag = false;
             
 
             if ~isempty(obj.econst) && ~isempty(obj.g_econst)

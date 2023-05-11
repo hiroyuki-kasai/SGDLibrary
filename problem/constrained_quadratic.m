@@ -25,6 +25,7 @@ classdef constrained_quadratic
 % This file is part of GDLibrary.
 %
 % Created by H.Kasai on Oct. 22, 2020
+% Modified by H.Kasai on Dec. 13, 2022
 
     properties
         d;
@@ -38,6 +39,8 @@ classdef constrained_quadratic
         b;
         G;
         h;
+        
+        prox_flag;
 
     end
     
@@ -54,7 +57,9 @@ classdef constrained_quadratic
             obj.A = A;     
             obj.b = b; 
             obj.G = G;     
-            obj.h = h;             
+            obj.h = h;  
+            
+            obj.prox_flag = true;
         end
         
 
